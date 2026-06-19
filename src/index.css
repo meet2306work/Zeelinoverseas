@@ -1,0 +1,227 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* Premium Brand Theme Colors (from BoxPrototype) */
+  --color-primary: #0F1729; /* Navy primary */
+  --color-primary-light: #1E293B;
+  --color-primary-medium: #334155;
+  --color-primary-blue: #2563EB;
+  --color-primary-slate: #64748B;
+  --color-primary-soft: #F1F5F9;
+  --color-primary-border: #E2E8F0;
+
+  --color-accent: #06B6D4; /* Cyan accent */
+  --color-accent-amber: #0EA5E9;
+  --color-accent-darkest: #083344;
+  --color-accent-dark: #0e7490;
+  --color-accent-light: #22d3ee;
+  --color-accent-soft: #ecfeff;
+  --color-accent-lightest: #f0fdfa;
+
+  /* We override secondary to be Blue */
+  --color-secondary: #2563EB;
+
+  /* Success Palette */
+  --color-brand-success: #10B981;
+  --color-brand-success-dark: #064E3B;
+  --color-brand-success-light: #D1FAE5;
+
+  /* Danger Palette */
+  --color-brand-danger: #EF4444;
+  --color-brand-danger-light: #FEE2E2;
+
+  /* Info Palette */
+  --color-brand-info: #3B82F6;
+  --color-brand-info-light: #DBEAFE;
+
+  --color-brand-bg: #F8FAFC;
+  --color-brand-card: #FFFFFF;
+  --color-brand-text-primary: #111827;
+  --color-brand-text-secondary: #4B5563;
+  --color-brand-border: #E5E7EB;
+
+  /* Global Color redirects to standard Tailwind slate/teal colors */
+  --color-teal-50: #f0fdfa;
+  --color-teal-100: #ccfbf1;
+  --color-teal-200: #99f6e4;
+  --color-teal-300: #5eead4;
+  --color-teal-400: #2dd4bf;
+  --color-teal-500: #14b8a6;
+  --color-teal-600: #0d9488;
+  --color-teal-700: #0f766e;
+  --color-teal-800: #115e59;
+  --color-teal-900: #134e4a;
+  --color-teal-950: #042f2e;
+
+  --color-slate-50: #f8fafc;
+  --color-slate-100: #f1f5f9;
+  --color-slate-200: #e2e8f0;
+  --color-slate-300: #cbd5e1;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-600: #475569;
+  --color-slate-700: #334155;
+  --color-slate-800: #1e293b;
+  --color-slate-900: #0f172a;
+  --color-slate-950: #020617;
+
+  /* Typography Override */
+  --font-sans: 'DM Sans', system-ui, -apple-system, sans-serif;
+  --font-display: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Spacing Tokens */
+  --spacing-brand-xs: 0.25rem;
+  --spacing-brand-sm: 0.5rem;
+  --spacing-brand-md: 1rem;
+  --spacing-brand-lg: 1.5rem;
+  --spacing-brand-xl: 2rem;
+  --spacing-brand-2xl: 3rem;
+  --spacing-brand-3xl: 4rem;
+
+  /* Border Radius Scale (from BoxPrototype) */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  
+  /* Shadow & Blur Enhancements */
+  --shadow-glass: 0 8px 32px 0 rgba(15, 23, 42, 0.08);
+  --shadow-premium: 0 10px 40px -10px rgba(15, 23, 42, 0.05);
+
+  /* Dynamic Custom Animations */
+  --animate-fade-in-up: fade-in-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Base Styles & Utility Classes */
+@layer base {
+  body {
+    @apply antialiased bg-brand-bg text-brand-text-primary dark:bg-slate-950 dark:text-slate-50 transition-colors duration-300;
+    font-family: var(--font-sans);
+  }
+}
+
+/* Glassmorphism utility helpers */
+.glass-panel {
+  @apply backdrop-blur-md bg-white/75 border border-brand-border/40 shadow-glass dark:bg-slate-900/70 dark:border-slate-800/20;
+}
+
+.glass-card {
+  @apply backdrop-blur-lg bg-white/50 border border-brand-border/50 dark:bg-slate-800/40 dark:border-slate-700/30 shadow-premium hover:shadow-xl transition-all duration-300;
+}
+
+.text-gradient {
+  @apply bg-gradient-to-r from-blue-500 via-cyan-400 to-teal-400 text-transparent bg-clip-text;
+}
+
+.hero-gradient {
+  background-image: radial-gradient(ellipse at top, var(--color-slate-900) 0%, var(--color-slate-950) 70%, #000000 100%);
+}
+
+/* Custom Type Scale Classes matching BoxPrototype */
+.text-display-xl, .text-h1 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 40px;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.text-display-lg, .text-h2 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 32px;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+}
+
+.text-display-md, .text-h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 26px;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.text-heading-xl, .text-h4 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 1.35;
+}
+
+.text-heading-lg, .text-h5 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 1.4;
+}
+
+.text-heading-md {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.text-body-lg {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.625;
+}
+
+.text-body-md {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.text-body-sm {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.text-label-sm {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.text-data-lg {
+  font-family: var(--font-sans);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.text-code {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  background-color: #f1f5f9;
+  color: #334155;
+  padding: 3px 6px;
+  border-radius: 4px;
+}
+.dark .text-code {
+  background-color: #1e293b;
+  color: #cbd5e1;
+}
