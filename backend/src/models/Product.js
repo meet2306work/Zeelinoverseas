@@ -153,4 +153,20 @@ productSchema.virtual('reviews', {
   justOne: false
 });
 
+// Auto-generate slug from title if not provided
+productSchema.pre('validate', async function (next) {
+  if (!this.slug && this.title) {
+    const baseSlug = this.title
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .trim();
+    // Add a short unique suffix to prevent duplicate slugs
+    const suffix = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    this.slug = `${baseSlug}-${suffix}`;
+  }
+  next();
+});
+
 module.exports = mongoose.model('Product', productSchema);
