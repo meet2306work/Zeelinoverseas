@@ -1,4 +1,6 @@
 const nodemailer = require('nodemailer');
+const dns = require('dns').promises;
+const net = require('net');
 
 const getVerificationEmailHtml = (name, otp) => {
   return `<!DOCTYPE html>
@@ -130,17 +132,36 @@ const getVerificationEmailHtml = (name, otp) => {
 
 const sendEmail = async (options) => {
   try {
+    const originalHost = process.env.SMTP_HOST;
+    let resolvedHost = originalHost;
+
+    // Resolve host to IPv4 if it's a hostname to bypass Render's IPv6 networking bugs
+    if (originalHost && !net.isIP(originalHost)) {
+      try {
+        const lookup = await dns.lookup(originalHost, { family: 4 });
+        resolvedHost = lookup.address;
+        console.log(`DNS Lookup: Resolved ${originalHost} to IPv4 ${resolvedHost}`);
+      } catch (dnsError) {
+        console.warn(`DNS Lookup failed for ${originalHost}, falling back to original hostname:`, dnsError.message);
+      }
+    }
+
     // Create a transporter
     const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
+      host: resolvedHost,
       port: parseInt(process.env.SMTP_PORT) || 587,
       secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
-      family: 4, // Force IPv4 to prevent connection issues on Render
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
       },
+      tls: {
+        // Ensure servername is set to original hostname for valid TLS certificate validation
+        servername: originalHost,
+        rejectUnauthorized: true,
+      },
     });
+
 
     const emailHtml = options.html || (options.otp && options.name ? getVerificationEmailHtml(options.name, options.otp) : undefined);
 
