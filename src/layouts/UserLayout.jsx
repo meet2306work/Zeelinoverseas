@@ -65,7 +65,7 @@ export default function UserLayout() {
     breadcrumbItems.push({ label, link });
   });
 
-  const selectedCategory = categoriesList.find((cat) => cat.slug === searchParams.get('category'));
+  const selectedCategory = (categoriesList || []).find((cat) => cat.slug === searchParams.get('category'));
 
   if (selectedCategory && location.pathname === '/user/products') {
     breadcrumbItems.push({ label: selectedCategory.name });

@@ -26,7 +26,7 @@ export default function PublicLayout() {
     { label: 'Submit RFQ', path: '/rfq' },
     { label: 'About', path: '/about' },
   ];
-  const selectedCategory = categoriesList.find((cat) => cat.slug === searchParams.get('category'));
+  const selectedCategory = (categoriesList || []).find((cat) => cat.slug === searchParams.get('category'));
 
   // Derive breadcrumbs based on pathname
   const pathSegments = location.pathname.split('/').filter(Boolean);

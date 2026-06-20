@@ -108,7 +108,7 @@ export default function ProductsScreen() {
   ];
   const regionOptions = [
     { label: 'All Supplier Regions', value: '' },
-    ...Array.from(new Set((products || []).map((p) => p.region))).map((value) => ({ label: value, value })),
+    ...Array.from(new Set((products || []).map((p) => p.region).filter(Boolean))).map((value) => ({ label: value, value })),
   ];
   const stockOptions = [
     { label: 'All Stock Status', value: '' },

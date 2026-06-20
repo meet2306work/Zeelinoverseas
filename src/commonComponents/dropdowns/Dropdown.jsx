@@ -39,7 +39,7 @@ export default function Dropdown({
 
   // Filter options based on search term
   const filteredOptions = options.filter((opt) =>
-    opt.label.toLowerCase().includes(searchTerm.toLowerCase())
+    (opt?.label || '').toString().toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Close on outside clicks
@@ -188,7 +188,7 @@ export default function Dropdown({
                     const isFocused = focusedIndex === idx;
                     return (
                       <button
-                        key={opt.value}
+                        key={opt.value || idx}
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
