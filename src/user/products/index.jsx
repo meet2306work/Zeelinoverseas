@@ -28,7 +28,7 @@ export default function ProductsScreen() {
   const sortBy = searchParams.get('sort') || 'relevance';
   const { categoriesList } = useSelector((state) => state.categories);
   const { products, loading } = useSelector((state) => state.products);
-  const selectedCategory = categoriesList.find((cat) => cat.slug === category);
+  const selectedCategory = (categoriesList || []).find((cat) => cat.slug === category);
 
   useEffect(() => {
     dispatch(fetchCategories());
@@ -81,18 +81,18 @@ export default function ProductsScreen() {
 
   const categoryOptions = [
     { label: 'All Categories', value: '' },
-    ...categoriesList.map(c => ({ label: c.name, value: c.slug }))
+    ...(categoriesList || []).map(c => ({ label: c.name, value: c.slug }))
   ];
   const catalogSuggestions = [
-    ...products.flatMap((product) => [
-      product.name,
-      product.category,
+    ...(products || []).flatMap((product) => [
+      product.name || product.title,
+      product.category?.name || product.category,
       product.material,
       product.tradeTerm,
       product.region,
       product.stock === 'ready' ? 'Ready stock' : product.stock === 'custom' ? 'Custom order' : 'Limited stock',
     ]),
-    ...categoriesList.flatMap((cat) => [cat.name, cat.slug, cat.desc]),
+    ...(categoriesList || []).flatMap((cat) => [cat.name, cat.slug, cat.desc]),
   ].filter(Boolean);
   const ratingOptions = [
     { label: 'Any Rating', value: '' },
@@ -108,7 +108,7 @@ export default function ProductsScreen() {
   ];
   const regionOptions = [
     { label: 'All Supplier Regions', value: '' },
-    ...Array.from(new Set(products.map((p) => p.region))).map((value) => ({ label: value, value })),
+    ...Array.from(new Set((products || []).map((p) => p.region))).map((value) => ({ label: value, value })),
   ];
   const stockOptions = [
     { label: 'All Stock Status', value: '' },
@@ -126,7 +126,7 @@ export default function ProductsScreen() {
 
   const normalizedSearch = search.trim().toLowerCase();
   const matchingCategories = normalizedSearch
-    ? categoriesList.filter((cat) =>
+    ? (categoriesList || []).filter((cat) =>
         [cat.name, cat.slug, cat.desc]
           .filter(Boolean)
           .some((value) => value.toLowerCase().includes(normalizedSearch))
@@ -134,7 +134,7 @@ export default function ProductsScreen() {
     : [];
   const matchingCategorySlugs = matchingCategories.map((cat) => cat.slug);
 
-  const filteredProducts = products.filter(p => {
+  const filteredProducts = (products || []).filter(p => {
     const productCategory = p.category; // Assuming p.category is an object populated from backend, or we map it if it's an ID
     const matchesSearch = normalizedSearch
       ? [

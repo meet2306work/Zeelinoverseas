@@ -34,7 +34,7 @@ export default function CategoriesScreen() {
       <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {loading ? (
           <div className="col-span-full text-center py-10 text-slate-500">Loading categories...</div>
-        ) : categoriesList.map((cat) => {
+        ) : (categoriesList || []).map((cat) => {
           const Icon = FiBox; // Placeholder icon since icon names aren't in DB usually
           return (
             <Card 
