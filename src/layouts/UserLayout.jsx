@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react';
 import { Link, Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { FiHome, FiShoppingBag, FiHeart, FiSettings, FiUser, FiBell, FiLogOut, FiMenu, FiX, FiHelpCircle, FiBox, FiFileText, FiGrid, FiMessageSquare } from 'react-icons/fi';
-import { motion, AnimatePresence } from 'framer-motion';
 import Breadcrumb from '../commonComponents/breadcrumbs/Breadcrumb';
 import Dropdown from '../commonComponents/dropdowns/Dropdown';
 import PageContainer from '../commonComponents/layouts/PageContainer';
+import PageTransition from '../commonComponents/layouts/PageTransition';
 import { logout, selectIsAuthenticated, selectUserRole, selectCurrentUser } from '../redux/slices/authSlice';
 import ConfirmationDialog from '../commonComponents/modals/ConfirmationDialog';
 import WhatsAppFloatingButton from '../commonComponents/buttons/WhatsAppFloatingButton';
@@ -265,18 +265,9 @@ export default function UserLayout() {
               <Breadcrumb items={breadcrumbItems} className="mb-brand-md" homeLink="/user/home" />
             )}
             
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={location.pathname}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -12 }}
-                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                className="flex-1 flex flex-col"
-              >
-                <Outlet />
-              </motion.div>
-            </AnimatePresence>
+            <PageTransition routeKey={location.pathname}>
+              <Outlet />
+            </PageTransition>
           </PageContainer>
         </main>
       </div>

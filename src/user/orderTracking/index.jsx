@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { FiAnchor, FiCompass, FiTruck, FiBox, FiCheckCircle } from 'react-icons/fi';
+import { FiAnchor, FiBox, FiCheckCircle } from 'react-icons/fi';
 import { fetchMyOrders } from '../../redux/slices/orderSlice';
 import Card from '../../commonComponents/cards/Card';
+import { StaggerGroup, StaggerItem } from '../../commonComponents/animations/ScrollReveal';
 
 export default function OrderTrackingScreen() {
   const { id } = useParams();
@@ -104,7 +105,7 @@ export default function OrderTrackingScreen() {
   };
 
   return (
-    <div className="flex flex-col gap-8 py-4 animate-fade-in-up">
+    <div className="flex flex-col gap-8 py-4">
       {/* Return Link */}
       <div>
         <Link to="/user/orders" className="text-xs text-slate-500 hover:text-teal-600 font-bold uppercase tracking-wider">
@@ -124,43 +125,42 @@ export default function OrderTrackingScreen() {
       </div>
 
       {/* Cargo specifications */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5">
-        <Card variant="glass" hover={false} className="p-4 flex flex-col gap-1 border-slate-200/40 dark:border-slate-800/40">
+      <StaggerGroup className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5">
+        <StaggerItem><Card variant="glass" hover={false} className="p-4 flex flex-col gap-1 border-slate-200/40 dark:border-slate-800/40">
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Vessel Name</span>
           <span className="text-sm font-bold text-slate-800 dark:text-white inline-flex items-center gap-1.5 mt-0.5">
             <FiAnchor className="h-4.5 w-4.5 text-teal-500" /> {shipment.vesselName}
           </span>
-        </Card>
-        <Card variant="glass" hover={false} className="p-4 flex flex-col gap-1 border-slate-200/40 dark:border-slate-800/40">
+        </Card></StaggerItem>
+        <StaggerItem><Card variant="glass" hover={false} className="p-4 flex flex-col gap-1 border-slate-200/40 dark:border-slate-800/40">
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Container ID</span>
           <span className="text-sm font-bold text-slate-800 dark:text-white inline-flex items-center gap-1.5 mt-0.5">
             <FiBox className="h-4.5 w-4.5 text-teal-500" /> {shipment.containerId}
           </span>
-        </Card>
-        <Card variant="glass" hover={false} className="p-4 flex flex-col gap-1 border-slate-200/40 dark:border-slate-800/40">
+        </Card></StaggerItem>
+        <StaggerItem><Card variant="glass" hover={false} className="p-4 flex flex-col gap-1 border-slate-200/40 dark:border-slate-800/40">
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Departure Port</span>
           <span className="text-sm font-bold text-slate-800 dark:text-white truncate mt-0.5">
             {shipment.departure}
           </span>
-        </Card>
-        <Card variant="glass" hover={false} className="p-4 flex flex-col gap-1 border-slate-200/40 dark:border-slate-800/40">
+        </Card></StaggerItem>
+        <StaggerItem><Card variant="glass" hover={false} className="p-4 flex flex-col gap-1 border-slate-200/40 dark:border-slate-800/40">
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Expected Arrival (ETA)</span>
           <span className="text-sm font-bold text-teal-600 dark:text-teal-400 mt-0.5">
             {shipment.eta}
           </span>
-        </Card>
-      </div>
+        </Card></StaggerItem>
+      </StaggerGroup>
 
       {/* Stepper Timeline */}
       <Card variant="glass" hover={false} className="p-6 sm:p-8 border-slate-200/40 dark:border-slate-800/40">
-        <div className="relative border-l border-slate-200 dark:border-slate-800 pl-6 ml-3 flex flex-col gap-8">
-          
+        <StaggerGroup className="relative border-l border-slate-200 dark:border-slate-800 pl-6 ml-3 flex flex-col gap-8" stagger={0.08}>
           {shipment.milestones.map((m, idx) => {
             const isDone = m.done;
             const isActive = m.active;
             
             return (
-              <div key={idx} className="relative">
+              <StaggerItem key={idx} className="relative">
                 {/* Stepper Indicator dot */}
                 <div className={`absolute -left-[35px] top-1.5 h-[17px] w-[17px] rounded-full border-2 flex items-center justify-center bg-white dark:bg-slate-900 transition-colors
                   ${isActive
@@ -197,11 +197,10 @@ export default function OrderTrackingScreen() {
                     {m.date}
                   </span>
                 </div>
-              </div>
+              </StaggerItem>
             );
           })}
-
-        </div>
+        </StaggerGroup>
       </Card>
     </div>
   );

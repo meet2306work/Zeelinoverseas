@@ -1,15 +1,19 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { useDispatch, useSelector } from 'react-redux';
 import { FiHeart, FiTrash2, FiArrowRight, FiInfo, FiShoppingCart } from 'react-icons/fi';
 import { removeProductFromWishlist, fetchWishlist, selectWishlistItems } from '../../redux/slices/wishlistSlice';
 import { addToCart } from '../../redux/slices/cartSlice';
 import Card from '../../commonComponents/cards/Card';
 import Button from '../../commonComponents/buttons/Button';
+import { Reveal } from '../../commonComponents/animations/ScrollReveal';
+import { motionTransitions } from '../../config/motion';
 
 export default function WishlistScreen() {
   const dispatch = useDispatch();
   const wishlistItems = useSelector(selectWishlistItems);
+  const shouldReduceMotion = useReducedMotion();
 
   useEffect(() => {
     dispatch(fetchWishlist());
@@ -25,7 +29,7 @@ export default function WishlistScreen() {
   };
 
   return (
-    <div className="flex flex-col gap-8 py-4 animate-fade-in-up">
+    <div className="flex flex-col gap-8 py-4">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-brand-border/40 dark:border-slate-800/40 pb-5">
         <div>
@@ -44,7 +48,7 @@ export default function WishlistScreen() {
       </div>
 
       {wishlistItems.length === 0 ? (
-        <Card variant="glass" className="p-8">
+        <Reveal><Card variant="glass" className="p-8">
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <div className="h-12 w-12 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mb-4">
               <FiHeart className="h-6 w-6" />
@@ -61,11 +65,13 @@ export default function WishlistScreen() {
               </Button>
             </Link>
           </div>
-        </Card>
+        </Card></Reveal>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          <AnimatePresence initial={false}>
           {wishlistItems.map((item) => (
-            <Card key={item.id} variant="default" className="flex flex-col p-4 group">
+            <motion.div key={item.id} layout={!shouldReduceMotion} initial={{ opacity: 0, scale: shouldReduceMotion ? 1 : 0.97 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: shouldReduceMotion ? 1 : 0.94 }} transition={shouldReduceMotion ? { duration: 0 } : motionTransitions.interface}>
+            <Card variant="default" className="flex h-full flex-col p-4 group">
               {/* Product Thumbnail */}
               <div className="relative aspect-video rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-850 mb-4 border border-brand-border/20">
                 <img
@@ -124,8 +130,9 @@ export default function WishlistScreen() {
                   </div>
                 </div>
               </div>
-            </Card>
+            </Card></motion.div>
           ))}
+          </AnimatePresence>
         </div>
       )}
     </div>

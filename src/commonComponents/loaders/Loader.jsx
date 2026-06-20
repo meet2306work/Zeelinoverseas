@@ -1,5 +1,5 @@
-import React from 'react';
 import { ImSpinner2 } from 'react-icons/im';
+import Skeleton, { SkeletonCard } from './Skeleton';
 
 export default function Loader({
   type = 'spinner', // 'spinner' | 'page' | 'skeleton' | 'skeleton-card'
@@ -26,27 +26,11 @@ export default function Loader({
   }
 
   if (type === 'skeleton-card') {
-    return (
-      <div className={`animate-pulse rounded-2xl border border-slate-200 dark:border-slate-800 p-5 bg-white dark:bg-slate-900 flex flex-col gap-4 ${className}`}>
-        <div className="h-44 bg-slate-200 dark:bg-slate-800 rounded-lg w-full" />
-        <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-2/3" />
-        <div className="h-3 bg-slate-200 dark:bg-slate-800 rounded w-1/2" />
-        <div className="flex justify-between items-center mt-2">
-          <div className="h-6 bg-slate-200 dark:bg-slate-800 rounded w-1/4" />
-          <div className="h-8 bg-slate-200 dark:bg-slate-800 rounded-lg w-1/3" />
-        </div>
-      </div>
-    );
+    return <SkeletonCard className={className} />;
   }
 
   if (type === 'skeleton') {
-    return (
-      <div className={`animate-pulse flex flex-col gap-2 w-full ${className}`}>
-        <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-3/4" />
-        <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-1/2" />
-        <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-5/6" />
-      </div>
-    );
+    return <Skeleton lines={3} className={className} />;
   }
 
   return (

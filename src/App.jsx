@@ -1,10 +1,10 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { MotionConfig } from 'framer-motion';
 import { fetchCurrentUser } from './redux/slices/authSlice';
 import { fetchWishlist } from './redux/slices/wishlistSlice';
 import AppRoutes from './routes/AppRoutes';
+import ToastProvider from './commonComponents/toasts/ToastProvider';
 
 export default function App() {
   const dispatch = useDispatch();
@@ -18,9 +18,9 @@ export default function App() {
   }, [dispatch]);
 
   return (
-    <>
+    <MotionConfig reducedMotion="user">
       <AppRoutes />
-      <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} theme="dark" />
-    </>
+      <ToastProvider />
+    </MotionConfig>
   );
 }

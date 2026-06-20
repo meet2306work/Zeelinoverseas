@@ -1,14 +1,17 @@
-import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { FiTrash2, FiShoppingCart, FiMinus, FiPlus, FiArrowRight, FiInfo } from 'react-icons/fi';
 import { addToCart, removeFromCart, clearCart } from '../../redux/slices/cartSlice';
 import Card from '../../commonComponents/cards/Card';
 import Button from '../../commonComponents/buttons/Button';
+import { Reveal } from '../../commonComponents/animations/ScrollReveal';
+import { motionTransitions } from '../../config/motion';
 
 export default function CartScreen() {
   const dispatch = useDispatch();
   const { items, totalPrice, totalQuantity } = useSelector((state) => state.cart);
+  const shouldReduceMotion = useReducedMotion();
 
   const handleIncrement = (item) => {
     dispatch(addToCart({ id: item.id, name: item.name, price: item.price, qty: 1 }));
@@ -36,7 +39,7 @@ export default function CartScreen() {
   const grandTotal = totalPrice + shippingCost + taxCost;
 
   return (
-    <div className="flex flex-col gap-8 py-4 animate-fade-in-up">
+    <div className="flex flex-col gap-8 py-4">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-brand-border/40 dark:border-slate-800/40 pb-5">
         <div>
@@ -59,7 +62,7 @@ export default function CartScreen() {
       </div>
 
       {items.length === 0 ? (
-        <Card variant="glass" className="p-8">
+        <Reveal><Card variant="glass" className="p-8">
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <div className="h-12 w-12 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mb-4">
               <FiShoppingCart className="h-6 w-6" />
@@ -76,14 +79,22 @@ export default function CartScreen() {
               </Button>
             </Link>
           </div>
-        </Card>
+        </Card></Reveal>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
           {/* Left Side: Items list */}
           <div className="lg:col-span-8 flex flex-col gap-4">
+            <AnimatePresence initial={false}>
             {items.map((item) => (
-              <Card key={item.id} variant="default" className="p-4 flex gap-4 items-center">
+              <motion.div
+                key={item.id}
+                layout={!shouldReduceMotion}
+                initial={{ opacity: 0, x: shouldReduceMotion ? 0 : -16 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: shouldReduceMotion ? 0 : 24, scale: shouldReduceMotion ? 1 : 0.98 }}
+                transition={shouldReduceMotion ? { duration: 0 } : motionTransitions.interface}
+              ><Card variant="default" className="p-4 flex gap-4 items-center">
                 {/* Product image or fallback */}
                 {item.image ? (
                   <img
@@ -120,9 +131,11 @@ export default function CartScreen() {
                   >
                     <FiMinus className="h-3.5 w-3.5" />
                   </button>
-                  <span className="px-3 text-xs font-bold text-slate-800 dark:text-white font-mono min-w-8 text-center">
-                    {item.qty}
-                  </span>
+                  <AnimatePresence mode="wait" initial={false}>
+                    <motion.span key={item.qty} initial={{ opacity: 0, y: shouldReduceMotion ? 0 : -5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: shouldReduceMotion ? 0 : 5 }} className="px-3 text-xs font-bold text-slate-800 dark:text-white font-mono min-w-8 text-center">
+                      {item.qty}
+                    </motion.span>
+                  </AnimatePresence>
                   <button
                     onClick={() => handleIncrement(item)}
                     className="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
@@ -143,8 +156,9 @@ export default function CartScreen() {
                     Remove
                   </button>
                 </div>
-              </Card>
+              </Card></motion.div>
             ))}
+            </AnimatePresence>
           </div>
 
           {/* Right Side: Order summary breakdown */}
@@ -176,7 +190,9 @@ export default function CartScreen() {
 
                 <div className="flex justify-between text-sm font-extrabold text-slate-900 dark:text-white">
                   <span>Estimated Total</span>
-                  <span className="text-secondary dark:text-accent font-display text-lg">${grandTotal.toLocaleString()}</span>
+                  <AnimatePresence mode="wait" initial={false}>
+                    <motion.span key={grandTotal} initial={{ opacity: 0, y: shouldReduceMotion ? 0 : -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: shouldReduceMotion ? 0 : 6 }} className="text-secondary dark:text-accent font-display text-lg">${grandTotal.toLocaleString()}</motion.span>
+                  </AnimatePresence>
                 </div>
               </div>
 

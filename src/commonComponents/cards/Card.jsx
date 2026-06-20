@@ -1,4 +1,5 @@
-import React from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
+import { motionTransitions } from '../../config/motion';
 
 export default function Card({
   children,
@@ -7,7 +8,9 @@ export default function Card({
   className = '',
   onClick,
 }) {
-  const baseClasses = 'rounded-2xl p-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 transition-all duration-300';
+  const shouldReduceMotion = useReducedMotion();
+  const isInteractive = Boolean(onClick);
+  const baseClasses = 'rounded-2xl p-5 bg-brand-surface dark:bg-slate-900 border border-slate-200 dark:border-slate-800 transition-[border-color,box-shadow,background-color] duration-brand-base';
   
   const variants = {
     default: 'shadow-premium',
@@ -17,15 +20,18 @@ export default function Card({
   };
 
   const hoverClasses = hover && variant !== 'borderless'
-    ? 'hover:-translate-y-1 hover:shadow-xl dark:hover:shadow-black/40 cursor-pointer'
+    ? `hover:shadow-card-hover dark:hover:shadow-black/40 ${isInteractive ? 'cursor-pointer' : ''}`
     : '';
 
   return (
-    <div
+    <motion.div
       onClick={onClick}
+      whileHover={hover && variant !== 'borderless' && !shouldReduceMotion ? { y: -4 } : undefined}
+      whileTap={isInteractive && !shouldReduceMotion ? { scale: 0.995 } : undefined}
+      transition={motionTransitions.interface}
       className={`${baseClasses} ${variants[variant]} ${hoverClasses} ${className}`}
     >
       {children}
-    </div>
+    </motion.div>
   );
 }

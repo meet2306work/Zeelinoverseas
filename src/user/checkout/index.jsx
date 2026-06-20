@@ -1,14 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useNavigate, Link } from 'react-router-dom';
+import { motion, useReducedMotion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { FiMapPin, FiCreditCard, FiCheckCircle, FiShield, FiFileText } from 'react-icons/fi';
 import { createOrder } from '../../redux/slices/orderSlice';
 import { clearCart } from '../../redux/slices/cartSlice';
 import Card from '../../commonComponents/cards/Card';
 import Input from '../../commonComponents/inputs/Input';
 import Button from '../../commonComponents/buttons/Button';
+import { Reveal } from '../../commonComponents/animations/ScrollReveal';
+import { motionSprings } from '../../config/motion';
 
 export default function CheckoutScreen() {
+  const shouldReduceMotion = useReducedMotion();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { items, totalPrice } = useSelector((state) => state.cart);
@@ -20,7 +24,8 @@ export default function CheckoutScreen() {
   const [country, setCountry] = useState('');
   const [postal, setPostal] = useState('');
 
-  // Auto-fill address from profile if available
+  /* Profile data arrives asynchronously and intentionally hydrates untouched checkout fields. */
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (user) {
       const defaultAddr = user.addresses?.find(a => a.isDefault) || user.addresses?.[0];
@@ -37,6 +42,7 @@ export default function CheckoutScreen() {
       }
     }
   }, [user]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   // Payment Selection State
   const [paymentMethod, setPaymentMethod] = useState('card'); // 'card' | 'paypal' | 'wire' | 'lc'
@@ -88,7 +94,7 @@ export default function CheckoutScreen() {
   };
 
   return (
-    <div className="flex flex-col gap-8 py-4 animate-fade-in-up">
+    <div className="flex flex-col gap-8 py-4">
       {/* Header */}
       <div className="border-b border-brand-border/40 dark:border-slate-800/40 pb-5">
         <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-1">
@@ -99,12 +105,21 @@ export default function CheckoutScreen() {
         </p>
       </div>
 
+      <ol className="grid grid-cols-3 overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900" aria-label="Checkout progress">
+        {['Shipping details', 'Payment method', 'Review order'].map((label, index) => (
+          <li key={label} className={`flex items-center justify-center gap-2 px-2 py-3 text-center text-[10px] font-bold uppercase tracking-wider sm:text-xs ${index === 2 ? 'text-brand-accent-hover dark:text-amber-300' : 'text-secondary dark:text-cyan-300'}`}>
+            <span className={`flex h-6 w-6 items-center justify-center rounded-full text-[10px] text-white ${index === 2 ? 'bg-brand-accent' : 'bg-secondary'}`}>{index + 1}</span>
+            <span className="hidden sm:inline">{label}</span>
+          </li>
+        ))}
+      </ol>
+
       <form onSubmit={handlePlaceOrder} className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
         {/* Left Columns: Forms */}
         <div className="lg:col-span-8 flex flex-col gap-6">
           {/* Shipping Details */}
-          <Card variant="default" className="p-6 border-slate-200 dark:border-slate-800 flex flex-col gap-4">
+          <Reveal><Card variant="default" className="p-6 border-slate-200 dark:border-slate-800 flex flex-col gap-4">
             <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-850">
               <FiMapPin className="h-4.5 w-4.5 text-secondary dark:text-accent" /> Shipping Destination Address
             </h3>
@@ -137,18 +152,21 @@ export default function CheckoutScreen() {
                 required
               />
             </div>
-          </Card>
+          </Card></Reveal>
 
           {/* Payment Methods */}
-          <Card variant="default" className="p-6 border-slate-200 dark:border-slate-800 flex flex-col gap-4">
+          <Reveal delay={0.06}><Card variant="default" className="p-6 border-slate-200 dark:border-slate-800 flex flex-col gap-4">
             <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-850">
               <FiCreditCard className="h-4.5 w-4.5 text-secondary dark:text-accent" /> Payment Option Integration
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Card option */}
-              <div
+              <motion.button
+                type="button"
                 onClick={() => setPaymentMethod('card')}
+                whileTap={!shouldReduceMotion ? { scale: 0.985 } : undefined}
+                transition={motionSprings.responsive}
                 className={`p-4 rounded-xl border-2 cursor-pointer transition-all flex flex-col gap-2
                   ${paymentMethod === 'card'
                     ? 'border-secondary bg-blue-50/20 dark:border-accent dark:bg-cyan-950/10'
@@ -161,11 +179,14 @@ export default function CheckoutScreen() {
                   <FiCreditCard className="h-4.5 w-4.5 text-slate-400" />
                 </div>
                 <p className="text-[11px] text-slate-500">Stripe and Razorpay gateway gateways supported.</p>
-              </div>
+              </motion.button>
 
               {/* LC Option */}
-              <div
+              <motion.button
+                type="button"
                 onClick={() => setPaymentMethod('lc')}
+                whileTap={!shouldReduceMotion ? { scale: 0.985 } : undefined}
+                transition={motionSprings.responsive}
                 className={`p-4 rounded-xl border-2 cursor-pointer transition-all flex flex-col gap-2
                   ${paymentMethod === 'lc'
                     ? 'border-secondary bg-blue-50/20 dark:border-accent dark:bg-cyan-950/10'
@@ -178,9 +199,9 @@ export default function CheckoutScreen() {
                   <FiFileText className="h-4.5 w-4.5 text-slate-400" />
                 </div>
                 <p className="text-[11px] text-slate-500">Standard inter-bank documentation verification required.</p>
-              </div>
+              </motion.button>
             </div>
-          </Card>
+          </Card></Reveal>
         </div>
 
         {/* Right Column: Review */}

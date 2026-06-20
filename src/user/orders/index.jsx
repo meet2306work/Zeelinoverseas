@@ -1,15 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
-import { FiCheckCircle, FiPackage, FiTruck, FiClock, FiAlertTriangle, FiX, FiCompass, FiShield, FiArrowRight } from 'react-icons/fi';
+import { FiCheckCircle, FiTruck } from 'react-icons/fi';
 import { fetchMyOrders } from '../../redux/slices/orderSlice';
 import { fetchMyRfqs } from '../../redux/slices/rfqSlice';
 import Card from '../../commonComponents/cards/Card';
 import Table from '../../commonComponents/tables/Table';
 import Button from '../../commonComponents/buttons/Button';
 import Tabs from '../../commonComponents/layouts/Tabs';
+import { motionTransitions } from '../../config/motion';
 
 export default function OrdersScreen() {
+  const shouldReduceMotion = useReducedMotion();
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
@@ -239,7 +242,7 @@ export default function OrdersScreen() {
 
   // STANDARD HISTORY LIST RENDER
   return (
-    <div className="flex flex-col gap-8 py-4 animate-fade-in-up">
+    <div className="flex flex-col gap-8 py-4">
       <div className="border-b border-brand-border/40 dark:border-slate-800/40 pb-5">
         <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-1">
           Transactions & Quotes
@@ -252,25 +255,27 @@ export default function OrdersScreen() {
       <div className="flex flex-col gap-5">
         <Tabs tabs={tabOptions} activeTab={activeTab} onTabChange={setActiveTab} />
 
+        <AnimatePresence mode="wait" initial={false}>
         {activeTab === 'orders' ? (
-          <div className="flex flex-col gap-4">
+          <motion.div key="orders" initial={{ opacity: 0, x: shouldReduceMotion ? 0 : -12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: shouldReduceMotion ? 0 : 12 }} transition={shouldReduceMotion ? { duration: 0 } : motionTransitions.interface} className="flex flex-col gap-4">
             <Table
               columns={orderColumns}
               data={activeOrders}
               emptyMessage="You have not placed any e-commerce orders yet."
               className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900"
             />
-          </div>
+          </motion.div>
         ) : (
-          <div className="flex flex-col gap-4">
+          <motion.div key="rfqs" initial={{ opacity: 0, x: shouldReduceMotion ? 0 : 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: shouldReduceMotion ? 0 : -12 }} transition={shouldReduceMotion ? { duration: 0 } : motionTransitions.interface} className="flex flex-col gap-4">
             <Table
               columns={rfqColumns}
               data={rfqsList}
               emptyMessage="You have no pending B2B RFQs."
               className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900"
             />
-          </div>
+          </motion.div>
         )}
+        </AnimatePresence>
       </div>
     </div>
   );

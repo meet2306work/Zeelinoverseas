@@ -1,8 +1,10 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { FiCpu, FiBox, FiFeather, FiArrowRight, FiGrid } from 'react-icons/fi';
+import { FiBox, FiArrowRight, FiGrid } from 'react-icons/fi';
 import Card from '../../commonComponents/cards/Card';
+import { SkeletonCard } from '../../commonComponents/loaders/Skeleton';
+import { Reveal, StaggerGroup, StaggerItem } from '../../commonComponents/animations/ScrollReveal';
 import { fetchCategories } from '../../redux/slices/categorySlice';
 
 export default function CategoriesScreen() {
@@ -16,7 +18,7 @@ export default function CategoriesScreen() {
   }, [dispatch]);
 
   return (
-    <div className="flex flex-col gap-12 py-4 animate-fade-in-up">
+    <div className="flex flex-col gap-12 py-4">
       {/* Header block */}
       <section className="text-center md:text-left border-b border-brand-border/40 dark:border-slate-800/40 pb-6">
         <span className="text-label-sm text-secondary dark:text-accent tracking-widest font-bold">
@@ -31,14 +33,13 @@ export default function CategoriesScreen() {
       </section>
 
       {/* Categories Grid */}
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <StaggerGroup className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {loading ? (
-          <div className="col-span-full text-center py-10 text-slate-500">Loading categories...</div>
+          Array.from({ length: 6 }, (_, index) => <SkeletonCard key={index} />)
         ) : (categoriesList || []).map((cat) => {
           const Icon = FiBox; // Placeholder icon since icon names aren't in DB usually
           return (
-            <Card 
-              key={cat._id || cat.id} 
+            <StaggerItem key={cat._id || cat.id} className="h-full"><Card
               variant="glass" 
               className="p-8 flex flex-col justify-between hover:-translate-y-1.5 transition-all duration-300 border-slate-200/40 dark:border-slate-800/40 group relative overflow-hidden"
             >
@@ -72,13 +73,13 @@ export default function CategoriesScreen() {
                   <FiArrowRight className="h-4 w-4" />
                 </Link>
               </div>
-            </Card>
+            </Card></StaggerItem>
           );
         })}
-      </section>
+      </StaggerGroup>
 
       {/* Catalog Overview Banner */}
-      <section className="bg-slate-900 dark:bg-slate-900/60 rounded-3xl p-8 border border-slate-800 relative overflow-hidden">
+      <Reveal className="bg-slate-900 dark:bg-slate-900/60 rounded-3xl p-8 border border-slate-800 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-secondary/15 rounded-full blur-3xl pointer-events-none translate-x-1/3 -translate-y-1/3" />
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-accent/15 rounded-full blur-3xl pointer-events-none -translate-x-1/3 translate-y-1/3" />
         
@@ -101,7 +102,7 @@ export default function CategoriesScreen() {
             <span>View All Products</span>
           </Link>
         </div>
-      </section>
+      </Reveal>
     </div>
   );
 }

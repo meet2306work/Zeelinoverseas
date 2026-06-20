@@ -5,6 +5,7 @@ import { FiMail, FiLock, FiArrowRight } from 'react-icons/fi';
 import Input from '../../commonComponents/inputs/Input';
 import Button from '../../commonComponents/buttons/Button';
 import Card from '../../commonComponents/cards/Card';
+import { Reveal } from '../../commonComponents/animations/ScrollReveal';
 import { loginUser } from '../../redux/slices/authSlice';
 
 export default function AuthLoginScreen() {
@@ -41,7 +42,7 @@ export default function AuthLoginScreen() {
         </Link>
       </div>
 
-      <div className="w-full max-w-md animate-fade-in-up">
+      <Reveal className="w-full max-w-md" amount={0.1}>
         <Card variant="glass" hover={false} className="p-8 sm:p-10 border-slate-800/80">
           <div className="text-center mb-8">
             <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
@@ -113,9 +114,7 @@ export default function AuthLoginScreen() {
             </p>
           </div>
         </Card>
-      </div>
+      </Reveal>
     </div>
   );
 }
-// Add wrapper to support animations if framer-motion is used, but we imported React. 
-// Wait, we didn't import motion from 'framer-motion'. Let's replace the `motion-div` tag with a normal div with the animate-fade-in-up class, which is safe and uses Tailwind v4 animations.

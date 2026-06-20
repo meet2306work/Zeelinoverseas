@@ -3,19 +3,21 @@ import { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchCategories } from '../../redux/slices/categorySlice';
 import { fetchProducts } from '../../redux/slices/productSlice';
-import { FiArrowRight, FiTrendingUp, FiAnchor, FiBriefcase, FiShield, FiBox, FiSearch, FiTruck, FiGlobe, FiCheckCircle, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { FiArrowRight, FiTrendingUp, FiAnchor, FiBriefcase, FiShield, FiSearch, FiTruck, FiGlobe, FiCheckCircle, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import Button from '../../commonComponents/buttons/Button';
 import Card from '../../commonComponents/cards/Card';
+import AnimatedNumber from '../../commonComponents/animations/AnimatedNumber';
+import { Reveal, StaggerGroup, StaggerItem } from '../../commonComponents/animations/ScrollReveal';
+import useHeroAnimation from '../../hooks/useHeroAnimation';
 
 export default function HomeScreen() {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isPortal = location.pathname.startsWith('/user');
-  const { categoriesList, loading: categoriesLoading } = useSelector((state) => state.categories);
-  const { products, loading: productsLoading } = useSelector((state) => state.products);
+  const { categoriesList } = useSelector((state) => state.categories);
+  const { products } = useSelector((state) => state.products);
   const { slideshowEnabled, slideshowInterval, slideshowImages } = useSelector((state) => state.settings);
-  const { wishlistItems } = useSelector((state) => state.wishlist);
   const orders = useSelector((state) => state.orders?.ordersList || []);
   const [catalogSearch, setCatalogSearch] = useState('');
 
@@ -23,13 +25,15 @@ export default function HomeScreen() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const slideTimerRef = useRef(null);
+  const heroRef = useRef(null);
+  useHeroAnimation(heroRef);
 
   const totalOrders = orders.length;
 
   const stats = [
-    { label: 'Custom Boxes Manufactured', value: '12M+', icon: FiTrendingUp },
-    { label: 'Active Enterprise Clients', value: '2,500+', icon: FiAnchor },
-    { label: 'Sourcing Regions Supported', value: '54+', icon: FiBriefcase },
+    { label: 'Custom Boxes Manufactured', value: 12, suffix: 'M+', icon: FiTrendingUp },
+    { label: 'Active Enterprise Clients', value: 2500, suffix: '+', icon: FiAnchor },
+    { label: 'Sourcing Regions Supported', value: 54, suffix: '+', icon: FiBriefcase },
   ];
 
   const topProducts = (products || []).slice(0, 3);
@@ -77,16 +81,16 @@ export default function HomeScreen() {
   const currentImage = slideshowImages[currentSlide];
 
   return (
-    <div className="flex flex-col gap-16 py-4 animate-fade-in-up">
+    <div className="flex flex-col gap-16 py-4">
       {/* Hero Section */}
-      <section className="relative overflow-hidden rounded-3xl border border-slate-200/70 bg-white shadow-xl shadow-slate-200/70 dark:border-slate-800 dark:bg-slate-950 dark:shadow-black/20">
+      <section ref={heroRef} className="relative overflow-hidden rounded-3xl border border-slate-200/70 bg-white shadow-xl shadow-slate-200/70 dark:border-slate-800 dark:bg-slate-950 dark:shadow-black/20">
         <div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[1.05fr_0.95fr] lg:p-10">
           <div className="flex flex-col justify-center gap-6 text-center lg:text-left">
-            <span className="mx-auto inline-flex w-fit items-center gap-1.5 rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1 text-xs font-bold uppercase tracking-wider text-cyan-700 dark:border-cyan-500/20 dark:bg-cyan-500/10 dark:text-cyan-300 lg:mx-0">
+            <span data-hero-item className="mx-auto inline-flex w-fit items-center gap-1.5 rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1 text-xs font-bold uppercase tracking-wider text-cyan-700 dark:border-cyan-500/20 dark:bg-cyan-500/10 dark:text-cyan-300 lg:mx-0">
               <FiShield className="h-3.5 w-3.5" /> Verified B2B Import Export Marketplace
             </span>
 
-            <div>
+            <div data-hero-item>
               <h1 className="text-3xl font-extrabold leading-tight tracking-tight text-slate-950 dark:text-white sm:text-4xl lg:text-5xl font-display">
                 Source packaging products from global suppliers
               </h1>
@@ -96,7 +100,7 @@ export default function HomeScreen() {
             </div>
 
             {/* Search + Browse Catalog */}
-            <form onSubmit={handleCatalogSearch} className="rounded-2xl border border-slate-200 bg-slate-50 p-2 shadow-sm dark:border-slate-800 dark:bg-slate-900/70">
+            <form data-hero-item onSubmit={handleCatalogSearch} className="rounded-2xl border border-slate-200 bg-slate-50 p-2 shadow-sm dark:border-slate-800 dark:bg-slate-900/70">
               <div className="flex flex-col gap-2 sm:flex-row">
                 <label className="flex min-h-11 flex-1 items-center gap-3 rounded-xl bg-white px-4 text-sm text-slate-500 dark:bg-slate-950 dark:text-slate-400">
                   <FiSearch className="h-4.5 w-4.5 shrink-0 text-slate-400" />
@@ -121,7 +125,7 @@ export default function HomeScreen() {
               </div>
             </form>
 
-            <div className="grid grid-cols-3 gap-3">
+            <div data-hero-item className="grid grid-cols-3 gap-3">
               {[
                 { label: 'Product SKUs', value: '8,400+' },
                 { label: 'Total Orders', value: totalOrders > 0 ? `${totalOrders}` : '1,200+' },
@@ -134,7 +138,7 @@ export default function HomeScreen() {
               ))}
             </div>
 
-            <div className="flex flex-wrap justify-center gap-3 lg:justify-start">
+            <div data-hero-item className="flex flex-wrap justify-center gap-3 lg:justify-start">
               <Link to={isPortal ? "/user/rfq" : "/rfq"}>
                 <Button variant="brandGradient" size="md">
                   Request Bulk Quote
@@ -149,7 +153,7 @@ export default function HomeScreen() {
           </div>
 
           {/* Live Sourcing Board with Slideshow */}
-          <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/60">
+          <div data-hero-board className="rounded-3xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900/60">
             <div className="mb-4 flex items-center justify-between gap-3">
               <div>
                 <h2 className="text-sm font-extrabold text-slate-950 dark:text-white">Live Sourcing Board</h2>
@@ -270,7 +274,7 @@ export default function HomeScreen() {
       </section>
 
       {/* Categories Grid */}
-      <section className="flex flex-col gap-8">
+      <Reveal className="flex flex-col gap-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
           <div className="text-center md:text-left">
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-955 dark:text-white tracking-tight mb-2 font-display">
@@ -287,49 +291,33 @@ export default function HomeScreen() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <StaggerGroup className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {(categoriesList || []).map((cat) => {
             return (
-              <Link
-                key={cat.slug}
-                to={`${isPortal ? '/user/products' : '/products'}?category=${cat.slug}`}
-                className="group"
-              >
-                <Card
-                  variant="glass"
-                  className="flex flex-col p-0 border-slate-200/40 dark:border-slate-800/40 hover:-translate-y-1.5 transition-all duration-300 h-full hover:border-secondary/30 overflow-hidden"
+              <StaggerItem key={cat.slug} className="h-full">
+                <Link
+                  to={`${isPortal ? '/user/products' : '/products'}?category=${cat.slug}`}
+                  className="group block h-full"
                 >
-                  <div className="relative aspect-video w-full overflow-hidden bg-slate-100 dark:bg-slate-800 border-b border-brand-border/20">
-                    <img
-                      src={cat.image}
-                      alt={cat.name}
-                      onError={(e) => {
-                        e.currentTarget.onerror = null;
-                        e.currentTarget.src = fallbackImage;
-                      }}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                  <div className="p-brand-md text-center flex flex-col items-center flex-1 justify-center">
-                    <h3 className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-secondary transition-colors font-display">
-                      {cat.name}
-                    </h3>
-                    {cat.desc && (
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
-                        {cat.desc}
-                      </p>
-                    )}
-                  </div>
-                </Card>
-              </Link>
+                  <Card variant="glass" className="flex h-full flex-col overflow-hidden border-slate-200/40 p-0 hover:border-secondary/30 dark:border-slate-800/40">
+                    <div className="relative aspect-video w-full overflow-hidden bg-slate-100 dark:bg-slate-800 border-b border-brand-border/20">
+                      <img src={cat.image} alt={cat.name} onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = fallbackImage; }} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                    </div>
+                    <div className="p-brand-md text-center flex flex-col items-center flex-1 justify-center">
+                      <h3 className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-secondary transition-colors font-display">{cat.name}</h3>
+                      {cat.desc && <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">{cat.desc}</p>}
+                    </div>
+                  </Card>
+                </Link>
+              </StaggerItem>
             );
           })}
-        </div>
+        </StaggerGroup>
 
-      </section>
+      </Reveal>
 
       {/* Top Selling Products */}
-      <section className="flex flex-col gap-8">
+      <Reveal className="flex flex-col gap-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
           <div className="text-center md:text-left">
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-955 dark:text-white tracking-tight mb-2 font-display">
@@ -346,9 +334,9 @@ export default function HomeScreen() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <StaggerGroup className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {topProducts.map((p) => (
-            <Card key={p.id} variant="default" className="flex flex-col justify-between h-full p-brand-md group">
+            <StaggerItem key={p.id} className="h-full"><Card variant="default" className="flex flex-col justify-between h-full p-brand-md group">
               <div>
                 <div className="relative aspect-video rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 mb-brand-md border border-brand-border/20">
                   <img
@@ -384,36 +372,36 @@ export default function HomeScreen() {
                   </Button>
                 </Link>
               </div>
-            </Card>
+            </Card></StaggerItem>
           ))}
-        </div>
+        </StaggerGroup>
 
-      </section>
+      </Reveal>
 
       {/* Stats Counter Grid */}
-      <section className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+      <StaggerGroup className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         {stats.map((stat, idx) => {
           const StatIcon = stat.icon;
           return (
-            <Card key={idx} variant="glass" className="flex items-center gap-5 p-6 border-slate-200/40 dark:border-slate-800/40">
+            <StaggerItem key={idx}><Card variant="glass" className="flex items-center gap-5 p-6 border-slate-200/40 dark:border-slate-800/40">
               <div className="rounded-xl p-3 bg-teal-50 dark:bg-teal-950/20 text-teal-600 dark:text-teal-400">
                 <StatIcon className="h-6 w-6" />
               </div>
               <div>
                 <h3 className="text-2xl font-extrabold text-slate-900 dark:text-white leading-none mb-1">
-                  {stat.value}
+                  <AnimatedNumber value={stat.value} suffix={stat.suffix} />
                 </h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
                   {stat.label}
                 </p>
               </div>
-            </Card>
+            </Card></StaggerItem>
           );
         })}
-      </section>
+      </StaggerGroup>
 
       {/* CTA Box */}
-      <section className="rounded-2xl bg-gradient-to-r from-teal-600 to-teal-700 dark:from-teal-800 dark:to-teal-950 p-8 sm:p-12 flex flex-col md:flex-row justify-between items-center gap-6 shadow-lg">
+      <Reveal className="rounded-2xl bg-gradient-to-r from-teal-600 to-teal-700 dark:from-teal-800 dark:to-teal-950 p-8 sm:p-12 flex flex-col md:flex-row justify-between items-center gap-6 shadow-lg">
         <div className="text-center md:text-left">
           <h3 className="text-xl sm:text-2xl font-bold text-white mb-2 font-display">
             Looking for Custom Dimensions or Printing?
@@ -427,7 +415,7 @@ export default function HomeScreen() {
             Launch RFQ Creator
           </Button>
         </Link>
-      </section>
+      </Reveal>
     </div>
   );
 }

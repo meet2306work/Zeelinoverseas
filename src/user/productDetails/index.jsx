@@ -1,10 +1,13 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
 import { useParams, useLocation, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { FiHeart, FiHelpCircle, FiCheck, FiLayers, FiShield, FiShoppingCart, FiMessageCircle, FiStar } from 'react-icons/fi';
-import Card from '../../commonComponents/cards/Card';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { FiHeart, FiCheck, FiShield, FiShoppingCart, FiMessageCircle, FiStar } from 'react-icons/fi';
 import Button from '../../commonComponents/buttons/Button';
 import Tabs from '../../commonComponents/layouts/Tabs';
+import Skeleton from '../../commonComponents/loaders/Skeleton';
+import { Reveal, StaggerGroup, StaggerItem } from '../../commonComponents/animations/ScrollReveal';
+import { motionTransitions } from '../../config/motion';
 import { addProductToWishlist, removeProductFromWishlist, selectIsInWishlist } from '../../redux/slices/wishlistSlice';
 import { fetchProductById, fetchProductReviews, createProductReview, clearProductDetails } from '../../redux/slices/productSlice';
 
@@ -23,6 +26,8 @@ export default function ProductDetailsScreen() {
   const [selectedQty, setSelectedQty] = useState(25);
   const [isAdded, setIsAdded] = useState(false);
   const [activeTab, setActiveTab] = useState('specs');
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const shouldReduceMotion = useReducedMotion();
 
 
   const isInWishlist = useSelector(selectIsInWishlist(id));
@@ -109,17 +114,16 @@ export default function ProductDetailsScreen() {
   };
 
   const needsInquiry = selectedQty > INQUIRY_THRESHOLD_QTY;
-  const selectedTier = product.priceTiers.reduce((best, tier) =>
-    selectedQty >= tier.qty ? tier : best, product.priceTiers[0]);
-
   const tabOptions = [
     { label: 'Specifications', value: 'specs' },
     { label: 'Shipping & Delivery', value: 'shipping' },
     { label: `Reviews (${reviews?.length || 0})`, value: 'reviews' },
   ];
+  const productImages = (productDetails?.images || []).map((image) => image.url).filter(Boolean);
+  const activeImage = productImages[selectedImageIndex] || product.image;
 
   return (
-    <div className="flex flex-col gap-brand-xl py-brand-md animate-fade-in-up">
+    <div className="flex flex-col gap-brand-xl py-brand-md">
       {/* Return Link */}
       <div>
         <Link to={isPortal ? "/user/products" : "/products"} className="text-xs text-brand-text-secondary hover:text-secondary font-bold uppercase tracking-wider">
@@ -130,15 +134,49 @@ export default function ProductDetailsScreen() {
       {/* Main Showcase Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-brand-lg lg:gap-brand-2xl">
         
-        {/* Left Side: 3D canvas */}
+        {/* Left Side: product gallery and 3D canvas */}
         <div className="lg:col-span-7 flex flex-col gap-brand-md">
-          <Suspense fallback={
-            <div className="aspect-video bg-slate-950 flex items-center justify-center rounded-2xl border border-slate-800">
-              <span className="text-xs text-slate-400">Loading 3D Canvas...</span>
+          {loading ? (
+            <Skeleton variant="rectangle" className="aspect-video w-full" />
+          ) : (
+            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 dark:border-slate-800 dark:bg-slate-900">
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={activeImage}
+                  src={activeImage}
+                  alt={product.name}
+                  initial={{ opacity: 0, scale: shouldReduceMotion ? 1 : 1.025 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={shouldReduceMotion ? { duration: 0 } : motionTransitions.storefront}
+                  className="aspect-video w-full object-cover"
+                />
+              </AnimatePresence>
             </div>
-          }>
-            <ThreeDViewer className="aspect-video" modelUrl={productDetails?.threeDModel?.url} />
-          </Suspense>
+          )}
+
+          {productImages.length > 1 && (
+            <StaggerGroup className="grid grid-cols-4 gap-3" stagger={0.04}>
+              {productImages.map((image, index) => (
+                <StaggerItem key={image}>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedImageIndex(index)}
+                    aria-label={`View product image ${index + 1}`}
+                    className={`aspect-video w-full overflow-hidden rounded-xl border-2 transition-colors ${selectedImageIndex === index ? 'border-secondary' : 'border-transparent hover:border-slate-300 dark:hover:border-slate-700'}`}
+                  >
+                    <img src={image} alt="" className="h-full w-full object-cover transition-transform duration-300 hover:scale-105" />
+                  </button>
+                </StaggerItem>
+              ))}
+            </StaggerGroup>
+          )}
+
+          {productDetails?.threeDModel?.url && (
+            <Suspense fallback={<Skeleton variant="rectangle" className="aspect-video w-full" />}>
+              <ThreeDViewer className="aspect-video" modelUrl={productDetails.threeDModel.url} />
+            </Suspense>
+          )}
         </div>
 
         {/* Right Side: Product Details & Cart Actions */}
@@ -275,18 +313,18 @@ export default function ProductDetailsScreen() {
       </div>
 
       {/* Tabs Specifications panel */}
-      <div className="mt-brand-xl border-t border-brand-border dark:border-slate-800 pt-xl">
+      <Reveal className="mt-brand-xl border-t border-brand-border dark:border-slate-800 pt-xl">
         <Tabs tabs={tabOptions} activeTab={activeTab} onTabChange={setActiveTab} className="mb-brand-md" />
 
         {activeTab === 'specs' ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-brand-md max-w-4xl">
+          <StaggerGroup key="specifications" className="grid grid-cols-1 md:grid-cols-2 gap-brand-md max-w-4xl">
             {product.specs.map((spec, idx) => (
-              <div key={idx} className="flex justify-between items-center py-brand-sm border-b border-brand-border/40 dark:border-slate-800/40 text-sm">
+              <StaggerItem key={idx} className="flex justify-between items-center py-brand-sm border-b border-brand-border/40 dark:border-slate-800/40 text-sm">
                 <span className="text-brand-text-secondary font-medium">{spec.key}</span>
                 <span className="text-brand-text-primary dark:text-white font-bold text-right ml-4">{spec.value}</span>
-              </div>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerGroup>
         ) : activeTab === 'shipping' ? (
           <p className="text-sm text-brand-text-secondary dark:text-slate-400 leading-relaxed max-w-2xl">
             {product.shipping}
@@ -340,7 +378,7 @@ export default function ProductDetailsScreen() {
             )}
           </div>
         )}
-      </div>
+      </Reveal>
     </div>
   );
 }

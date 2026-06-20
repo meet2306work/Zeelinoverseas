@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link, useSearchParams, useLocation } from 'react-router-dom';
 import { FiSearch, FiSliders, FiBox, FiArrowRight, FiX } from 'react-icons/fi';
@@ -6,6 +6,8 @@ import Card from '../../commonComponents/cards/Card';
 import Input from '../../commonComponents/inputs/Input';
 import Dropdown from '../../commonComponents/dropdowns/Dropdown';
 import Button from '../../commonComponents/buttons/Button';
+import { SkeletonCard } from '../../commonComponents/loaders/Skeleton';
+import { Reveal, StaggerGroup, StaggerItem } from '../../commonComponents/animations/ScrollReveal';
 import { fetchProducts } from '../../redux/slices/productSlice';
 import { fetchCategories } from '../../redux/slices/categorySlice';
 
@@ -14,7 +16,7 @@ export default function ProductsScreen() {
   const dispatch = useDispatch();
   const isPortal = location.pathname.startsWith('/user');
   const [searchParams, setSearchParams] = useSearchParams();
-  const [search, setSearch] = useState(searchParams.get('q') || '');
+  const search = searchParams.get('q') || '';
   const category = searchParams.get('category') || '';
   const query = searchParams.get('q') || '';
   const minPrice = searchParams.get('minPrice') || '';
@@ -35,10 +37,6 @@ export default function ProductsScreen() {
     dispatch(fetchProducts());
   }, [dispatch]);
 
-  useEffect(() => {
-    setSearch(query);
-  }, [query]);
-
   const handleCategoryChange = (e) => {
     const newVal = e.target.value;
     const nextParams = new URLSearchParams(searchParams);
@@ -53,7 +51,6 @@ export default function ProductsScreen() {
   const handleSearchChange = (e) => {
     const nextValue = e.target.value;
     const nextParams = new URLSearchParams(searchParams);
-    setSearch(nextValue);
     if (nextValue.trim()) {
       nextParams.set('q', nextValue);
     } else {
@@ -75,7 +72,6 @@ export default function ProductsScreen() {
   };
 
   const resetFilters = () => {
-    setSearch('');
     setSearchParams({});
   };
 
@@ -172,7 +168,7 @@ export default function ProductsScreen() {
   const fallbackImage = 'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?auto=format&fit=crop&w=400&q=80';
 
   return (
-    <div className="flex flex-col gap-brand-md py-brand-sm animate-fade-in-up">
+    <div className="flex flex-col gap-brand-md py-brand-sm">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-brand-md border-b border-brand-border/40 dark:border-slate-800/40 pb-md">
         <div>
           <h1 className="text-2xl font-extrabold text-brand-text-primary dark:text-white tracking-tight mb-1">
@@ -339,8 +335,12 @@ export default function ProductsScreen() {
             </div>
           )}
 
-          {filteredProducts.length === 0 ? (
-            <div className="text-center py-20 border border-dashed border-brand-border dark:border-slate-800 rounded-2xl bg-brand-card dark:bg-slate-900">
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-brand-md" aria-label="Loading products">
+              {Array.from({ length: 6 }, (_, index) => <SkeletonCard key={index} />)}
+            </div>
+          ) : filteredProducts.length === 0 ? (
+            <Reveal className="text-center py-20 border border-dashed border-brand-border dark:border-slate-800 rounded-2xl bg-brand-card dark:bg-slate-900">
               <FiBox className="h-10 w-10 text-brand-text-secondary mx-auto mb-3" />
               <h3 className="text-base font-bold text-brand-text-primary dark:text-white mb-1">
                 Not available in products or categories
@@ -348,11 +348,11 @@ export default function ProductsScreen() {
               <p className="text-xs text-brand-text-secondary">
                 Try another keyword, browse all categories, or request a custom quotation.
               </p>
-            </div>
+            </Reveal>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-brand-md">
+            <StaggerGroup key={searchParams.toString()} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-brand-md">
               {filteredProducts.map((p) => (
-                <Card key={p._id || p.id} variant="default" className="flex flex-col h-full p-brand-md group">
+                <StaggerItem key={p._id || p.id} className="h-full"><Card variant="default" className="flex flex-col h-full p-brand-md group">
                   <div className="relative aspect-video rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 mb-brand-md border border-brand-border/20">
                     <img
                       src={p.images && p.images.length > 0 ? p.images[0].url : p.image}
@@ -396,9 +396,9 @@ export default function ProductsScreen() {
                       </Link>
                     </div>
                   </div>
-                </Card>
+                </Card></StaggerItem>
               ))}
-            </div>
+            </StaggerGroup>
           )}
         </div>
       </div>

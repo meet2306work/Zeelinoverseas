@@ -1,5 +1,7 @@
-import React, { useId, useState } from 'react';
-import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
+import { useId, useState } from 'react';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { FiEye, FiEyeOff } from 'react-icons/fi';
+import { motionTransitions } from '../../config/motion';
 
 export default function Input({
   label,
@@ -15,9 +17,13 @@ export default function Input({
   disabled = false,
   required = false,
   suggestions = [],
+  onFocus,
+  onBlur,
   ...props
 }) {
   const [showPassword, setShowPassword] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
   const inputId = useId();
   const suggestionsId = `${inputId}-suggestions`;
 
@@ -33,7 +39,11 @@ export default function Input({
         </label>
       )}
       
-      <div className="relative flex items-center">
+      <motion.div
+        animate={{ scale: isFocused && !shouldReduceMotion ? 1.005 : 1 }}
+        transition={shouldReduceMotion ? { duration: 0 } : motionTransitions.admin}
+        className="relative flex items-center"
+      >
         {Icon && (
           <div className="absolute left-3 text-slate-400 dark:text-slate-500">
             <Icon className="h-5 w-5" />
@@ -48,6 +58,16 @@ export default function Input({
           placeholder={placeholder}
           disabled={disabled}
           required={required}
+          aria-invalid={Boolean(error)}
+          aria-describedby={error || helperText ? `${inputId}-message` : undefined}
+          onFocus={(event) => {
+            setIsFocused(true);
+            onFocus?.(event);
+          }}
+          onBlur={(event) => {
+            setIsFocused(false);
+            onBlur?.(event);
+          }}
           list={uniqueSuggestions.length > 0 ? suggestionsId : undefined}
           className={`w-full rounded-lg border text-sm text-brand-text-primary dark:text-slate-100 transition-all duration-200 outline-none
             ${Icon ? 'pl-10' : 'pl-3.5'} 
@@ -78,19 +98,21 @@ export default function Input({
             className="absolute right-3 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
           >
             {showPassword ? (
-              <AiOutlineEyeInvisible className="h-5 w-5" />
+              <FiEyeOff className="h-5 w-5" />
             ) : (
-              <AiOutlineEye className="h-5 w-5" />
+              <FiEye className="h-5 w-5" />
             )}
           </button>
         )}
-      </div>
+      </motion.div>
 
-      {error ? (
-        <p className="text-xs text-red-500 font-medium">{error}</p>
-      ) : helperText ? (
-        <p className="text-xs text-slate-500 dark:text-slate-400">{helperText}</p>
-      ) : null}
+      <AnimatePresence mode="wait" initial={false}>
+        {error ? (
+          <motion.p id={`${inputId}-message`} key="error" initial={{ opacity: 0, y: shouldReduceMotion ? 0 : -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="text-xs text-red-500 font-medium">{error}</motion.p>
+        ) : helperText ? (
+          <motion.p id={`${inputId}-message`} key="helper" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-xs text-slate-500 dark:text-slate-400">{helperText}</motion.p>
+        ) : null}
+      </AnimatePresence>
     </div>
   );
 }

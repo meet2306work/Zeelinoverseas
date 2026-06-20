@@ -1,22 +1,33 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, Outlet, useLocation, useSearchParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { FiMenu, FiX, FiMessageSquare, FiUser } from 'react-icons/fi';
 import Button from '../commonComponents/buttons/Button';
 import Breadcrumb from '../commonComponents/breadcrumbs/Breadcrumb';
 import PageContainer from '../commonComponents/layouts/PageContainer';
+import PageTransition from '../commonComponents/layouts/PageTransition';
 import { logout, selectIsAuthenticated, selectUserRole } from '../redux/slices/authSlice';
-import { motion, AnimatePresence } from 'framer-motion';
 import WhatsAppFloatingButton from '../commonComponents/buttons/WhatsAppFloatingButton';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { motionTransitions } from '../config/motion';
 
 export default function PublicLayout() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const dispatch = useDispatch();
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const role = useSelector(selectUserRole);
   const { categoriesList } = useSelector((state) => state.categories);
+
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 24);
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const navLinks = [
     { label: 'Home', path: '/' },
@@ -45,8 +56,8 @@ export default function PublicLayout() {
   return (
     <div className="min-h-screen flex flex-col bg-brand-bg dark:bg-slate-950">
       {/* Premium Glass Header */}
-      <header className="sticky top-0 z-40 w-full border-b border-brand-border/40 dark:border-slate-800/40 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md">
-        <div className="h-16 w-full px-brand-md sm:px-brand-lg lg:px-brand-xl flex items-center justify-between">
+      <motion.header layout={!shouldReduceMotion} transition={motionTransitions.admin} className={`sticky top-0 z-40 w-full border-b backdrop-blur-xl transition-[background-color,border-color,box-shadow] ${isScrolled ? 'border-brand-border bg-white/90 shadow-card dark:border-slate-800 dark:bg-slate-900/90' : 'border-brand-border/40 bg-white/70 dark:border-slate-800/40 dark:bg-slate-900/70'}`}>
+        <div className={`${isScrolled ? 'h-14' : 'h-16'} w-full px-brand-md sm:px-brand-lg lg:px-brand-xl flex items-center justify-between transition-[height] duration-brand-fast`}>
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
             <span className="text-xl font-extrabold tracking-tight">
@@ -113,11 +124,12 @@ export default function PublicLayout() {
             {isMobileMenuOpen ? <FiX className="h-6 w-6" /> : <FiMenu className="h-6 w-6" />}
           </button>
         </div>
-      </header>
+      </motion.header>
 
       {/* Mobile Drawer Menu */}
+      <AnimatePresence>
       {isMobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 top-16 z-30 bg-white dark:bg-slate-900 border-b border-brand-border dark:border-slate-800 p-brand-md flex flex-col gap-brand-md shadow-xl">
+        <motion.div initial={{ opacity: 0, y: shouldReduceMotion ? 0 : -12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: shouldReduceMotion ? 0 : -12 }} transition={shouldReduceMotion ? { duration: 0 } : motionTransitions.interface} className="md:hidden fixed inset-0 top-16 z-30 bg-white dark:bg-slate-900 border-b border-brand-border dark:border-slate-800 p-brand-md flex flex-col gap-brand-md shadow-xl">
           <nav className="flex flex-col gap-brand-sm">
             {navLinks.map((link) => (
               <Link
@@ -162,8 +174,9 @@ export default function PublicLayout() {
               </Link>
             )}
           </div>
-        </div>
+        </motion.div>
       )}
+      </AnimatePresence>
 
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col py-brand-md">
@@ -175,18 +188,9 @@ export default function PublicLayout() {
         )}
 
         <PageContainer className="flex-1 flex flex-col">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={location.pathname}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-              className="flex-1 flex flex-col"
-            >
-              <Outlet />
-            </motion.div>
-          </AnimatePresence>
+          <PageTransition routeKey={location.pathname}>
+            <Outlet />
+          </PageTransition>
         </PageContainer>
       </main>
 

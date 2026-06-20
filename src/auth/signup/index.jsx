@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { FiUser, FiMail, FiLock, FiPhone, FiCheckSquare, FiArrowRight } from 'react-icons/fi';
+import { FiUser, FiMail, FiLock, FiPhone, FiArrowRight } from 'react-icons/fi';
 import Input from '../../commonComponents/inputs/Input';
 import Button from '../../commonComponents/buttons/Button';
 import Card from '../../commonComponents/cards/Card';
+import { Reveal } from '../../commonComponents/animations/ScrollReveal';
 import { registerUser } from '../../redux/slices/authSlice';
 
 export default function AuthSignupScreen() {
@@ -48,7 +49,7 @@ export default function AuthSignupScreen() {
         </Link>
       </div>
 
-      <div className="w-full max-w-md animate-fade-in-up">
+      <Reveal className="w-full max-w-md" amount={0.1}>
         <Card variant="glass" hover={false} className="p-8 sm:p-10 border-slate-800/80">
           <div className="text-center mb-8">
             <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
@@ -138,7 +139,7 @@ export default function AuthSignupScreen() {
             </p>
           </div>
         </Card>
-      </div>
+      </Reveal>
     </div>
   );
 }

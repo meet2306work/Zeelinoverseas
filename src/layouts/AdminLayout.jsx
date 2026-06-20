@@ -9,9 +9,9 @@ import {
 import Breadcrumb from '../commonComponents/breadcrumbs/Breadcrumb';
 import Dropdown from '../commonComponents/dropdowns/Dropdown';
 import PageContainer from '../commonComponents/layouts/PageContainer';
+import PageTransition from '../commonComponents/layouts/PageTransition';
 import { logout, selectIsAuthenticated, selectUserRole, selectCurrentUser } from '../redux/slices/authSlice';
 import ConfirmationDialog from '../commonComponents/modals/ConfirmationDialog';
-import { motion, AnimatePresence } from 'framer-motion';
 
 export default function AdminLayout() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -270,18 +270,9 @@ export default function AdminLayout() {
               <Breadcrumb items={breadcrumbItems} className="mb-brand-md opacity-80" homeLink="/admin/dashboard" />
             )}
             
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={location.pathname}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -12 }}
-                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                className="flex-1 flex flex-col"
-              >
-                <Outlet />
-              </motion.div>
-            </AnimatePresence>
+            <PageTransition routeKey={location.pathname}>
+              <Outlet />
+            </PageTransition>
           </PageContainer>
         </main>
       </div>

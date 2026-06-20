@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { FiShield, FiArrowRight } from 'react-icons/fi';
-import { toast } from 'react-toastify';
+import { notify } from '../../commonComponents/toasts/notify';
 import Input from '../../commonComponents/inputs/Input';
 import Button from '../../commonComponents/buttons/Button';
 import Card from '../../commonComponents/cards/Card';
@@ -53,12 +53,12 @@ export default function AuthOtpVerificationScreen() {
 
     try {
       await dispatch(resendEmailOtp({ email })).unwrap();
-      toast.success('A new OTP has been sent.');
+      notify.success('A new OTP has been sent.');
       setResendCooldown(60); // Restart 60s timer
       setExpiryTime(600); // Reset 10m expiry timer
       setOtp(''); // Clear current input
     } catch (err) {
-      toast.error(err || 'Failed to resend OTP');
+      notify.error(err || 'Failed to resend OTP');
     }
   };
 
@@ -78,10 +78,10 @@ export default function AuthOtpVerificationScreen() {
 
     try {
       await dispatch(verifyEmailOtp({ email, otp })).unwrap();
-      toast.success('Email verified successfully.');
+      notify.success('Email verified successfully.');
       navigate('/auth/verify-email');
     } catch (err) {
-      toast.error(err || 'Failed to verify OTP');
+      notify.error(err || 'Failed to verify OTP');
       setLocalError(err || 'Failed to verify OTP');
     }
   };
