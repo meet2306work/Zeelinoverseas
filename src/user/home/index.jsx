@@ -32,23 +32,12 @@ export default function HomeScreen() {
     { label: 'Sourcing Regions Supported', value: '54+', icon: FiBriefcase },
   ];
 
-  const topProducts = products.length > 0 
-    ? products.slice(0, 3) 
-    : [
-        { id: 'prod-001', name: 'Heavy-Duty Double-Wall Corrugated Boxes', price: 1.20, moq: 500, rating: 4.8, category: 'corrugated', images: ['https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&w=400&q=80'] },
-        { id: 'prod-002', name: 'Custom Printed Kraft Paper Mailers', price: 0.35, moq: 1000, rating: 4.9, category: 'mailers', images: ['https://images.unsplash.com/photo-1595079676339-1534801ad6cf?auto=format&fit=crop&w=400&q=80'] },
-        { id: 'prod-003', name: 'Premium Magnetic Gift Presentation Boxes', price: 2.50, moq: 200, rating: 4.7, category: 'rigid', images: ['https://images.unsplash.com/photo-1512909006721-3d6018887383?auto=format&fit=crop&w=400&q=80'] },
-      ];
+  const topProducts = (products || []).slice(0, 3);
 
   const fallbackImage = 'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?auto=format&fit=crop&w=400&q=80';
   const catalogSuggestions = [
-    ...topProducts.map((product) => product.name),
+    ...topProducts.map((product) => product.name || product.title),
     ...(categoriesList || []).flatMap((cat) => [cat.name, cat.slug, cat.desc]),
-    'Bubble wrap rolls',
-    'Export cartons',
-    'Kraft mailers',
-    'Rigid gift boxes',
-    'FOB packaging',
   ].filter(Boolean);
 
   const handleCatalogSearch = (e) => {

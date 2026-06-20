@@ -87,7 +87,7 @@ export default function PublicLayout() {
               <>
                 <Link to={role === 'admin' ? '/admin/dashboard' : '/user/home'}>
                   <Button variant="primary" size="sm">
-                    {role === 'admin' ? 'Admin CRM' : 'My Portal'}
+                    {role === 'admin' ? 'Dashboard' : 'My Portal'}
                   </Button>
                 </Link>
                 <Button variant="outline" size="sm" onClick={() => dispatch(logout())}>
@@ -143,7 +143,7 @@ export default function PublicLayout() {
               <>
                 <Link to={role === 'admin' ? '/admin/dashboard' : '/user/home'} onClick={() => setIsMobileMenuOpen(false)}>
                   <Button variant="primary" className="w-full">
-                    {role === 'admin' ? 'Admin CRM' : 'My Portal'}
+                    {role === 'admin' ? 'Dashboard' : 'My Portal'}
                   </Button>
                 </Link>
                 <Button variant="outline" className="w-full" onClick={() => { setIsMobileMenuOpen(false); dispatch(logout()); }}>

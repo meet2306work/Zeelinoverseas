@@ -41,6 +41,8 @@ export default function AdminProductsScreen() {
   const [threeDModel, setThreeDModel] = useState({ url: '', public_id: '' });
   const [uploadingImages, setUploadingImages] = useState(false);
   const [uploadingModel, setUploadingModel] = useState(false);
+  const [isDraggingImages, setIsDraggingImages] = useState(false);
+  const [isDraggingModel, setIsDraggingModel] = useState(false);
 
   const { products } = useSelector((state) => state.products);
   const { categoriesList } = useSelector((state) => state.categories);
@@ -49,11 +51,6 @@ export default function AdminProductsScreen() {
     dispatch(fetchProducts('?limit=50'));
     dispatch(fetchCategories());
   }, [dispatch]);
-
-  const fallbackProducts = [
-    { id: 'prod-001', name: 'Premium Kraft Paper Bag', category: 'bags', price: '$0.45', moq: '500 Units', status: 'Active' },
-    { id: 'prod-002', name: 'Corrugated Pizza Packing Box', category: 'boxes', price: '$0.28', moq: '1000 Units', status: 'Active' },
-  ];
 
   const mappedProducts = products.map((p) => ({
     id: p._id,
@@ -64,7 +61,7 @@ export default function AdminProductsScreen() {
     status: p.availabilityStatus || 'Active',
   }));
 
-  const activeProducts = [...mappedProducts, ...fallbackProducts];
+  const activeProducts = mappedProducts;
 
   const resetForm = () => {
     setName('');
@@ -121,16 +118,15 @@ export default function AdminProductsScreen() {
     setIsEditModalOpen(true);
   };
 
-  const handleImageUpload = async (e) => {
-    const files = Array.from(e.target.files);
-    if (files.length === 0) return;
+  const uploadImagesFiles = async (filesList) => {
+    if (!filesList || filesList.length === 0) return;
 
     setUploadingImages(true);
     const formData = new FormData();
-    files.forEach(file => formData.append('images', file));
+    Array.from(filesList).forEach(file => formData.append('images', file));
 
     try {
-      const response = await apiClient.post('/upload', formData, {
+      const response = await apiClient.post('/uploads', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       setImages(prev => [...prev, ...response.data.data]);
@@ -142,8 +138,7 @@ export default function AdminProductsScreen() {
     }
   };
 
-  const handleModelUpload = async (e) => {
-    const file = e.target.files[0];
+  const uploadModelFile = async (file) => {
     if (!file) return;
 
     setUploadingModel(true);
@@ -151,7 +146,7 @@ export default function AdminProductsScreen() {
     formData.append('model', file);
 
     try {
-      const response = await apiClient.post('/upload', formData, {
+      const response = await apiClient.post('/uploads', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       if (response.data.data && response.data.data.length > 0) {
@@ -162,6 +157,42 @@ export default function AdminProductsScreen() {
       alert(error.response?.data?.message || error.message || '3D Model upload failed');
     } finally {
       setUploadingModel(false);
+    }
+  };
+
+  const handleImageUpload = (e) => {
+    uploadImagesFiles(e.target.files);
+  };
+
+  const handleModelUpload = (e) => {
+    uploadModelFile(e.target.files[0]);
+  };
+
+  const handleDragOverImages = (e) => {
+    e.preventDefault();
+    setIsDraggingImages(true);
+  };
+  const handleDragLeaveImages = () => {
+    setIsDraggingImages(false);
+  };
+  const handleDropImages = (e) => {
+    e.preventDefault();
+    setIsDraggingImages(false);
+    uploadImagesFiles(e.dataTransfer.files);
+  };
+
+  const handleDragOverModel = (e) => {
+    e.preventDefault();
+    setIsDraggingModel(true);
+  };
+  const handleDragLeaveModel = () => {
+    setIsDraggingModel(false);
+  };
+  const handleDropModel = (e) => {
+    e.preventDefault();
+    setIsDraggingModel(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      uploadModelFile(e.dataTransfer.files[0]);
     }
   };
 
@@ -529,50 +560,85 @@ export default function AdminProductsScreen() {
       {/* Product Images Uploader */}
       <div className="flex flex-col gap-2">
         <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Product Images</label>
-        <div className="flex flex-wrap gap-2.5">
-          {images.map((img, idx) => (
-            <div key={idx} className="relative h-16 w-20 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-100">
-              <img src={img.url} alt="Product" className="h-full w-full object-cover" />
-              <button
-                type="button"
-                onClick={() => removeUploadedImage(idx)}
-                className="absolute top-1 right-1 p-0.5 rounded-full bg-red-600 text-white hover:bg-red-700"
-              >
-                <FiX className="h-3 w-3" />
-              </button>
-            </div>
-          ))}
-          <label className="h-16 w-20 rounded-lg border border-dashed border-slate-300 hover:border-cyan-500 flex flex-col items-center justify-center cursor-pointer text-slate-400 hover:text-cyan-500 transition-colors">
-            <FiUpload className="h-4.5 w-4.5 mb-1" />
-            <span className="text-[9px] font-bold">Upload</span>
-            <input type="file" multiple accept="image/*" onChange={handleImageUpload} className="hidden" />
-          </label>
+        <div
+          onDragOver={handleDragOverImages}
+          onDragLeave={handleDragLeaveImages}
+          onDrop={handleDropImages}
+          className={`border-2 border-dashed rounded-xl p-4 transition-all duration-300 flex flex-col items-center justify-center gap-3
+            ${isDraggingImages 
+              ? 'border-secondary bg-secondary/5 dark:bg-slate-900/40 scale-[1.01]' 
+              : 'border-slate-300 dark:border-slate-850 bg-slate-50/50 dark:bg-slate-950/20 hover:border-secondary/50'
+            }
+          `}
+        >
+          <div className="flex flex-wrap gap-2.5 justify-center w-full">
+            {images.map((img, idx) => (
+              <div key={idx} className="relative h-16 w-20 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-100 shadow-sm">
+                <img src={img.url} alt="Product" className="h-full w-full object-cover" />
+                <button
+                  type="button"
+                  onClick={() => removeUploadedImage(idx)}
+                  className="absolute top-1 right-1 p-0.5 rounded-full bg-red-600 text-white hover:bg-red-700 shadow-md transition-transform hover:scale-105"
+                >
+                  <FiX className="h-3 w-3" />
+                </button>
+              </div>
+            ))}
+            
+            <label className="h-16 w-20 rounded-lg border border-dashed border-slate-300 hover:border-secondary flex flex-col items-center justify-center cursor-pointer text-slate-400 hover:text-secondary transition-colors bg-white dark:bg-slate-900/50">
+              <FiUpload className="h-5 w-5 mb-1" />
+              <span className="text-[10px] font-bold">Choose</span>
+              <input type="file" multiple accept="image/*" onChange={handleImageUpload} className="hidden" />
+            </label>
+          </div>
+          
+          <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
+            Drag and drop your images here, or click <span className="text-secondary dark:text-accent font-bold">Choose</span> to select files from device
+          </p>
         </div>
         {uploadingImages && <span className="text-xs text-cyan-500 flex items-center gap-1.5 font-bold"><FiInfo className="animate-spin" /> Uploading images to gallery...</span>}
       </div>
 
       {/* 3D Model Uploader */}
       <div className="flex flex-col gap-2">
-        <label className="text-xs font-bold uppercase tracking-wider text-slate-500">3D Asset Link (.GLB / .GLTF)</label>
+        <label className="text-xs font-bold uppercase tracking-wider text-slate-500">3D Asset Model (.GLB / .GLTF)</label>
         {threeDModel.url ? (
-          <div className="flex items-center justify-between p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950">
-            <span className="text-xs font-mono font-bold text-slate-600 dark:text-slate-400 truncate max-w-[280px]">
-              {threeDModel.public_id || '3d_model_file.glb'}
-            </span>
+          <div className="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/40">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <FiBox className="h-5 w-5 text-secondary shrink-0" />
+              <span className="text-xs font-mono font-bold text-slate-700 dark:text-slate-350 truncate max-w-[280px]">
+                {threeDModel.public_id || '3d_model_file.glb'}
+              </span>
+            </div>
             <button
               type="button"
               onClick={removeThreeDModel}
-              className="p-1 rounded bg-slate-200 dark:bg-slate-850 hover:bg-red-100 hover:text-red-600 text-slate-500"
+              className="p-1.5 rounded bg-slate-200 dark:bg-slate-850 hover:bg-red-50 hover:text-red-600 text-slate-500 transition-colors"
             >
               <FiTrash2 className="h-3.5 w-3.5" />
             </button>
           </div>
         ) : (
-          <label className="w-full py-4 border border-dashed border-slate-300 hover:border-cyan-500 rounded-xl flex flex-col items-center justify-center cursor-pointer text-slate-400 hover:text-cyan-500 transition-colors">
-            <FiBox className="h-6 w-6 mb-1" />
-            <span className="text-xs font-bold">Choose a 3D Model File (.glb, .gltf)</span>
-            <input type="file" accept=".glb,.gltf" onChange={handleModelUpload} className="hidden" />
-          </label>
+          <div
+            onDragOver={handleDragOverModel}
+            onDragLeave={handleDragLeaveModel}
+            onDrop={handleDropModel}
+            className={`w-full py-6 border-2 border-dashed rounded-xl flex flex-col items-center justify-center gap-2 cursor-pointer transition-all duration-300
+              ${isDraggingModel 
+                ? 'border-secondary bg-secondary/5 dark:bg-slate-900/40 scale-[1.01]' 
+                : 'border-slate-300 dark:border-slate-850 bg-slate-50/50 dark:bg-slate-950/20 hover:border-secondary/50'
+              }
+            `}
+          >
+            <label className="flex flex-col items-center justify-center cursor-pointer w-full text-slate-400 hover:text-secondary">
+              <FiBox className="h-7 w-7 mb-1.5" />
+              <span className="text-xs font-bold">Choose a 3D Model File (.glb, .gltf)</span>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                Drag & Drop file here, or click to choose from device
+              </p>
+              <input type="file" accept=".glb,.gltf" onChange={handleModelUpload} className="hidden" />
+            </label>
+          </div>
         )}
         {uploadingModel && <span className="text-xs text-cyan-500 flex items-center gap-1.5 font-bold"><FiInfo className="animate-spin" /> Processing 3D asset model...</span>}
       </div>

@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { FiPlus, FiTrash2, FiEdit2, FiSearch, FiImage } from 'react-icons/fi';
+import { FiPlus, FiTrash2, FiEdit2, FiSearch, FiImage, FiUpload, FiX, FiInfo } from 'react-icons/fi';
 import Card from '../../commonComponents/cards/Card';
 import Table from '../../commonComponents/tables/Table';
 import Button from '../../commonComponents/buttons/Button';
 import Modal from '../../commonComponents/modals/Modal';
 import Input from '../../commonComponents/inputs/Input';
 import { addCategory, updateCategory, deleteCategory, fetchCategories } from '../../redux/slices/categorySlice';
+import apiClient from '../../services/apiClient';
 
 export default function AdminCategoriesScreen() {
   const dispatch = useDispatch();
@@ -20,10 +21,61 @@ export default function AdminCategoriesScreen() {
   const [imageUrl, setImageUrl] = useState('');
   const [description, setDescription] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [isDraggingImage, setIsDraggingImage] = useState(false);
 
   useEffect(() => {
     dispatch(fetchCategories());
   }, [dispatch]);
+
+  const uploadCategoryImageFile = async (file) => {
+    if (!file) return;
+
+    setUploadingImage(true);
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      const response = await apiClient.post('/uploads', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      if (response.data.data && response.data.data.length > 0) {
+        setImageUrl(response.data.data[0].url);
+        alert('Image uploaded successfully!');
+      }
+    } catch (error) {
+      alert(error.response?.data?.message || error.message || 'Image upload failed');
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const handleImageUpload = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      uploadCategoryImageFile(e.target.files[0]);
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDraggingImage(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDraggingImage(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDraggingImage(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      uploadCategoryImageFile(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImageUrl('');
+  };
 
   const handleOpenCreateModal = () => {
     setEditingCategory(null);
@@ -225,22 +277,44 @@ export default function AdminCategoriesScreen() {
             onChange={(e) => setSlug(e.target.value)}
           />
 
-          <Input
-            label="Category Image URL"
-            placeholder="e.g. https://images.unsplash.com/photo-..."
-            value={imageUrl}
-            onChange={(e) => setImageUrl(e.target.value)}
-            icon={FiImage}
-          />
-
-          {imageUrl && (
-            <div className="flex flex-col gap-1.5">
-              <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Image Preview</span>
-              <div className="h-24 w-40 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950">
-                <img src={imageUrl} alt="Preview" className="h-full w-full object-cover" />
+          <div className="flex flex-col gap-2">
+            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Category Image</label>
+            {imageUrl ? (
+              <div className="relative h-32 w-full rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/40 flex items-center justify-center">
+                <img src={imageUrl} alt="Category" className="h-full object-contain" />
+                <button
+                  type="button"
+                  onClick={handleRemoveImage}
+                  className="absolute top-2 right-2 p-1.5 rounded-full bg-red-600 text-white hover:bg-red-700 shadow-md transition-transform hover:scale-105"
+                  title="Remove Image"
+                >
+                  <FiX className="h-4 w-4" />
+                </button>
               </div>
-            </div>
-          )}
+            ) : (
+              <div
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                className={`w-full py-8 border-2 border-dashed rounded-xl flex flex-col items-center justify-center gap-2 cursor-pointer transition-all duration-300
+                  ${isDraggingImage 
+                    ? 'border-secondary bg-secondary/5 dark:bg-slate-900/40 scale-[1.01]' 
+                    : 'border-slate-350 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/20 hover:border-secondary/50'
+                  }
+                `}
+              >
+                <label className="flex flex-col items-center justify-center cursor-pointer w-full text-slate-400 hover:text-secondary">
+                  <FiImage className="h-8 w-8 mb-1.5" />
+                  <span className="text-xs font-bold">Upload Category Image</span>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                    Drag & Drop file here, or click to choose from device
+                  </p>
+                  <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                </label>
+              </div>
+            )}
+            {uploadingImage && <span className="text-xs text-cyan-500 flex items-center gap-1.5 font-bold"><FiInfo className="animate-spin" /> Uploading image to cloud...</span>}
+          </div>
 
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
