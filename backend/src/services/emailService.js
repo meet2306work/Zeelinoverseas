@@ -1,6 +1,5 @@
-const nodemailer = require('nodemailer');
-const dns = require('dns').promises;
-const net = require('net');
+const { Resend } = require('resend');
+
 
 const getVerificationEmailHtml = (name, otp) => {
   return `<!DOCTYPE html>
@@ -132,59 +131,33 @@ const getVerificationEmailHtml = (name, otp) => {
 
 const sendEmail = async (options) => {
   try {
-    const originalHost = process.env.SMTP_HOST;
-    let resolvedHost = originalHost;
-
-    // Resolve host to IPv4 if it's a hostname to bypass Render's IPv6 networking bugs
-    if (originalHost && !net.isIP(originalHost)) {
-      try {
-        const lookup = await dns.lookup(originalHost, { family: 4 });
-        resolvedHost = lookup.address;
-        console.log(`DNS Lookup: Resolved ${originalHost} to IPv4 ${resolvedHost}`);
-      } catch (dnsError) {
-        console.warn(`DNS Lookup failed for ${originalHost}, falling back to original hostname:`, dnsError.message);
-      }
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+      console.error('RESEND_API_KEY is not configured in environment variables.');
+      return false;
     }
 
-    // Create a transporter
-    const transporter = nodemailer.createTransport({
-      host: resolvedHost,
-      port: parseInt(process.env.SMTP_PORT) || 587,
-      secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-      tls: {
-        // Ensure servername is set to original hostname for valid TLS certificate validation
-        servername: originalHost,
-        rejectUnauthorized: true,
-      },
-    });
-
-
+    const resend = new Resend(apiKey);
     const emailHtml = options.html || (options.otp && options.name ? getVerificationEmailHtml(options.name, options.otp) : undefined);
+    const fromAddress = process.env.SMTP_FROM || 'onboarding@resend.dev';
 
-    // Define email options
-    const message = {
-      from: `${process.env.FROM_NAME || 'Zeelin Overseas'} <${process.env.SMTP_FROM || process.env.FROM_EMAIL}>`,
+    const { data, error } = await resend.emails.send({
+      from: `${process.env.FROM_NAME || 'Zeelin Overseas'} <${fromAddress}>`,
       to: options.email,
       subject: options.subject,
       text: options.message || options.text || `Welcome to Zeelin Overseas! Your verification code is ${options.otp}`,
       html: emailHtml,
-    };
+    });
 
-    // Send email
-    const info = await transporter.sendMail(message);
-    console.log('Email sent successfully: %s', info.messageId);
-    const previewUrl = nodemailer.getTestMessageUrl(info);
-    if (previewUrl) {
-      console.log('✉️ Email Preview URL (Open in browser): %s', previewUrl);
+    if (error) {
+      console.error('Resend API Error:', error.message || error);
+      return false;
     }
-    return info;
+
+    console.log('Email sent successfully via Resend. Message ID:', data.id);
+    return data;
   } catch (error) {
-    console.error('Email send failure:', error.message || error);
-    // Do not crash the server, return false
+    console.error('Email send failure via Resend:', error.message || error);
     return false;
   }
 };
