@@ -43,7 +43,7 @@ export default function HomeScreen() {
   const fallbackImage = 'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?auto=format&fit=crop&w=400&q=80';
   const catalogSuggestions = [
     ...topProducts.map((product) => product.name),
-    ...categoriesList.flatMap((cat) => [cat.name, cat.slug, cat.desc]),
+    ...(categoriesList || []).flatMap((cat) => [cat.name, cat.slug, cat.desc]),
     'Bubble wrap rolls',
     'Export cartons',
     'Kraft mailers',
@@ -299,7 +299,7 @@ export default function HomeScreen() {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {categoriesList.map((cat) => {
+          {(categoriesList || []).map((cat) => {
             return (
               <Link
                 key={cat.slug}

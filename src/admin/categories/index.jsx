@@ -89,7 +89,7 @@ export default function AdminCategoriesScreen() {
     }
   };
 
-  const filteredCategories = categoriesList.filter(c => 
+  const filteredCategories = (categoriesList || []).filter(c => 
     (c.name || '').toLowerCase().includes(search.toLowerCase()) || 
     (c.slug || '').toLowerCase().includes(search.toLowerCase())
   );

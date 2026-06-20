@@ -43,7 +43,7 @@ export default function RfqScreen() {
     e.preventDefault();
     setIsLoading(true);
 
-    const selectedCategory = categoriesList.find((cat) => cat.slug === category);
+    const selectedCategory = (categoriesList || []).find((cat) => cat.slug === category);
     const selectedPort = portOptions.find((option) => option.value === port);
 
     // Sanitize numeric fields for backend validation
@@ -74,7 +74,7 @@ export default function RfqScreen() {
       });
   };
 
-  const categoryOptions = categoriesList.map(c => ({ label: c.name, value: c.slug }));
+  const categoryOptions = (categoriesList || []).map(c => ({ label: c.name, value: c.slug }));
 
   const portOptions = [
     { label: 'Port of Rotterdam (Netherlands)', value: 'NLRTM' },

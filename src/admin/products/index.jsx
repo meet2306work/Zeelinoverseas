@@ -170,7 +170,7 @@ export default function AdminProductsScreen() {
     setIsLoading(true);
 
     const priceVal = parseFloat(price) || 0;
-    const selectedCategory = categoriesList.find(c => c._id === category || c.slug === category);
+    const selectedCategory = (categoriesList || []).find(c => c._id === category || c.slug === category);
 
     if (!selectedCategory) {
       setIsLoading(false);
@@ -221,7 +221,7 @@ export default function AdminProductsScreen() {
     setIsLoading(true);
 
     const priceVal = parseFloat(price) || 0;
-    const selectedCategory = categoriesList.find(c => c._id === category || c.slug === category);
+    const selectedCategory = (categoriesList || []).find(c => c._id === category || c.slug === category);
 
     if (!selectedCategory) {
       setIsLoading(false);
@@ -280,7 +280,7 @@ export default function AdminProductsScreen() {
     }
   };
 
-  const categoryOptions = categoriesList.map(c => ({
+  const categoryOptions = (categoriesList || []).map(c => ({
     label: c.name,
     value: c._id
   }));
