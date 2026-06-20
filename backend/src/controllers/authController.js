@@ -60,16 +60,15 @@ exports.register = async (req, res, next) => {
       otpExpire
     });
 
-    try {
-      await sendEmail({
-        email: user.email,
-        subject: 'Verify Your Email',
-        name: user.firstName,
-        otp
-      });
-    } catch (err) {
+    // Send verification email in the background (non-blocking for instant response)
+    sendEmail({
+      email: user.email,
+      subject: 'Verify Your Email',
+      name: user.firstName,
+      otp
+    }).catch((err) => {
       console.error('Error sending OTP email:', err);
-    }
+    });
 
     res.status(201).json({
       success: true,
@@ -253,16 +252,15 @@ exports.resendOtp = async (req, res, next) => {
     user.otpExpire = otpExpire;
     await user.save();
 
-    try {
-      await sendEmail({
-        email: user.email,
-        subject: 'Verify Your Email',
-        name: user.firstName,
-        otp
-      });
-    } catch (err) {
+    // Send verification email in the background (non-blocking for instant response)
+    sendEmail({
+      email: user.email,
+      subject: 'Verify Your Email',
+      name: user.firstName,
+      otp
+    }).catch((err) => {
       console.error('Error sending OTP email:', err);
-    }
+    });
 
     res.status(200).json({
       success: true,
