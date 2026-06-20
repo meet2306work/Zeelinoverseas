@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { FiSettings, FiGlobe, FiKey, FiBell, FiCheck, FiImage, FiPlus, FiTrash2, FiToggleLeft, FiToggleRight, FiClock } from 'react-icons/fi';
+import { FiGlobe, FiKey, FiBell, FiCheck, FiImage, FiPlus, FiTrash2, FiToggleLeft, FiToggleRight, FiClock, FiUploadCloud } from 'react-icons/fi';
 import Card from '../../commonComponents/cards/Card';
 import Input from '../../commonComponents/inputs/Input';
 import Button from '../../commonComponents/buttons/Button';
+import apiClient from '../../services/apiClient';
 import {
   setSlideshowEnabled,
   setSlideshowInterval,
@@ -27,6 +28,8 @@ export default function AdminSettingsScreen() {
   // Slideshow form state
   const [newImageUrl, setNewImageUrl] = useState('');
   const [newImageCaption, setNewImageCaption] = useState('');
+  const [uploadingImages, setUploadingImages] = useState(false);
+  const [imageUploadError, setImageUploadError] = useState('');
   const [intervalInput, setIntervalInput] = useState(String(slideshowInterval));
 
   const tabs = [
@@ -54,6 +57,38 @@ export default function AdminSettingsScreen() {
     }));
     setNewImageUrl('');
     setNewImageCaption('');
+  };
+
+  const handleImageUpload = async (event) => {
+    const files = Array.from(event.target.files || []);
+    event.target.value = '';
+    if (files.length === 0) return;
+
+    setUploadingImages(true);
+    setImageUploadError('');
+
+    const formData = new FormData();
+    files.forEach((file) => formData.append('images', file));
+
+    try {
+      const response = await apiClient.post('/uploads', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      response.data.data.forEach((image, index) => {
+        const fallbackCaption = files[index]?.name.replace(/\.[^.]+$/, '') || 'Product Image';
+        dispatch(addSlideshowImage({
+          id: `slide-${Date.now()}-${index}`,
+          url: image.url,
+          caption: newImageCaption.trim() || fallbackCaption,
+        }));
+      });
+      setNewImageCaption('');
+    } catch (error) {
+      setImageUploadError(error.response?.data?.message || error.message || 'Image upload failed');
+    } finally {
+      setUploadingImages(false);
+    }
   };
 
   const handleIntervalSave = () => {
@@ -183,7 +218,28 @@ export default function AdminSettingsScreen() {
 
                   {/* Add new image */}
                   <div className="flex flex-col gap-3 p-4 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/30">
-                    <p className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Add Slideshow Image</p>
+                    <p className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Add Slideshow Images</p>
+                    <label className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-300 bg-white px-4 py-6 text-center transition-colors hover:border-secondary dark:border-slate-700 dark:bg-slate-950/50 ${uploadingImages ? 'pointer-events-none opacity-60' : ''}`}>
+                      <FiUploadCloud className="h-7 w-7 text-secondary" />
+                      <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+                        {uploadingImages ? 'Uploading images...' : 'Choose multiple images'}
+                      </span>
+                      <span className="text-[11px] text-slate-500">JPG, PNG or WebP. You can select several files at once.</span>
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        multiple
+                        onChange={handleImageUpload}
+                        disabled={uploadingImages}
+                        className="hidden"
+                      />
+                    </label>
+                    {imageUploadError && <p className="text-xs font-medium text-red-500">{imageUploadError}</p>}
+                    <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                      <span className="h-px flex-1 bg-slate-200 dark:bg-slate-800" />
+                      Or add by URL
+                      <span className="h-px flex-1 bg-slate-200 dark:bg-slate-800" />
+                    </div>
                     <input
                       type="url"
                       placeholder="Image URL (https://...)"
@@ -211,7 +267,7 @@ export default function AdminSettingsScreen() {
                     {slideshowImages.length === 0 && (
                       <p className="text-xs text-slate-400 italic">No slideshow images added yet.</p>
                     )}
-                    {slideshowImages.map((img, idx) => (
+                    {slideshowImages.map((img) => (
                       <div key={img.id} className="flex items-center gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/40">
                         <div className="h-12 w-16 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0">
                           <img
