@@ -4,6 +4,7 @@ const http = require("http");
 const { Server } = require("socket.io");
 const app = require("./app");
 const connectDB = require("./src/database/connection");
+const User = require("./src/models/User");
 
 const PORT = process.env.PORT || 5000;
 
@@ -50,6 +51,26 @@ io.on("connection", (socket) => {
 const startServer = async () => {
   try {
     await connectDB();
+
+    // Seed default admin user if it does not exist
+    try {
+      const adminEmail = "admin@zeelinoverseas.com";
+      const adminExists = await User.findOne({ email: adminEmail });
+      if (!adminExists) {
+        await User.create({
+          firstName: "System",
+          lastName: "Administrator",
+          email: adminEmail,
+          phone: "0000000000",
+          password: "AdminPassword123!",
+          role: "admin",
+          isEmailVerified: true
+        });
+        console.log(`❇️ Default admin user seeded successfully: ${adminEmail}`);
+      }
+    } catch (err) {
+      console.error("❌ Failed to seed default admin user:", err.message);
+    }
 
     server.listen(PORT, () => {
       console.log("======================================");
