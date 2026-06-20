@@ -56,6 +56,66 @@ const productSchema = new mongoose.Schema({
     type: String,
     default: null
   },
+  ply: {
+    type: String,
+    default: null
+  },
+  dimension: {
+    type: String,
+    default: null
+  },
+  sizeUnit: {
+    type: String,
+    enum: ['mm', 'cm', 'inch'],
+    default: 'mm'
+  },
+  gsm: {
+    type: String,
+    default: null
+  },
+  color: {
+    type: String,
+    default: null
+  },
+  bundle: {
+    type: String,
+    default: null
+  },
+  unit: {
+    type: String,
+    enum: ['pcs', 'bundle'],
+    default: 'pcs'
+  },
+  gstRate: {
+    type: Number,
+    default: 18
+  },
+  availabilityStatus: {
+    type: String,
+    enum: ['In Stock', 'Out Of Stock', 'Pre-Order', 'Archived'],
+    default: 'In Stock'
+  },
+  thickness: {
+    type: String,
+    default: null
+  },
+  recyclable: {
+    type: Boolean,
+    default: true
+  },
+  printingOption: {
+    type: String,
+    enum: ['Plain', 'Printed'],
+    default: 'Plain'
+  },
+  burstingFactor: {
+    type: String,
+    default: null
+  },
+  threeDModel: {
+    url: { type: String, default: null },
+    public_id: { type: String, default: null }
+  },
   specifications: [
     {
       key: { type: String, required: true },

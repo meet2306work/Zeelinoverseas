@@ -21,9 +21,18 @@ if (isCloudinaryConfigured) {
 
   storage = new CloudinaryStorage({
     cloudinary: cloudinary,
-    params: {
-      folder: 'zeelinoverseas_uploads',
-      allowed_formats: ['jpg', 'png', 'jpeg', 'webp', 'pdf'],
+    params: async (req, file) => {
+      const ext = path.extname(file.originalname).toLowerCase();
+      if (ext === '.glb' || ext === '.gltf') {
+        return {
+          folder: 'zeelinoverseas_3d',
+          resource_type: 'raw',
+        };
+      }
+      return {
+        folder: 'zeelinoverseas_uploads',
+        allowed_formats: ['jpg', 'png', 'jpeg', 'webp', 'pdf'],
+      };
     },
   });
 } else {

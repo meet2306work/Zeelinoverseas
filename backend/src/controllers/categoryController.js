@@ -8,7 +8,9 @@ const sendResponse = require('../utils/responseFormatter');
 // @access  Public
 exports.getCategories = async (req, res, next) => {
   try {
-    const categories = await Category.find({ isActive: true }).populate('subCategories');
+    const categories = await Category.find({ isActive: true })
+      .populate('subCategories')
+      .populate('count');
     sendResponse(res, 200, 'Categories fetched successfully', categories);
   } catch (error) {
     next(error);

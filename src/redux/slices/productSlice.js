@@ -97,6 +97,23 @@ export const adminDeleteProduct = createAsyncThunk(
   }
 );
 
+export const adminUpdateProduct = createAsyncThunk(
+  'products/adminUpdateProduct',
+  async ({ id, ...productData }, { rejectWithValue }) => {
+    try {
+      const response = await apiClient.put(`/products/${id}`, productData);
+      return response.data.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message
+      );
+    }
+  }
+);
+
+
 const initialState = {
   products: [],
   productDetails: null,
@@ -182,6 +199,22 @@ const productSlice = createSlice({
         state.products = state.products.filter(p => p._id !== action.payload && p.id !== action.payload);
       })
       .addCase(adminDeleteProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Admin Update Product
+      .addCase(adminUpdateProduct.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(adminUpdateProduct.fulfilled, (state, action) => {
+        state.loading = false;
+        const index = state.products.findIndex(p => p._id === action.payload._id || p.id === action.payload._id);
+        if (index !== -1) {
+          state.products[index] = action.payload;
+        }
+      })
+      .addCase(adminUpdateProduct.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

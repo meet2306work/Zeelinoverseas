@@ -38,7 +38,7 @@ export default function CategoriesScreen() {
           const Icon = FiBox; // Placeholder icon since icon names aren't in DB usually
           return (
             <Card 
-              key={cat.id} 
+              key={cat._id || cat.id} 
               variant="glass" 
               className="p-8 flex flex-col justify-between hover:-translate-y-1.5 transition-all duration-300 border-slate-200/40 dark:border-slate-800/40 group relative overflow-hidden"
             >
@@ -66,7 +66,7 @@ export default function CategoriesScreen() {
                 <Link 
                   to={isPortal ? `/user/products?category=${cat.slug}` : `/products?category=${cat.slug}`} 
                   className="flex items-center gap-1.5 text-xs font-bold text-secondary dark:text-accent hover:gap-2.5 transition-all"
-                  id={`btn-browse-cat-${cat.id}`}
+                  id={`btn-browse-cat-${cat._id || cat.id}`}
                 >
                   <span>Browse Category</span>
                   <FiArrowRight className="h-4 w-4" />

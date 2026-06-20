@@ -352,7 +352,7 @@ export default function ProductsScreen() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-brand-md">
               {filteredProducts.map((p) => (
-                <Card key={p.id} variant="default" className="flex flex-col h-full p-brand-md group">
+                <Card key={p._id || p.id} variant="default" className="flex flex-col h-full p-brand-md group">
                   <div className="relative aspect-video rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 mb-brand-md border border-brand-border/20">
                     <img
                       src={p.images && p.images.length > 0 ? p.images[0].url : p.image}

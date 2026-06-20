@@ -1,3 +1,5 @@
+import { useState, useEffect, lazy, Suspense } from 'react';
+import { useParams, useLocation, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { FiHeart, FiHelpCircle, FiCheck, FiLayers, FiShield, FiShoppingCart, FiMessageCircle, FiStar } from 'react-icons/fi';
 import Card from '../../commonComponents/cards/Card';
@@ -18,6 +20,10 @@ export default function ProductDetailsScreen() {
   const [reviewComment, setReviewComment] = useState('');
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewTitle, setReviewTitle] = useState('');
+  const [selectedQty, setSelectedQty] = useState(25);
+  const [isAdded, setIsAdded] = useState(false);
+  const [activeTab, setActiveTab] = useState('specs');
+
 
   const isInWishlist = useSelector(selectIsInWishlist(id));
   const { user } = useSelector((state) => state.auth);
@@ -41,13 +47,27 @@ export default function ProductDetailsScreen() {
     name: productDetails.title,
     description: productDetails.description,
     priceTiers: [
-      { qty: 25, label: '25 Units', price: `$${productDetails.price?.toFixed(2)} / Unit` },
-      { qty: 50, label: '50 Units', price: `$${(productDetails.price * 0.95)?.toFixed(2)} / Unit` },
-      { qty: 100, label: '100 Units', price: `$${(productDetails.price * 0.90)?.toFixed(2)} / Unit` },
-      { qty: 200, label: '200 Units', price: `$${(productDetails.price * 0.85)?.toFixed(2)} / Unit` },
+      { qty: 25, label: `25 ${productDetails.unit || 'pcs'}`, price: `$${productDetails.price?.toFixed(2)} / ${productDetails.unit || 'pcs'}` },
+      { qty: 50, label: `50 ${productDetails.unit || 'pcs'}`, price: `$${(productDetails.price * 0.95)?.toFixed(2)} / ${productDetails.unit || 'pcs'}` },
+      { qty: 100, label: `100 ${productDetails.unit || 'pcs'}`, price: `$${(productDetails.price * 0.90)?.toFixed(2)} / ${productDetails.unit || 'pcs'}` },
+      { qty: 200, label: `200 ${productDetails.unit || 'pcs'}`, price: `$${(productDetails.price * 0.85)?.toFixed(2)} / ${productDetails.unit || 'pcs'}` },
     ],
-    moq: `${productDetails.specifications?.find(s => s.key === 'moq')?.value || 25} Units`,
-    specs: productDetails.specifications || [],
+    moq: `${productDetails.specifications?.find(s => s.key === 'moq')?.value || 25} ${productDetails.unit || 'pcs'}`,
+    specs: [
+      productDetails.sku && { key: 'SKU', value: productDetails.sku },
+      productDetails.ply && { key: 'PLY Count', value: productDetails.ply },
+      productDetails.dimension && { key: 'Dimensions', value: `${productDetails.dimension} ${productDetails.sizeUnit || 'mm'}` },
+      productDetails.gsm && { key: 'Paper Weight (GSM)', value: productDetails.gsm },
+      productDetails.color && { key: 'Color / Shade', value: productDetails.color },
+      productDetails.bundle && { key: 'Bundle Quantity', value: `${productDetails.bundle} pcs` },
+      productDetails.unit && { key: 'Sales Unit', value: productDetails.unit === 'pcs' ? 'Per Piece' : 'Per Bundle' },
+      productDetails.gstRate !== undefined && { key: 'GST Rate', value: `${productDetails.gstRate}%` },
+      productDetails.thickness && { key: 'Thickness', value: productDetails.thickness },
+      productDetails.recyclable !== undefined && { key: 'Recyclable', value: productDetails.recyclable ? 'Yes (100% Recyclable)' : 'No' },
+      productDetails.printingOption && { key: 'Printing Option', value: productDetails.printingOption },
+      productDetails.burstingFactor && { key: 'Bursting Factor (BF)', value: productDetails.burstingFactor },
+      ...(productDetails.specifications || [])
+    ].filter(Boolean),
     shipping: 'Vessel shipment to designated Port of Destination. Standard loading duration is 5-7 business days from order release.',
     image: productDetails.images && productDetails.images.length > 0 ? productDetails.images[0].url : fallbackProduct.image,
   } : fallbackProduct;
@@ -117,7 +137,7 @@ export default function ProductDetailsScreen() {
               <span className="text-xs text-slate-400">Loading 3D Canvas...</span>
             </div>
           }>
-            <ThreeDViewer className="aspect-video" />
+            <ThreeDViewer className="aspect-video" modelUrl={productDetails?.threeDModel?.url} />
           </Suspense>
         </div>
 

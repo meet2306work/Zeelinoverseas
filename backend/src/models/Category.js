@@ -38,4 +38,11 @@ categorySchema.virtual('subCategories', {
   justOne: false
 });
 
+categorySchema.virtual('count', {
+  ref: 'Product',
+  localField: '_id',
+  foreignField: 'category',
+  count: true
+});
+
 module.exports = mongoose.model('Category', categorySchema);
