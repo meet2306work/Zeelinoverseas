@@ -11,6 +11,9 @@ require("dotenv").config();
 
 const app = express();
 
+// Trust proxy (required for express-rate-limit behind reverse proxies like Render/Heroku)
+app.set('trust proxy', 1);
+
 // ============================
 // Security
 // ============================
