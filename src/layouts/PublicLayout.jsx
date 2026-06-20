@@ -85,11 +85,13 @@ export default function PublicLayout() {
             )}
             {isAuthenticated ? (
               <>
-                <Link to={role === 'admin' ? '/admin/dashboard' : '/user/home'}>
-                  <Button variant="primary" size="sm">
-                    {role === 'admin' ? 'Dashboard' : 'My Portal'}
-                  </Button>
-                </Link>
+                {role === 'user' && (
+                  <Link to="/user/home">
+                    <Button variant="primary" size="sm">
+                      My Portal
+                    </Button>
+                  </Link>
+                )}
                 <Button variant="outline" size="sm" onClick={() => dispatch(logout())}>
                   Sign Out
                 </Button>
@@ -141,11 +143,13 @@ export default function PublicLayout() {
             )}
             {isAuthenticated ? (
               <>
-                <Link to={role === 'admin' ? '/admin/dashboard' : '/user/home'} onClick={() => setIsMobileMenuOpen(false)}>
-                  <Button variant="primary" className="w-full">
-                    {role === 'admin' ? 'Dashboard' : 'My Portal'}
-                  </Button>
-                </Link>
+                {role === 'user' && (
+                  <Link to="/user/home" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Button variant="primary" className="w-full">
+                      My Portal
+                    </Button>
+                  </Link>
+                )}
                 <Button variant="outline" className="w-full" onClick={() => { setIsMobileMenuOpen(false); dispatch(logout()); }}>
                   Sign Out
                 </Button>
