@@ -94,8 +94,14 @@ const userSchema = new mongoose.Schema({
   resetPasswordExpire: Date,
   emailVerificationToken: String,
   emailVerificationExpire: Date,
-  otp: String,
-  otpExpire: Date,
+  otp: {
+    type: String,
+    select: false
+  },
+  otpExpire: {
+    type: Date,
+    select: false
+  },
   wishlist: [{
     type: mongoose.Schema.ObjectId,
     ref: 'Product'
@@ -119,10 +125,11 @@ userSchema.virtual('fullName').get(function () {
 // Encrypt password using bcrypt before saving
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {
-    next();
+    return typeof next === 'function' ? next() : Promise.resolve();
   }
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
+  if (typeof next === 'function') next();
 });
 
 // Match user entered password to hashed password in database

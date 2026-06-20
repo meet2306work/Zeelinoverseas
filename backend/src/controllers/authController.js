@@ -32,10 +32,16 @@ exports.register = async (req, res, next) => {
   try {
     const { firstName, lastName, email, phone, password, role } = req.body;
 
-    // Check if user exists
-    const userExists = await User.findOne({ email });
-    if (userExists) {
+    // Check duplicate email
+    const emailExists = await User.findOne({ email });
+    if (emailExists) {
       return next(new ErrorResponse('Email is already registered', 400));
+    }
+
+    // Check duplicate phone
+    const phoneExists = await User.findOne({ phone });
+    if (phoneExists) {
+      return next(new ErrorResponse('Phone number is already registered', 400));
     }
 
     // Generate OTP
@@ -57,14 +63,18 @@ exports.register = async (req, res, next) => {
     try {
       await sendEmail({
         email: user.email,
-        subject: 'Email Verification OTP',
-        message: `Welcome to Zeelinoverseas! Your OTP for email verification is ${otp}. It will expire in 10 minutes.`
+        subject: 'Verify Your Email',
+        name: user.firstName,
+        otp
       });
     } catch (err) {
-      console.log('Error sending OTP email:', err);
+      console.error('Error sending OTP email:', err);
     }
 
-    sendTokenResponse(user, 201, res, 'Registration successful. Please verify your email with the OTP sent to you.');
+    res.status(201).json({
+      success: true,
+      message: 'OTP has been sent to your email.'
+    });
   } catch (error) {
     next(error);
   }
@@ -85,6 +95,11 @@ exports.login = async (req, res, next) => {
 
     if (user.status !== 'active') {
       return next(new ErrorResponse('Account is inactive or suspended.', 403));
+    }
+
+    // Block login if email is not verified
+    if (!user.isEmailVerified) {
+      return next(new ErrorResponse('Please verify your email before logging in.', 401));
     }
 
     // Check if password matches
@@ -170,12 +185,12 @@ exports.forgotPassword = async (req, res, next) => {
 
 // @desc    Verify Email with OTP
 // @route   POST /v1/auth/verify-email
-// @access  Private
+// @access  Public
 exports.verifyEmail = async (req, res, next) => {
   try {
-    const { otp } = req.body;
+    const { email, otp } = req.body;
 
-    const user = await User.findById(req.user.id);
+    const user = await User.findOne({ email }).select('+otp +otpExpire');
 
     if (!user) {
       return next(new ErrorResponse('User not found', 404));
@@ -185,16 +200,74 @@ exports.verifyEmail = async (req, res, next) => {
       return next(new ErrorResponse('Email already verified', 400));
     }
 
-    if (user.otp !== otp || user.otpExpire < Date.now()) {
-      return next(new ErrorResponse('Invalid or expired OTP', 400));
+    if (!user.otp || user.otp !== otp) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid OTP.'
+      });
+    }
+
+    if (user.otpExpire < Date.now()) {
+      return res.status(400).json({
+        success: false,
+        message: 'OTP has expired.'
+      });
     }
 
     user.isEmailVerified = true;
-    user.otp = undefined;
-    user.otpExpire = undefined;
+    user.otp = null;
+    user.otpExpire = null;
     await user.save();
 
-    sendResponse(res, 200, 'Email verified successfully');
+    res.status(200).json({
+      success: true,
+      message: 'Email verified successfully.'
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Resend OTP
+// @route   POST /v1/auth/resend-otp
+// @access  Public
+exports.resendOtp = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return next(new ErrorResponse('User not found with this email', 404));
+    }
+
+    if (user.isEmailVerified) {
+      return next(new ErrorResponse('Email already verified', 400));
+    }
+
+    // Generate new OTP
+    const otp = generateOTP();
+    const otpExpire = Date.now() + 10 * 60 * 1000; // 10 minutes
+
+    user.otp = otp;
+    user.otpExpire = otpExpire;
+    await user.save();
+
+    try {
+      await sendEmail({
+        email: user.email,
+        subject: 'Verify Your Email',
+        name: user.firstName,
+        otp
+      });
+    } catch (err) {
+      console.error('Error sending OTP email:', err);
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'A new OTP has been sent.'
+    });
   } catch (error) {
     next(error);
   }

@@ -43,3 +43,14 @@ exports.resetPasswordValidation = [
   check('password', 'Password must be at least 6 characters').isLength({ min: 6 }),
   validate
 ];
+
+exports.verifyEmailValidation = [
+  check('email', 'Please include a valid email').isEmail(),
+  check('otp', 'OTP must be 6 digits').isLength({ min: 6, max: 6 }),
+  validate
+];
+
+exports.resendOtpValidation = [
+  check('email', 'Please include a valid email').isEmail(),
+  validate
+];

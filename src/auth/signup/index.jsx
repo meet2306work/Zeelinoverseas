@@ -34,7 +34,7 @@ export default function AuthSignupScreen() {
 
     try {
       await dispatch(registerUser({ firstName, lastName, email, phone, password })).unwrap();
-      navigate('/auth/verify-otp');
+      navigate('/auth/verify-otp', { state: { email } });
     } catch (err) {
       setLocalError(err || 'Failed to register');
     }

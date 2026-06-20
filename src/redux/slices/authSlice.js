@@ -24,7 +24,6 @@ export const registerUser = createAsyncThunk(
   async (userData, { rejectWithValue }) => {
     try {
       const response = await apiClient.post('/auth/register', userData);
-      localStorage.setItem('auth_token', response.data.data.token);
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -57,6 +56,22 @@ export const verifyEmailOtp = createAsyncThunk(
   async (otpData, { rejectWithValue }) => {
     try {
       const response = await apiClient.post('/auth/verify-email', otpData);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message
+      );
+    }
+  }
+);
+
+export const resendEmailOtp = createAsyncThunk(
+  'auth/resendEmailOtp',
+  async (emailData, { rejectWithValue }) => {
+    try {
+      const response = await apiClient.post('/auth/resend-otp', emailData);
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -184,13 +199,12 @@ const authSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(registerUser.fulfilled, (state, action) => {
+      .addCase(registerUser.fulfilled, (state) => {
         state.loading = false;
-        // User needs to verify email, but they get a token
-        state.isAuthenticated = true;
-        state.user = action.payload.data.user;
-        state.token = action.payload.data.token;
-        state.role = action.payload.data.user.role;
+        state.isAuthenticated = false;
+        state.user = null;
+        state.token = null;
+        state.role = null;
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;
