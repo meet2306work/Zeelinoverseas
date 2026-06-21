@@ -137,10 +137,10 @@ export default function Dropdown({
 
           <div
             onClick={() => !disabled && !isLoading && setIsOpen(!isOpen)}
-            className={`w-full flex items-center justify-between rounded-xl border text-sm transition-all duration-200 outline-none px-3.5 py-2.5 bg-brand-card dark:bg-slate-900 cursor-pointer select-none
-              ${disabled ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed border-brand-border dark:border-slate-800' : 'border-brand-border dark:border-slate-800'}
-              ${error ? 'border-brand-danger focus:ring-1 focus:ring-brand-danger' : 'hover:border-slate-400 dark:hover:border-slate-700'}
-              ${isOpen && !error ? 'ring-2 ring-secondary/20 border-secondary' : ''}
+            className={`w-full flex items-center justify-between rounded-xl border text-sm transition-all duration-200 outline-none px-3.5 py-2.5 bg-background-primary/40 cursor-pointer select-none
+              ${disabled ? 'bg-background-primary/20 text-text-secondary/50 cursor-not-allowed border-border-default' : 'border-border-default'}
+              ${error ? 'border-red-500 focus:ring-1 focus:ring-red-500' : 'hover:border-accent-gold/60'}
+              ${isOpen && !error ? 'ring-1 ring-accent-gold border-accent-gold' : ''}
             `}
           >
             {isLoading ? (
@@ -159,9 +159,9 @@ export default function Dropdown({
 
           {/* Options Panel */}
           {isOpen && (
-            <div className="absolute left-0 right-0 mt-1.5 max-h-60 overflow-y-auto rounded-xl bg-brand-card dark:bg-slate-900 border border-brand-border dark:border-slate-800 shadow-lg z-50 py-1.5 focus:outline-none flex flex-col">
+            <div className="absolute left-0 right-0 mt-1.5 max-h-60 overflow-y-auto rounded-xl bg-background-surface border border-border-default shadow-premium z-50 py-1.5 focus:outline-none flex flex-col">
               {searchable && (
-                <div className="px-2 pb-1.5 border-b border-brand-border/40 dark:border-slate-800/40 mb-1">
+                <div className="px-2 pb-1.5 border-b border-border-default/40 mb-1">
                   <div className="relative flex items-center">
                     <FiSearch className="absolute left-2.5 h-4 w-4 text-brand-text-secondary" />
                     <input
@@ -170,7 +170,7 @@ export default function Dropdown({
                       placeholder="Search..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-brand-border dark:border-slate-805 bg-slate-50 dark:bg-slate-950 outline-none focus:border-secondary transition-colors"
+                      className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-border-default bg-background-primary/60 outline-none focus:border-accent-gold transition-colors"
                       onClick={(e) => e.stopPropagation()}
                     />
                   </div>
@@ -196,12 +196,12 @@ export default function Dropdown({
                           setIsOpen(false);
                         }}
                         className={`flex w-full items-center justify-between px-3.5 py-2 text-sm text-left transition-colors
-                          ${isSelected ? 'bg-secondary/10 text-secondary font-semibold' : 'text-brand-text-primary dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800'}
-                          ${isFocused ? 'bg-slate-100 dark:bg-slate-800' : ''}
+                          ${isSelected ? 'bg-accent-gold/10 text-accent-gold font-semibold' : 'text-text-primary hover:bg-background-primary/60'}
+                          ${isFocused ? 'bg-background-primary/40' : ''}
                         `}
                       >
                         <span>{opt.label}</span>
-                        {isSelected && <FiCheck className="h-4 w-4 text-secondary shrink-0" />}
+                        {isSelected && <FiCheck className="h-4 w-4 text-accent-gold shrink-0" />}
                       </button>
                     );
                   })

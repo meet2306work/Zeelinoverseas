@@ -57,7 +57,7 @@ export default function FileUpload({
   return (
     <div className={`w-full flex flex-col gap-1.5 ${className}`}>
       {label && (
-        <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+        <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
           {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}
@@ -69,10 +69,10 @@ export default function FileUpload({
           onDragLeave={handleDrag}
           onDrop={handleDrop}
           onClick={() => fileInputRef.current?.click()}
-          className={`flex flex-col items-center justify-center border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all duration-200 bg-white dark:bg-slate-900/40
+          className={`flex flex-col items-center justify-center border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all duration-200 bg-background-primary/40
             ${isDragActive 
-              ? 'border-teal-500 bg-teal-50/20 dark:bg-teal-950/10' 
-              : 'border-slate-300 hover:border-teal-500 dark:border-slate-800'
+              ? 'border-accent-gold bg-accent-gold/5' 
+              : 'border-border-default hover:border-accent-gold hover:bg-background-primary/60'
             }
           `}
         >
@@ -83,25 +83,25 @@ export default function FileUpload({
             accept={accept}
             className="hidden"
           />
-          <FiUploadCloud className="h-9 w-9 text-slate-400 dark:text-slate-600 mb-2.5" />
-          <p className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">
+          <FiUploadCloud className="h-9 w-9 text-accent-gold/60 mb-2.5" />
+          <p className="text-sm font-semibold text-text-primary mb-1">
             Click to upload or drag & drop
           </p>
-          <p className="text-xs text-slate-500 dark:text-slate-500">
+          <p className="text-xs text-text-secondary">
             Accepts {accept.replaceAll('.', '').toUpperCase()} up to {maxSizeMB}MB
           </p>
         </div>
       ) : (
-        <div className="flex items-center justify-between rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 p-4.5">
+        <div className="flex items-center justify-between rounded-xl border border-border-default bg-background-primary/40 p-4">
           <div className="flex items-center gap-3">
-            <div className="rounded-lg p-2 bg-teal-50 dark:bg-teal-950/20 text-teal-600 dark:text-teal-400">
+            <div className="rounded-lg p-2 bg-accent-gold/15 text-accent-gold">
               <FiFile className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate max-w-[200px] sm:max-w-xs">
+              <p className="text-sm font-semibold text-text-primary truncate max-w-[200px] sm:max-w-xs">
                 {selectedFile.name}
               </p>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-text-secondary">
                 {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB
               </p>
             </div>
@@ -109,7 +109,7 @@ export default function FileUpload({
           <button
             type="button"
             onClick={onClear}
-            className="rounded-lg p-2 text-slate-400 hover:text-red-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            className="rounded-lg p-2 text-text-secondary/60 hover:text-red-500 hover:bg-border-default/30 transition-colors"
           >
             <FiTrash2 className="h-5 w-5" />
           </button>
