@@ -10,24 +10,24 @@ export default function Card({
 }) {
   const shouldReduceMotion = useReducedMotion();
   const isInteractive = Boolean(onClick);
-  const baseClasses = 'rounded-2xl p-5 bg-brand-surface dark:bg-slate-900 border border-slate-200 dark:border-slate-800 transition-[border-color,box-shadow,background-color] duration-brand-base';
+  const baseClasses = 'rounded-2xl p-5 bg-primary-light border border-primary-border/60 transition-[border-color,box-shadow,background-color] duration-brand-base text-brand-text-primary';
   
   const variants = {
-    default: 'shadow-premium',
-    glass: 'glass-card border-slate-200/40 dark:border-slate-800/40',
-    borderless: 'border-none shadow-none p-0 bg-transparent dark:bg-transparent',
-    glow: 'shadow-premium border-teal-500/10 dark:border-teal-500/5 relative before:absolute before:inset-0 before:rounded-2xl before:border before:border-teal-500/10 dark:before:border-teal-400/5 before:pointer-events-none',
+    default: 'shadow-premium hover:border-accent/30 hover:shadow-card-hover',
+    glass: 'glass-panel border-accent/15 dark:border-accent/15',
+    borderless: 'border-none shadow-none p-0 bg-transparent dark:bg-transparent text-inherit',
+    glow: 'shadow-premium border-accent/25 relative hover:border-accent/50 hover:shadow-[0_0_25px_rgba(212,164,55,0.15)]',
   };
 
   const hoverClasses = hover && variant !== 'borderless'
-    ? `hover:shadow-card-hover dark:hover:shadow-black/40 ${isInteractive ? 'cursor-pointer' : ''}`
+    ? `hover:shadow-card-hover ${isInteractive ? 'cursor-pointer' : ''}`
     : '';
 
   return (
     <motion.div
       onClick={onClick}
-      whileHover={hover && variant !== 'borderless' && !shouldReduceMotion ? { y: -4 } : undefined}
-      whileTap={isInteractive && !shouldReduceMotion ? { scale: 0.995 } : undefined}
+      whileHover={hover && variant !== 'borderless' && !shouldReduceMotion ? { y: -6, scale: 1.01 } : undefined}
+      whileTap={isInteractive && !shouldReduceMotion ? { scale: 0.99 } : undefined}
       transition={motionTransitions.interface}
       className={`${baseClasses} ${variants[variant]} ${hoverClasses} ${className}`}
     >

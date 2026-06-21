@@ -20,8 +20,8 @@ export const motionSprings = Object.freeze({
 export const motionTransitions = Object.freeze({
   admin: { duration: motionDurations.fast, ease: motionEasings.enter },
   interface: { duration: motionDurations.base, ease: motionEasings.enter },
-  storefront: { duration: motionDurations.expressive, ease: motionEasings.enter },
-  exit: { duration: motionDurations.fast, ease: motionEasings.exit },
+  storefront: { duration: motionDurations.slow, ease: motionEasings.enter },
+  exit: { duration: motionDurations.base, ease: motionEasings.exit },
 });
 
 export function createFadeVariants(reducedMotion = false) {

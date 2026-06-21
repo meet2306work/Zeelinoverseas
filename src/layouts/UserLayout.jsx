@@ -83,23 +83,23 @@ export default function UserLayout() {
   ];
 
   return (
-    <div className="min-h-screen flex bg-brand-bg dark:bg-slate-950 font-sans">
+    <div className="min-h-screen flex bg-brand-bg font-sans text-slate-100">
       {/* Collapsible Left Sidebar (Desktop only) */}
       <aside
-        className={`hidden lg:flex flex-col border-r border-brand-border dark:border-slate-800 bg-brand-card dark:bg-slate-900 transition-all duration-300 h-screen sticky top-0
+        className={`hidden lg:flex flex-col border-r border-primary-border bg-primary-light transition-all duration-300 h-screen sticky top-0
           ${isSidebarCollapsed ? 'w-20' : 'w-64'}
         `}
       >
         {/* Logo Block */}
-        <div className={`h-16 flex items-center border-b border-brand-border/40 dark:border-slate-800/40 ${isSidebarCollapsed ? 'justify-center' : 'justify-between px-brand-md'}`}>
+        <div className={`h-16 flex items-center border-b border-primary-border/60 ${isSidebarCollapsed ? 'justify-center' : 'justify-between px-brand-md'}`}>
           {!isSidebarCollapsed && (
-            <span className="text-lg font-bold tracking-tight bg-gradient-to-r from-secondary to-accent text-transparent bg-clip-text">
-              ZEELIN<span className="text-primary dark:text-white">PORTAL</span>
+            <span className="text-lg font-bold tracking-tight text-slate-100">
+              ZEELIN<span className="text-accent font-black">PORTAL</span>
             </span>
           )}
           <button
             onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-            className={`p-1.5 rounded-lg text-brand-text-secondary hover:text-brand-text-primary hover:bg-slate-100 dark:hover:bg-slate-800/60 ${isSidebarCollapsed ? '' : 'ml-auto'}`}
+            className={`p-1.5 rounded-lg text-slate-400 hover:text-accent hover:bg-primary-medium/60 ${isSidebarCollapsed ? '' : 'ml-auto'}`}
           >
             <FiMenu className="h-5 w-5" />
           </button>
@@ -123,12 +123,12 @@ export default function UserLayout() {
                     : 'gap-brand-md px-brand-md py-brand-sm text-sm font-semibold'
                   }
                   ${isActive
-                    ? 'bg-secondary text-white shadow-md shadow-secondary/15'
-                    : 'text-brand-text-secondary hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-brand-text-primary dark:hover:text-slate-100'
+                    ? 'bg-accent text-slate-950 shadow-md shadow-accent/15'
+                    : 'text-slate-400 hover:bg-primary-medium/60 hover:text-slate-100'
                   }
                 `}
               >
-                <LinkIcon className="h-5 w-5 shrink-0" />
+                <LinkIcon className={`h-5 w-5 shrink-0 ${isActive ? 'text-slate-955' : 'text-slate-400'}`} />
                 {!isSidebarCollapsed && <span>{link.label}</span>}
               </Link>
             );
@@ -136,7 +136,7 @@ export default function UserLayout() {
         </nav>
 
         {/* Footer actions */}
-        <div className="p-brand-sm border-t border-brand-border dark:border-slate-800">
+        <div className="p-brand-sm border-t border-primary-border">
           <button
             onClick={() => setIsLogoutDialogOpen(true)}
             title={isSidebarCollapsed ? "Sign Out" : undefined}
@@ -145,7 +145,7 @@ export default function UserLayout() {
                 ? 'justify-center w-10 h-10 mx-auto' 
                 : 'gap-brand-md w-full px-brand-md py-brand-sm text-sm font-semibold'
               }
-              text-brand-text-secondary hover:text-brand-danger hover:bg-red-50 dark:hover:bg-red-950/10
+              text-slate-400 hover:text-brand-danger hover:bg-red-950/10
             `}
           >
             <FiLogOut className="h-5 w-5 shrink-0" />
@@ -158,15 +158,15 @@ export default function UserLayout() {
       {isMobileOpen && (
         <div className="lg:hidden fixed inset-0 z-50 flex">
           {/* Backdrop */}
-          <div onClick={() => setIsMobileOpen(false)} className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs" />
+          <div onClick={() => setIsMobileOpen(false)} className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs" />
           
           {/* Menu */}
-          <div className="relative w-64 bg-brand-card dark:bg-slate-900 h-full flex flex-col p-brand-md border-r border-brand-border dark:border-slate-800 shadow-2xl glass-panel">
+          <div className="relative w-64 bg-primary-light h-full flex flex-col p-brand-md border-r border-primary-border shadow-2xl glass-panel">
             <div className="flex items-center justify-between mb-brand-lg">
-              <span className="text-lg font-bold bg-gradient-to-r from-secondary to-accent text-transparent bg-clip-text">
-                ZEELINPORTAL
+              <span className="text-lg font-bold text-slate-150">
+                ZEELIN<span className="text-accent font-black">PORTAL</span>
               </span>
-              <button onClick={() => setIsMobileOpen(false)} className="p-1.5 text-brand-text-secondary">
+              <button onClick={() => setIsMobileOpen(false)} className="p-1.5 text-slate-400">
                 <FiX className="h-6 w-6" />
               </button>
             </div>
@@ -184,12 +184,12 @@ export default function UserLayout() {
                     onClick={() => setIsMobileOpen(false)}
                     className={`flex items-center gap-brand-md px-brand-md py-brand-sm text-sm font-semibold rounded-xl
                       ${isActive
-                        ? 'bg-secondary text-white'
-                        : 'text-brand-text-secondary hover:bg-slate-100 dark:hover:bg-slate-800'
+                        ? 'bg-accent text-slate-950 shadow-md shadow-accent/15'
+                        : 'text-slate-400 hover:bg-primary-medium/60'
                       }
                     `}
                   >
-                    <LinkIcon className="h-5 w-5" />
+                    <LinkIcon className={`h-5 w-5 ${isActive ? 'text-slate-955' : 'text-slate-400'}`} />
                     <span>{link.label}</span>
                   </Link>
                 );
@@ -198,7 +198,7 @@ export default function UserLayout() {
 
             <button
               onClick={() => setIsLogoutDialogOpen(true)}
-              className="flex items-center gap-brand-md w-full px-brand-md py-brand-sm text-sm font-semibold text-brand-text-secondary hover:text-brand-danger rounded-xl"
+              className="flex items-center gap-brand-md w-full px-brand-md py-brand-sm text-sm font-semibold text-slate-400 hover:text-brand-danger rounded-xl"
             >
               <FiLogOut className="h-5 w-5" />
               <span>Sign Out</span>
@@ -210,44 +210,44 @@ export default function UserLayout() {
       {/* Right Content Workspace */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Right Header */}
-        <header className="h-16 border-b border-brand-border/45 dark:border-slate-800/40 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md sticky top-0 z-30 px-brand-md flex items-center justify-between">
+        <header className="h-16 border-b border-primary-border bg-primary-light/90 backdrop-blur-md sticky top-0 z-30 px-brand-md flex items-center justify-between shadow-lg shadow-primary/10">
           <div className="flex items-center gap-brand-sm">
             <button
               onClick={() => setIsMobileOpen(true)}
-              className="lg:hidden p-2 rounded-lg text-brand-text-secondary hover:bg-slate-100 dark:hover:bg-slate-800"
+              className="lg:hidden p-2 rounded-lg text-slate-400 hover:bg-primary-medium/60 hover:text-accent"
             >
               <FiMenu className="h-6 w-6" />
             </button>
-            <h2 className="text-base font-bold text-brand-text-primary dark:text-white hidden sm:block">
+            <h2 className="text-sm font-extrabold text-slate-100 hidden sm:block uppercase tracking-wider font-display">
               Global Trade Desk
             </h2>
           </div>
 
           <div className="flex items-center gap-brand-md">
-            <Link to="/user/inquiry-cart" className="relative p-2 text-brand-text-secondary hover:text-secondary transition-colors" title="Inquiry Follow-up">
+            <Link to="/user/inquiry-cart" className="relative p-2 text-slate-400 hover:text-accent transition-colors" title="Inquiry Follow-up">
               <FiMessageSquare className="h-5.5 w-5.5" />
             </Link>
-            <Link to="/user/notifications" className="relative p-2 text-brand-text-secondary hover:text-secondary transition-colors">
+            <Link to="/user/notifications" className="relative p-2 text-slate-400 hover:text-accent transition-colors">
               <FiBell className="h-5.5 w-5.5" />
-              <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-brand-danger ring-2 ring-brand-card dark:ring-slate-900" />
+              <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-brand-danger ring-2 ring-primary-light" />
             </Link>
 
             {/* Profile Dropdown */}
             <Dropdown
               trigger={
-                <div className="flex items-center gap-2.5 p-1 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors">
+                <div className="flex items-center gap-2.5 p-1 rounded-xl hover:bg-primary-medium/80 transition-colors cursor-pointer">
                   {currentUser?.avatar ? (
                     <img
                       src={currentUser.avatar}
                       alt={fullName}
-                      className="h-8.5 w-8.5 rounded-full object-cover border border-secondary/20 shadow-sm"
+                      className="h-8.5 w-8.5 rounded-full object-cover border border-accent/25 shadow-sm"
                     />
                   ) : (
-                    <div className="h-8.5 w-8.5 rounded-full bg-blue-50 dark:bg-blue-950 flex items-center justify-center font-bold text-secondary dark:text-blue-400">
+                    <div className="h-8.5 w-8.5 rounded-full bg-primary-medium flex items-center justify-center font-bold text-accent">
                       {initials}
                     </div>
                   )}
-                  <span className="text-sm font-semibold text-brand-text-primary dark:text-slate-200 hidden md:inline">
+                  <span className="text-xs font-bold text-slate-205 hidden md:inline">
                     {fullName}
                   </span>
                 </div>

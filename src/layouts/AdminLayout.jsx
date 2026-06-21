@@ -84,31 +84,31 @@ export default function AdminLayout() {
   ];
 
   return (
-    <div className="min-h-screen flex bg-slate-50 text-slate-800 font-sans transition-colors duration-300">
+    <div className="min-h-screen flex bg-brand-bg text-brand-text-primary font-sans transition-colors duration-300">
       {/* Collapsible Left Sidebar (Desktop) */}
       <aside
-        className={`hidden lg:flex flex-col border-r border-slate-200/80 bg-white shadow-sm transition-all duration-300 h-screen sticky top-0
+        className={`hidden lg:flex flex-col border-r border-brand-border bg-brand-card transition-all duration-300 h-screen sticky top-0
           ${isSidebarCollapsed ? 'w-20' : 'w-64'}
         `}
       >
         {/* Logo Section */}
-        <div className={`h-16 flex items-center border-b border-slate-200/80 ${isSidebarCollapsed ? 'justify-center' : 'justify-between px-brand-md'}`}>
+        <div className={`h-16 flex items-center border-b border-brand-border/60 ${isSidebarCollapsed ? 'justify-center' : 'justify-between px-brand-md'}`}>
           {!isSidebarCollapsed && (
-            <span className="text-sm font-black tracking-widest text-slate-800 flex items-center gap-1.5 uppercase select-none">
-              <span className="text-blue-600">Zeelin</span>
-              <span className="text-cyan-600">CRM</span>
+            <span className="text-sm font-black tracking-widest text-brand-text-primary flex items-center gap-1.5 uppercase select-none font-display">
+              <span className="text-accent">Zeelin</span>
+              <span className="text-brand-text-secondary">CRM</span>
             </span>
           )}
           <button
             onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-            className={`p-1.5 rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer ${isSidebarCollapsed ? '' : 'ml-auto'}`}
+            className={`p-1.5 rounded-lg text-brand-text-secondary hover:text-accent hover:bg-primary-medium/60 transition-colors cursor-pointer ${isSidebarCollapsed ? '' : 'ml-auto'}`}
           >
             <FiMenu className="h-5 w-5" />
           </button>
         </div>
 
         {/* Navigation items */}
-        <nav className="flex-1 overflow-y-auto px-brand-sm py-brand-md flex flex-col gap-brand-xs scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
+        <nav className="flex-1 overflow-y-auto px-brand-sm py-brand-md flex flex-col gap-brand-xs scrollbar-thin scrollbar-thumb-primary-medium scrollbar-track-transparent">
           {sidebarLinks.map((link) => {
             const LinkIcon = link.icon;
             const isActive = location.pathname === link.path;
@@ -123,15 +123,15 @@ export default function AdminLayout() {
                     : 'gap-brand-md px-brand-md py-brand-sm text-xs font-semibold'
                   }
                   ${isActive
-                    ? 'bg-blue-50/80 border-blue-100/50 text-blue-600 font-bold shadow-sm'
-                    : 'text-slate-500 hover:bg-slate-100/70 hover:text-slate-800 hover:translate-x-0.5 border-transparent'
+                    ? 'bg-accent/10 border-accent/25 text-accent font-bold shadow-sm shadow-accent/5'
+                    : 'text-brand-text-secondary hover:bg-primary-medium/40 hover:text-brand-text-primary hover:translate-x-0.5 border-transparent'
                   }
                 `}
               >
                 {isActive && !isSidebarCollapsed && (
-                  <span className="absolute left-0 top-3 bottom-3 w-0.75 rounded-r bg-blue-600" />
+                  <span className="absolute left-0 top-3 bottom-3 w-0.75 rounded-r bg-accent" />
                 )}
-                <LinkIcon className={`h-4.5 w-4.5 shrink-0 ${isActive ? 'text-blue-600' : 'text-slate-400'}`} />
+                <LinkIcon className={`h-4.5 w-4.5 shrink-0 ${isActive ? 'text-accent' : 'text-brand-text-secondary'}`} />
                 {!isSidebarCollapsed && <span>{link.label}</span>}
               </Link>
             );
@@ -139,7 +139,7 @@ export default function AdminLayout() {
         </nav>
 
         {/* Footer */}
-        <div className="p-brand-sm border-t border-slate-200/80">
+        <div className="p-brand-sm border-t border-brand-border/60">
           <button
             onClick={() => setIsLogoutDialogOpen(true)}
             title={isSidebarCollapsed ? "Log Out" : undefined}
@@ -148,7 +148,7 @@ export default function AdminLayout() {
                 ? 'justify-center w-10 h-10 mx-auto' 
                 : 'gap-brand-md w-full px-brand-md py-brand-sm text-xs font-semibold'
               }
-              text-slate-500 hover:text-brand-danger hover:bg-red-50
+              text-brand-text-secondary hover:text-brand-danger hover:bg-red-950/10
             `}
           >
             <FiLogOut className="h-4.5 w-4.5 shrink-0" />
@@ -161,16 +161,16 @@ export default function AdminLayout() {
       {isMobileOpen && (
         <div className="lg:hidden fixed inset-0 z-50 flex">
           {/* Backdrop */}
-          <div onClick={() => setIsMobileOpen(false)} className="fixed inset-0 bg-slate-950/40 backdrop-blur-sm transition-opacity duration-300" />
+          <div onClick={() => setIsMobileOpen(false)} className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs transition-opacity duration-300" />
           
           {/* Menu */}
-          <div className="relative w-64 bg-white h-full flex flex-col p-brand-md border-r border-slate-200/80 shadow-2xl animate-fade-in-up">
+          <div className="relative w-64 bg-brand-card h-full flex flex-col p-brand-md border-r border-brand-border/60 shadow-2xl glass-panel animate-fade-in-up">
             <div className="flex items-center justify-between mb-brand-lg">
-              <span className="text-sm font-black tracking-widest text-slate-800 flex items-center gap-1.5 uppercase select-none">
-                <span className="text-blue-600">Zeelin</span>
-                <span className="text-cyan-600">CRM</span>
+              <span className="text-sm font-black tracking-widest text-brand-text-primary flex items-center gap-1.5 uppercase select-none font-display">
+                <span className="text-accent">Zeelin</span>
+                <span className="text-brand-text-secondary">CRM</span>
               </span>
-              <button onClick={() => setIsMobileOpen(false)} className="p-1.5 text-slate-400 hover:text-slate-800 cursor-pointer">
+              <button onClick={() => setIsMobileOpen(false)} className="p-1.5 text-brand-text-secondary hover:text-brand-text-primary cursor-pointer">
                 <FiX className="h-6 w-6" />
               </button>
             </div>
@@ -186,25 +186,25 @@ export default function AdminLayout() {
                     onClick={() => setIsMobileOpen(false)}
                     className={`flex items-center gap-brand-md px-brand-md py-brand-sm text-xs font-semibold rounded-xl border relative
                       ${isActive
-                        ? 'bg-blue-50 border-blue-100 text-blue-600 font-bold'
-                        : 'text-slate-500 hover:bg-slate-100 hover:text-slate-800 border-transparent'
+                        ? 'bg-accent/10 border-accent/25 text-accent font-bold shadow-sm shadow-accent/5'
+                        : 'text-brand-text-secondary hover:bg-primary-medium/40 hover:text-brand-text-primary border-transparent'
                       }
                     `}
                   >
                     {isActive && (
-                      <span className="absolute left-0 top-3 bottom-3 w-0.75 rounded-r bg-blue-600" />
+                      <span className="absolute left-0 top-3 bottom-3 w-0.75 rounded-r bg-accent" />
                     )}
-                    <LinkIcon className={`h-4.5 w-4.5 ${isActive ? 'text-blue-600' : 'text-slate-400'}`} />
+                    <LinkIcon className={`h-4.5 w-4.5 ${isActive ? 'text-accent' : 'text-brand-text-secondary'}`} />
                     <span>{link.label}</span>
                   </Link>
                 );
               })}
             </nav>
             
-            <div className="pt-4 border-t border-slate-200/80 mt-4">
+            <div className="pt-4 border-t border-brand-border/60 mt-4">
               <button
                 onClick={() => setIsLogoutDialogOpen(true)}
-                className="flex items-center gap-brand-md w-full px-brand-md py-brand-sm text-xs font-semibold text-slate-500 hover:text-brand-danger hover:bg-red-50 rounded-xl transition-colors border border-transparent cursor-pointer"
+                className="flex items-center gap-brand-md w-full px-brand-md py-brand-sm text-xs font-semibold text-brand-text-secondary hover:text-brand-danger hover:bg-red-950/10 rounded-xl transition-colors border border-transparent cursor-pointer"
               >
                 <FiLogOut className="h-4.5 w-4.5" />
                 <span>Log Out</span>
@@ -215,44 +215,44 @@ export default function AdminLayout() {
       )}
 
       {/* Content Space */}
-      <div className="flex-1 flex flex-col min-w-0 bg-slate-50">
+      <div className="flex-1 flex flex-col min-w-0 bg-brand-bg">
         {/* Header */}
-        <header className="h-16 border-b border-slate-200/80 bg-white/80 backdrop-blur-xl sticky top-0 z-30 px-brand-md flex items-center justify-between">
+        <header className="h-16 border-b border-brand-border/60 bg-brand-card/90 backdrop-blur-xl sticky top-0 z-30 px-brand-md flex items-center justify-between">
           <div className="flex items-center gap-brand-sm">
             <button
               onClick={() => setIsMobileOpen(true)}
-              className="lg:hidden p-2 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors cursor-pointer"
+              className="lg:hidden p-2 rounded-lg text-brand-text-secondary hover:bg-primary-medium/60 hover:text-accent transition-colors cursor-pointer"
             >
               <FiMenu className="h-6 w-6" />
             </button>
-            <h2 className="text-xs font-extrabold text-slate-400 uppercase tracking-widest hidden sm:block select-none">
+            <h2 className="text-xs font-extrabold text-brand-text-secondary uppercase tracking-widest hidden sm:block select-none">
               Control Panel
             </h2>
           </div>
 
           <div className="flex items-center gap-brand-md">
-            <button className="relative p-2 text-slate-400 hover:text-slate-650 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer">
+            <button className="relative p-2 text-brand-text-secondary hover:text-accent hover:bg-primary-medium/60 rounded-lg transition-colors cursor-pointer">
               <FiBell className="h-5 w-5" />
-              <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-blue-600 ring-2 ring-white" />
+              <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-brand-danger ring-2 ring-brand-card" />
             </button>
 
             {/* Profile Dropdown */}
             <Dropdown
               align="right"
               trigger={
-                <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-slate-100/80 border border-slate-200/60 hover:bg-slate-200 hover:border-slate-300 transition-all duration-200 cursor-pointer">
+                <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-primary-medium/70 border border-brand-border/40 hover:bg-primary-medium hover:border-brand-border/80 transition-all duration-200 cursor-pointer">
                   {currentUser?.avatar ? (
                     <img
                       src={currentUser.avatar}
                       alt={fullName}
-                      className="h-7 w-7 rounded-lg object-cover border border-blue-500/20 shadow-md"
+                      className="h-7 w-7 rounded-lg object-cover border border-accent/25 shadow-md"
                     />
                   ) : (
-                    <div className="h-7 w-7 rounded-lg bg-gradient-to-tr from-blue-600 to-cyan-500 flex items-center justify-center font-black text-white text-xs shadow-md shadow-blue-500/10">
+                    <div className="h-7 w-7 rounded-lg bg-gradient-to-tr from-accent to-accent-light flex items-center justify-center font-black text-primary text-xs shadow-md shadow-accent/10">
                       {initials}
                     </div>
                   )}
-                  <span className="text-xs font-bold text-slate-700 hidden md:inline">
+                  <span className="text-xs font-bold text-brand-text-primary hidden md:inline">
                     {fullName}
                   </span>
                 </div>

@@ -54,15 +54,15 @@ export default function PublicLayout() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-brand-bg dark:bg-slate-950">
+    <div className="min-h-screen flex flex-col bg-brand-bg">
       {/* Premium Glass Header */}
-      <motion.header layout={!shouldReduceMotion} transition={motionTransitions.admin} className={`sticky top-0 z-40 w-full border-b backdrop-blur-xl transition-[background-color,border-color,box-shadow] ${isScrolled ? 'border-brand-border bg-white/90 shadow-card dark:border-slate-800 dark:bg-slate-900/90' : 'border-brand-border/40 bg-white/70 dark:border-slate-800/40 dark:bg-slate-900/70'}`}>
+      <motion.header layout={!shouldReduceMotion} transition={motionTransitions.admin} className={`sticky top-0 z-40 w-full border-b backdrop-blur-xl transition-[background-color,border-color,box-shadow] ${isScrolled ? 'border-accent/20 bg-primary-light/95 shadow-lg shadow-accent/5' : 'border-primary-border/60 bg-primary/90'}`}>
         <div className={`${isScrolled ? 'h-14' : 'h-16'} w-full px-brand-md sm:px-brand-lg lg:px-brand-xl flex items-center justify-between transition-[height] duration-brand-fast`}>
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
             <span className="text-xl font-extrabold tracking-tight">
-              <span className="text-secondary dark:text-blue-400">ZEELIN</span>
-              <span className="text-primary dark:text-white font-medium">OVERSEAS</span>
+              <span className="text-accent font-black tracking-wide">ZEELIN</span>
+              <span className="text-slate-200 font-medium">OVERSEAS</span>
             </span>
           </Link>
 
@@ -74,14 +74,17 @@ export default function PublicLayout() {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`text-sm font-semibold transition-colors
+                  className={`text-xs uppercase tracking-widest font-bold transition-colors relative py-1
                     ${isActive 
-                      ? 'text-secondary dark:text-accent' 
-                      : 'text-brand-text-secondary dark:text-slate-400 hover:text-secondary dark:hover:text-accent'
+                      ? 'text-accent' 
+                      : 'text-slate-400 hover:text-accent'
                     }
                   `}
                 >
                   {link.label}
+                  {isActive && (
+                    <motion.span layoutId="activeNavLine" className="absolute bottom-0 left-0 right-0 h-[2px] bg-accent" transition={motionTransitions.interface} />
+                  )}
                 </Link>
               );
             })}
@@ -90,8 +93,8 @@ export default function PublicLayout() {
           {/* Action Icons */}
           <div className="hidden md:flex items-center gap-brand-md">
             {isAuthenticated && (
-              <Link to="/inquiry-cart" className="relative p-2 text-brand-text-secondary hover:text-secondary transition-colors" title="Inquiry Follow-up">
-                <FiMessageSquare className="h-5.5 w-5.5" />
+              <Link to="/inquiry-cart" className="relative p-2 text-slate-400 hover:text-accent transition-colors" title="Inquiry Follow-up">
+                <FiMessageSquare className="h-5 w-5" />
               </Link>
             )}
             {isAuthenticated ? (
@@ -119,7 +122,7 @@ export default function PublicLayout() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg text-brand-text-secondary dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            className="md:hidden p-2 rounded-lg text-slate-400 hover:text-accent hover:bg-primary-medium transition-colors"
           >
             {isMobileMenuOpen ? <FiX className="h-6 w-6" /> : <FiMenu className="h-6 w-6" />}
           </button>
@@ -129,21 +132,21 @@ export default function PublicLayout() {
       {/* Mobile Drawer Menu */}
       <AnimatePresence>
       {isMobileMenuOpen && (
-        <motion.div initial={{ opacity: 0, y: shouldReduceMotion ? 0 : -12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: shouldReduceMotion ? 0 : -12 }} transition={shouldReduceMotion ? { duration: 0 } : motionTransitions.interface} className="md:hidden fixed inset-0 top-16 z-30 bg-white dark:bg-slate-900 border-b border-brand-border dark:border-slate-800 p-brand-md flex flex-col gap-brand-md shadow-xl">
+        <motion.div initial={{ opacity: 0, y: shouldReduceMotion ? 0 : -12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: shouldReduceMotion ? 0 : -12 }} transition={shouldReduceMotion ? { duration: 0 } : motionTransitions.interface} className="md:hidden fixed inset-x-0 top-16 z-30 bg-primary-light border-b border-primary-border p-brand-md flex flex-col gap-brand-md shadow-2xl">
           <nav className="flex flex-col gap-brand-sm">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="text-base font-semibold text-brand-text-primary dark:text-slate-200 hover:text-secondary"
+                className="text-sm uppercase tracking-wider font-bold text-slate-300 hover:text-accent py-1"
               >
                 {link.label}
               </Link>
             ))}
           </nav>
           
-          <div className="h-px bg-brand-border dark:bg-slate-800 my-1" />
+          <div className="h-px bg-primary-border my-1" />
 
           <div className="flex flex-col gap-brand-sm">
             {isAuthenticated && (

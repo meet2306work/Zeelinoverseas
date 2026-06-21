@@ -1,41 +1,41 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap');
 
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  /* Core brand palette */
-  --color-primary: #0F1729; /* Navy primary */
-  --color-primary-light: #1E293B;
-  --color-primary-medium: #334155;
-  --color-primary-blue: #2563EB;
-  --color-primary-slate: #64748B;
-  --color-primary-soft: #F1F5F9;
-  --color-primary-border: #E2E8F0;
+  /* Core brand palette: Premium Deep Navy & Gold */
+  --color-primary: #04263F; /* Navy primary background */
+  --color-primary-light: #0B2C46; /* Navy medium background */
+  --color-primary-medium: #0F3757; /* Lighter navy surface */
+  --color-primary-blue: #16466E;
+  --color-primary-slate: #8BA8C2; /* Muted blue-grey */
+  --color-primary-soft: #F4EFE6; /* Warm cream/off-white */
+  --color-primary-border: #163A57;
 
-  --color-accent: #06B6D4; /* Cyan accent */
-  --color-accent-amber: #0EA5E9;
-  --color-accent-darkest: #083344;
-  --color-accent-dark: #0e7490;
-  --color-accent-light: #22d3ee;
-  --color-accent-soft: #ecfeff;
-  --color-accent-lightest: #f0fdfa;
+  --color-accent: #D4A437; /* Warm Gold accent */
+  --color-accent-amber: #F0B94A;
+  --color-accent-darkest: #1D1502;
+  --color-accent-dark: #8F6E20;
+  --color-accent-light: #FCDA82;
+  --color-accent-soft: #FFFBEF;
+  --color-accent-lightest: #FFFDF9;
 
-  /* We override secondary to be Blue */
-  --color-secondary: #2563EB;
+  /* Overrides to match amber/gold secondary */
+  --color-secondary: #D4A437;
 
   /* Restrained premium accent */
-  --color-brand-accent: #F59E0B;
-  --color-brand-accent-hover: #D97706;
-  --color-brand-accent-soft: #FFFBEB;
+  --color-brand-accent: #D4A437;
+  --color-brand-accent-hover: #B88A24;
+  --color-brand-accent-soft: #FFFBEF;
 
   /* Semantic surfaces */
-  --color-brand-surface: #FFFFFF;
-  --color-brand-surface-muted: #F1F5F9;
-  --color-brand-surface-raised: #FFFFFF;
-  --color-brand-surface-inverse: #0F1729;
-  --color-brand-text-inverse: #F8FAFC;
+  --color-brand-surface: #0A2E4B; /* Dark navy card surface */
+  --color-brand-surface-muted: #04263F;
+  --color-brand-surface-raised: #0F3757;
+  --color-brand-surface-inverse: #FAF6EE;
+  --color-brand-text-inverse: #04263F;
 
   /* Success Palette */
   --color-brand-success: #10B981;
@@ -47,43 +47,45 @@
   --color-brand-danger-light: #FEE2E2;
 
   /* Info Palette */
-  --color-brand-info: #3B82F6;
-  --color-brand-info-light: #DBEAFE;
+  --color-brand-info: #D4A437;
+  --color-brand-info-light: #FFFBEF;
 
-  --color-brand-bg: #F8FAFC;
-  --color-brand-card: #FFFFFF;
-  --color-brand-text-primary: #111827;
-  --color-brand-text-secondary: #4B5563;
-  --color-brand-border: #E5E7EB;
+  --color-brand-bg: #041D30;
+  --color-brand-card: #0F3354; /* Slightly lighter navy for cards/panels to sit visibly above bg */
+  --color-brand-text-primary: #FAF6EE;
+  --color-brand-text-secondary: #8BA8C2;
+  --color-brand-border: #163A57;
 
   /* Global Color redirects to standard Tailwind slate/teal colors */
-  --color-teal-50: #f0fdfa;
-  --color-teal-100: #ccfbf1;
-  --color-teal-200: #99f6e4;
-  --color-teal-300: #5eead4;
-  --color-teal-400: #2dd4bf;
-  --color-teal-500: #14b8a6;
-  --color-teal-600: #0d9488;
-  --color-teal-700: #0f766e;
-  --color-teal-800: #115e59;
-  --color-teal-900: #134e4a;
-  --color-teal-950: #042f2e;
+  --color-teal-50: #fdfbf7;
+  --color-teal-100: #faf6ee;
+  --color-teal-200: #fcda82;
+  --color-teal-300: #f0b94a;
+  --color-teal-400: #d4a437;
+  --color-teal-500: #b88a24;
+  --color-teal-600: #8f6e20;
+  --color-teal-700: #695015;
+  --color-teal-800: #42320b;
+  --color-teal-900: #1d1502;
+  --color-teal-950: #0f0a01;
 
-  --color-slate-50: #f8fafc;
-  --color-slate-100: #f1f5f9;
-  --color-slate-200: #e2e8f0;
-  --color-slate-300: #cbd5e1;
-  --color-slate-400: #94a3b8;
-  --color-slate-500: #64748b;
-  --color-slate-600: #475569;
-  --color-slate-700: #334155;
-  --color-slate-800: #1e293b;
-  --color-slate-900: #0f172a;
-  --color-slate-950: #020617;
+  --color-slate-50: #0a2a44;
+  --color-slate-100: #0b2c46;
+  --color-slate-200: #163a57;
+  --color-slate-300: #194b73;
+  --color-slate-400: #64748b;
+  --color-slate-500: #8ba8c2;
+  --color-slate-650: #ccd9e3;
+  --color-slate-600: #a3b8cc;
+  --color-slate-700: #b0c0d1;
+  --color-slate-800: #faf6ee;
+  --color-slate-900: #FAF8F5;
+  --color-slate-950: #FAF8F5;
 
-  /* Typography Override */
+  /* Typography Override: Elegant serif headings and modern body text */
   --font-sans: 'DM Sans', system-ui, -apple-system, sans-serif;
-  --font-display: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-serif-display: 'Playfair Display', Georgia, serif;
   --font-mono: 'JetBrains Mono', monospace;
 
   /* Spacing Tokens */
@@ -96,7 +98,7 @@
   --spacing-brand-3xl: 4rem;
   --spacing-brand-4xl: 6rem;
 
-  /* Border Radius Scale (from BoxPrototype) */
+  /* Border Radius Scale */
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 12px;
@@ -104,19 +106,19 @@
   --radius-2xl: 24px;
   
   /* Shadow & Blur Enhancements */
-  --shadow-glass: 0 8px 32px 0 rgba(15, 23, 42, 0.08);
-  --shadow-premium: 0 10px 40px -10px rgba(15, 23, 42, 0.05);
-  --shadow-card: 0 12px 32px -18px rgba(15, 23, 42, 0.22);
-  --shadow-card-hover: 0 22px 48px -24px rgba(15, 23, 42, 0.3);
-  --shadow-focus: 0 0 0 4px rgba(37, 99, 235, 0.16);
+  --shadow-glass: 0 8px 32px 0 rgba(4, 38, 63, 0.35);
+  --shadow-premium: 0 10px 40px -10px rgba(4, 38, 63, 0.25);
+  --shadow-card: 0 12px 32px -18px rgba(4, 38, 63, 0.4);
+  --shadow-card-hover: 0 22px 48px -24px rgba(212, 164, 55, 0.15);
+  --shadow-focus: 0 0 0 4px rgba(212, 164, 55, 0.25);
 
   /* Shared motion tokens */
   --ease-brand: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-brand-standard: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-brand-exit: cubic-bezier(0.4, 0, 1, 1);
-  --duration-brand-fast: 160ms;
-  --duration-brand-base: 240ms;
-  --duration-brand-expressive: 400ms;
+  --duration-brand-fast: 180ms;
+  --duration-brand-base: 260ms;
+  --duration-brand-expressive: 450ms;
 
   /* Dynamic Custom Animations */
   --animate-fade-in-up: fade-in-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -145,6 +147,12 @@
     font-family: var(--font-sans);
   }
 
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.015em;
+  }
+
   :focus-visible {
     outline: 2px solid var(--color-secondary);
     outline-offset: 3px;
@@ -166,11 +174,11 @@
 }
 
 .text-gradient {
-  @apply bg-gradient-to-r from-blue-500 via-cyan-400 to-teal-400 text-transparent bg-clip-text;
+  @apply bg-gradient-to-r from-amber-200 via-accent to-amber-500 text-transparent bg-clip-text;
 }
 
 .hero-gradient {
-  background-image: radial-gradient(ellipse at top, var(--color-slate-900) 0%, var(--color-slate-950) 70%, #000000 100%);
+  background-image: radial-gradient(ellipse at top, #04263F 0%, #041D30 70%, #021626 100%);
 }
 
 .skeleton-shimmer {

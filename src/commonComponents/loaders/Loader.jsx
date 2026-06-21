@@ -14,12 +14,21 @@ export default function Loader({
 
   if (type === 'page') {
     return (
-      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 dark:bg-black/75 backdrop-blur-sm">
-        <div className="flex flex-col items-center gap-3 p-6 rounded-2xl glass-panel">
-          <ImSpinner2 className="animate-spin text-teal-500 h-10 w-10" />
-          <span className="text-sm font-semibold text-slate-800 dark:text-slate-100 uppercase tracking-wider">
-            Loading Platform...
-          </span>
+      <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-brand-bg/95 backdrop-blur-md">
+        <div className="flex flex-col items-center gap-4 p-8 rounded-3xl border border-accent/20 bg-primary-light/95 shadow-2xl relative overflow-hidden max-w-xs w-full text-center">
+          <div className="absolute inset-0 bg-gradient-to-tr from-accent/5 to-transparent pointer-events-none" />
+          <div className="relative flex items-center justify-center h-16 w-16 rounded-2xl border-2 border-accent bg-primary-medium shadow-lg shadow-accent/15">
+            <span className="text-xl font-black tracking-wider text-accent">ZO</span>
+            <div className="absolute -inset-1 rounded-2xl border border-dashed border-accent/40 animate-spin" />
+          </div>
+          <div className="flex flex-col gap-1 mt-2">
+            <span className="text-sm font-extrabold tracking-widest text-slate-150 font-display uppercase">
+              ZEELIN OVERSEAS
+            </span>
+            <span className="text-[9px] font-bold text-accent uppercase tracking-widest animate-pulse">
+              Securing Trade Desk...
+            </span>
+          </div>
         </div>
       </div>
     );
@@ -35,7 +44,7 @@ export default function Loader({
 
   return (
     <div className={`flex items-center justify-center ${className}`}>
-      <ImSpinner2 className={`animate-spin text-teal-600 dark:text-teal-500 ${sizeMap[size]}`} />
+      <ImSpinner2 className={`animate-spin text-accent ${sizeMap[size]}`} />
     </div>
   );
 }

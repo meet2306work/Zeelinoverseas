@@ -10,6 +10,19 @@ import { SkeletonCard } from '../../commonComponents/loaders/Skeleton';
 import { Reveal, StaggerGroup, StaggerItem } from '../../commonComponents/animations/ScrollReveal';
 import { fetchProducts } from '../../redux/slices/productSlice';
 import { fetchCategories } from '../../redux/slices/categorySlice';
+import { motion } from 'framer-motion';
+import useTiltEffect from '../../hooks/useTiltEffect';
+
+function TiltCard({ children, ...props }) {
+  const { tiltProps, style } = useTiltEffect(6);
+  return (
+    <motion.div {...tiltProps} style={style} className="h-full">
+      <Card {...props} hover={false}>
+        {children}
+      </Card>
+    </motion.div>
+  );
+}
 
 export default function ProductsScreen() {
   const location = useLocation();
@@ -352,8 +365,8 @@ export default function ProductsScreen() {
           ) : (
             <StaggerGroup key={searchParams.toString()} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-brand-md">
               {filteredProducts.map((p) => (
-                <StaggerItem key={p._id || p.id} className="h-full"><Card variant="default" className="flex flex-col h-full p-brand-md group">
-                  <div className="relative aspect-video rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 mb-brand-md border border-brand-border/20">
+                <StaggerItem key={p._id || p.id} className="h-full"><TiltCard variant="default" className="flex flex-col h-full p-brand-md group">
+                  <div className="relative aspect-video rounded-xl overflow-hidden bg-primary-medium mb-brand-md border border-brand-border/20">
                     <img
                       src={p.images && p.images.length > 0 ? p.images[0].url : p.image}
                       alt={p.title || p.name}
@@ -363,28 +376,28 @@ export default function ProductsScreen() {
                       }}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
-                    <div className="absolute top-2 left-2 px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-slate-900/80 text-white backdrop-blur-xs uppercase tracking-wider">
+                    <div className="absolute top-2 left-2 px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-primary/80 text-brand-text-primary backdrop-blur-xs uppercase tracking-wider">
                       3D Model
                     </div>
                   </div>
 
                     <div className="flex-1 flex flex-col justify-between gap-brand-sm">
                     <div>
-                      <h4 className="text-sm font-bold text-brand-text-primary dark:text-white line-clamp-2 group-hover:text-secondary transition-colors">
+                      <h4 className="text-sm font-bold text-brand-text-primary line-clamp-2 group-hover:text-accent transition-colors font-display">
                         {p.title || p.name}
                       </h4>
-                      <p className="text-xs text-brand-text-secondary dark:text-slate-400 mt-1">
-                        Category: <span className="font-semibold text-brand-text-primary dark:text-slate-200">{p.category?.name || 'Uncategorized'}</span>
+                      <p className="text-xs text-brand-text-secondary mt-1">
+                        Category: <span className="font-semibold text-brand-text-primary">{p.category?.name || 'Uncategorized'}</span>
                       </p>
                       <div className="mt-3 flex flex-wrap gap-1.5">
-                        <span className="rounded-md bg-slate-100 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                        <span className="rounded-md bg-primary-medium/80 border border-brand-border/40 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-brand-text-secondary">
                             {p.stock > 0 ? 'Ready Stock' : 'Out of Stock'}
                         </span>
                       </div>
                     </div>
 
                     <div>
-                      <div className="flex items-center justify-between gap-3 text-sm font-extrabold text-secondary dark:text-accent mb-brand-sm">
+                      <div className="flex items-center justify-between gap-3 text-sm font-extrabold text-accent mb-brand-sm">
                         <span>${p.price?.toFixed(2)}</span>
                         <span className="text-xs text-amber-600 dark:text-amber-300">{(p.averageRating || p.rating || 0).toFixed(1)} ★</span>
                       </div>
@@ -396,7 +409,7 @@ export default function ProductsScreen() {
                       </Link>
                     </div>
                   </div>
-                </Card></StaggerItem>
+                </TiltCard></StaggerItem>
               ))}
             </StaggerGroup>
           )}

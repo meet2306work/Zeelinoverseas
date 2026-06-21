@@ -24,13 +24,25 @@ export default function useHeroAnimation(heroRef) {
 
         if (window.matchMedia('(min-width: 1024px)').matches) {
           gsap.to('[data-hero-board]', {
-            yPercent: -4,
+            yPercent: -8,
             ease: 'none',
             scrollTrigger: {
               trigger: root,
               start: 'top top+=80',
               end: 'bottom top',
               scrub: 0.6,
+            },
+          });
+
+          gsap.to('[data-hero-item]', {
+            yPercent: 10,
+            opacity: 0.35,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: root,
+              start: 'top top',
+              end: 'bottom top',
+              scrub: 0.5,
             },
           });
         }

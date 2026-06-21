@@ -20,14 +20,14 @@ export default function Button({
   const baseStyles = 'relative inline-flex items-center justify-center overflow-hidden font-semibold rounded-xl transition-[color,background-color,border-color,box-shadow] duration-brand-fast focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed select-none';
 
   const variants = {
-    primary: 'bg-primary hover:bg-slate-800 text-white dark:bg-slate-100 dark:hover:bg-white dark:text-slate-950 focus:ring-slate-500 shadow-sm hover:shadow-md',
-    secondary: 'bg-secondary hover:bg-blue-700 text-white focus:ring-blue-500 shadow-sm hover:shadow-md hover:shadow-blue-500/15',
-    outline: 'border border-brand-border dark:border-slate-800 text-brand-text-primary dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 focus:ring-slate-500',
-    danger: 'bg-brand-danger hover:bg-red-600 text-white focus:ring-brand-danger shadow-sm hover:shadow-md hover:shadow-red-500/15',
-    success: 'bg-brand-success hover:bg-emerald-600 text-white focus:ring-brand-success shadow-sm hover:shadow-md hover:shadow-emerald-500/15',
-    ghost: 'text-brand-text-secondary hover:text-brand-text-primary dark:text-slate-400 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800',
-    gold: 'bg-brand-accent hover:bg-brand-accent-hover text-slate-950 font-bold focus:ring-amber-500 shadow-sm hover:shadow-md hover:shadow-amber-500/15',
-    brandGradient: 'bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white shadow-lg shadow-blue-500/20 hover:shadow-xl focus:ring-blue-500 border border-transparent',
+    primary: 'bg-accent hover:bg-accent-light text-primary shadow-md hover:shadow-lg focus:ring-accent border border-accent/20 font-bold',
+    secondary: 'bg-primary-medium hover:bg-primary-light text-accent hover:text-accent-light focus:ring-accent border border-primary-border',
+    outline: 'border border-accent/40 text-accent hover:bg-accent/10 focus:ring-accent',
+    danger: 'bg-brand-danger hover:bg-red-650 text-white focus:ring-brand-danger shadow-sm',
+    success: 'bg-brand-success hover:bg-emerald-650 text-white focus:ring-brand-success shadow-sm',
+    ghost: 'text-primary-slate hover:text-white hover:bg-primary-medium/40',
+    gold: 'bg-accent hover:bg-accent-light text-primary font-bold focus:ring-accent shadow-sm shadow-accent/15 border border-accent/20',
+    brandGradient: 'bg-gradient-to-r from-accent to-accent-light text-primary font-extrabold shadow-lg shadow-accent/15 border border-accent/20 hover:from-accent-light hover:to-accent',
   };
 
   const sizes = {
@@ -42,7 +42,7 @@ export default function Button({
       type={type}
       disabled={isDisabled}
       onClick={onClick}
-      whileHover={!shouldReduceMotion && !isDisabled ? { y: -1 } : undefined}
+      whileHover={!shouldReduceMotion && !isDisabled ? { y: -2, scale: 1.02, boxShadow: '0 8px 20px -6px rgba(212,164,55,0.35)' } : undefined}
       whileTap={!shouldReduceMotion && !isDisabled ? { scale: 0.98 } : undefined}
       transition={motionSprings.responsive}
       aria-busy={isLoading || undefined}
