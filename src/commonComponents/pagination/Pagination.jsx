@@ -1,4 +1,3 @@
-import React from 'react';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 
 export default function Pagination({
@@ -15,14 +14,14 @@ export default function Pagination({
         <button
           onClick={() => onPageChange(Math.max(currentPage - 1, 1))}
           disabled={currentPage === 1}
-          className="relative inline-flex items-center rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="relative inline-flex items-center rounded-lg border border-border-default bg-background-surface px-4 py-2 text-sm font-medium text-text-primary hover:bg-accent-gold/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           Previous
         </button>
         <button
           onClick={() => onPageChange(Math.min(currentPage + 1, totalPages))}
           disabled={currentPage === totalPages}
-          className="relative ml-3 inline-flex items-center rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="relative ml-3 inline-flex items-center rounded-lg border border-border-default bg-background-surface px-4 py-2 text-sm font-medium text-text-primary hover:bg-accent-gold/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           Next
         </button>
@@ -30,9 +29,9 @@ export default function Pagination({
 
       <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
         <div>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            Showing Page <span className="font-semibold text-slate-900 dark:text-white">{currentPage}</span> of{' '}
-            <span className="font-semibold text-slate-900 dark:text-white">{totalPages}</span>
+          <p className="text-sm text-text-secondary">
+            Showing Page <span className="font-semibold text-text-primary">{currentPage}</span> of{' '}
+            <span className="font-semibold text-text-primary">{totalPages}</span>
           </p>
         </div>
         <div>
@@ -40,7 +39,7 @@ export default function Pagination({
             <button
               onClick={() => onPageChange(Math.max(currentPage - 1, 1))}
               disabled={currentPage === 1}
-              className="relative inline-flex items-center rounded-l-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-2 py-2 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 focus:z-20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="relative inline-flex items-center rounded-l-lg border border-border-default bg-background-surface px-2 py-2 text-text-secondary hover:bg-accent-gold/10 focus:z-20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               <span className="sr-only">Previous</span>
               <FiChevronLeft className="h-5 w-5" aria-hidden="true" />
@@ -55,8 +54,8 @@ export default function Pagination({
                   onClick={() => onPageChange(pageNum)}
                   className={`relative inline-flex items-center border px-4 py-2 text-sm font-semibold focus:z-20 transition-colors
                     ${isActive
-                      ? 'z-10 bg-teal-600 border-teal-600 text-white dark:bg-teal-500 dark:border-teal-500'
-                      : 'border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                      ? 'z-10 bg-accent-gold border-accent-gold text-text-on-accent'
+                      : 'border-border-default bg-background-surface text-text-primary hover:bg-accent-gold/10'
                     }
                   `}
                 >
@@ -68,7 +67,7 @@ export default function Pagination({
             <button
               onClick={() => onPageChange(Math.min(currentPage + 1, totalPages))}
               disabled={currentPage === totalPages}
-              className="relative inline-flex items-center rounded-r-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-2 py-2 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 focus:z-20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="relative inline-flex items-center rounded-r-lg border border-border-default bg-background-surface px-2 py-2 text-text-secondary hover:bg-accent-gold/10 focus:z-20 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               <span className="sr-only">Next</span>
               <FiChevronRight className="h-5 w-5" aria-hidden="true" />

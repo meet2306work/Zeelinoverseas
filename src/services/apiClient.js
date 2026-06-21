@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'https://api.zeelinoverseas.com/v1',
+  baseURL: import.meta.env.VITE_API_URL || 'https://zeelinoverseas.onrender.com/v1',
   timeout: 60000,
   headers: {
     'Content-Type': 'application/json',

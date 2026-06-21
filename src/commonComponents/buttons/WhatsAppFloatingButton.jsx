@@ -2,7 +2,7 @@ import { FaWhatsapp } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 
 export default function WhatsAppFloatingButton() {
-  const whatsappUrl = 'https://wa.me/15552345678?text=Hello%20Zeelin%20Overseas%2C%20I%20need%20help%20with%20packaging%20sourcing.';
+  const whatsappUrl = 'https://wa.me/918347152224?text=Hello%20Zeelin%20Overseas%2C%20I%20need%20help%20with%20packaging%20sourcing.';
 
   return (
     <motion.a

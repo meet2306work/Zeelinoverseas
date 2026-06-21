@@ -18,6 +18,7 @@ export default function AdminProductsScreen() {
   const [isLoading, setIsLoading] = useState(false);
 
   // Form Fields
+  const [sku, setSku] = useState('');
   const [name, setName] = useState('');
   const [category, setCategory] = useState('');
   const [price, setPrice] = useState('');
@@ -54,6 +55,7 @@ export default function AdminProductsScreen() {
 
   const mappedProducts = products.map((p) => ({
     id: p._id,
+    sku: p.sku || p._id,
     name: p.title,
     category: p.category?.name || p.category?.slug || p.category || 'Boxes',
     price: `$${p.price?.toFixed(2)}`,
@@ -64,6 +66,7 @@ export default function AdminProductsScreen() {
   const activeProducts = mappedProducts;
 
   const resetForm = () => {
+    setSku('');
     setName('');
     setCategory('');
     setPrice('');
@@ -94,6 +97,7 @@ export default function AdminProductsScreen() {
     }
 
     setEditingProduct(prod);
+    setSku(prod.sku || '');
     setName(prod.title || '');
     setCategory(prod.category?._id || prod.category || '');
     setPrice(prod.price?.toString() || '');
@@ -209,6 +213,7 @@ export default function AdminProductsScreen() {
     }
 
     const payload = {
+      sku: sku.trim().toUpperCase(),
       title: name,
       price: priceVal,
       category: selectedCategory._id,
@@ -261,6 +266,7 @@ export default function AdminProductsScreen() {
 
     const payload = {
       id: editingProduct._id,
+      sku: sku.trim().toUpperCase(),
       title: name,
       price: priceVal,
       category: selectedCategory._id,
@@ -326,8 +332,8 @@ export default function AdminProductsScreen() {
 
   const columns = [
     { 
-      key: 'id', 
-      label: 'SKU / ID',
+      key: 'sku',
+      label: 'SKU ID',
       render: (val) => <span className="font-mono font-bold text-slate-500 dark:text-slate-400">{val}</span>
     },
     { 
@@ -384,8 +390,40 @@ export default function AdminProductsScreen() {
   ];
 
   const productFormFields = (
-    <div className="flex flex-col gap-4 text-slate-700 dark:text-slate-300">
-      <div className="grid grid-cols-2 gap-4">
+    <div className="flex flex-col gap-5 text-text-primary">
+      <div className="flex items-start gap-3 rounded-xl border border-accent-gold/25 bg-accent-gold/8 px-4 py-3">
+        <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent-gold text-text-on-accent">
+          <FiInfo className="h-4 w-4" />
+        </div>
+        <div>
+          <p className="text-sm font-bold text-text-primary">Catalog information</p>
+          <p className="mt-0.5 text-xs leading-relaxed text-text-secondary">
+            Required fields publish the product to the catalog. Specifications and media help buyers evaluate it faster.
+          </p>
+        </div>
+      </div>
+
+      <section className="rounded-2xl border border-border-default/55 bg-background-surface/75 p-4 sm:p-5">
+        <div className="mb-5 flex items-center gap-3 border-b border-border-default/45 pb-3">
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-black-accent text-xs font-bold text-text-on-dark">1</span>
+          <div>
+            <h4 className="text-sm font-bold text-text-primary">Product &amp; Pricing</h4>
+            <p className="text-xs text-text-secondary">Core catalog identity and commercial terms</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <Input
+          label="SKU ID"
+          placeholder="e.g. BOX-SL-001"
+          value={sku}
+          onChange={(e) => setSku(e.target.value.toUpperCase())}
+          helperText="Unique letters, numbers, hyphens or underscores"
+          maxLength={64}
+          pattern="[A-Za-z0-9][A-Za-z0-9_-]*"
+          required
+        />
+
         <Input
           label="Product Title"
           placeholder="e.g. 3-Ply Corrugated Box"
@@ -402,9 +440,9 @@ export default function AdminProductsScreen() {
           required
           searchable={false}
         />
-      </div>
+        </div>
 
-      <div className="grid grid-cols-2 gap-4">
+        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Input
           label="Base Price Rate ($)"
           placeholder="e.g. 0.45"
@@ -423,12 +461,19 @@ export default function AdminProductsScreen() {
           onChange={(e) => setMoq(e.target.value)}
           required
         />
-      </div>
+        </div>
+      </section>
 
-      <div className="border-t border-slate-200 dark:border-slate-800 my-2" />
-      <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Packaging Specifications</h4>
+      <section className="rounded-2xl border border-border-default/55 bg-background-surface/75 p-4 sm:p-5">
+        <div className="mb-5 flex items-center gap-3 border-b border-border-default/45 pb-3">
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-black-accent text-xs font-bold text-text-on-dark">2</span>
+          <div>
+            <h4 className="text-sm font-bold text-text-primary">Packaging Specifications</h4>
+            <p className="text-xs text-text-secondary">Material strength, dimensions, tax and availability</p>
+          </div>
+        </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <Input
           label="PLY Rating"
           placeholder="e.g. 3 PLY, 5 PLY"
@@ -451,7 +496,7 @@ export default function AdminProductsScreen() {
         />
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <Input
           label="Dimension"
           placeholder="e.g. 300x200x150"
@@ -479,7 +524,7 @@ export default function AdminProductsScreen() {
         />
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <Input
           label="Bundle Quantity"
           placeholder="e.g. 50"
@@ -508,7 +553,7 @@ export default function AdminProductsScreen() {
         />
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <Input
           label="Color"
           placeholder="e.g. Kraft Brown"
@@ -541,21 +586,38 @@ export default function AdminProductsScreen() {
         />
       </div>
 
-      <div className="flex items-center gap-2 mt-1">
-        <input
-          type="checkbox"
-          id="recyclable"
-          checked={recyclable}
-          onChange={(e) => setRecyclable(e.target.checked)}
-          className="rounded border-slate-300 text-cyan-600 focus:ring-cyan-500 h-4 w-4"
-        />
-        <label htmlFor="recyclable" className="text-xs font-bold text-slate-700 dark:text-slate-350 cursor-pointer select-none">
-          This product is 100% Recyclable
-        </label>
-      </div>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={recyclable}
+        onClick={() => setRecyclable((current) => !current)}
+        className="mt-5 flex w-full items-center justify-between gap-4 rounded-xl border border-border-default/55 bg-background-primary/45 p-3.5 text-left transition-colors hover:border-accent-gold/50 focus-visible:border-accent-gold"
+      >
+        <span className="flex items-center gap-3">
+          <span className={`flex h-9 w-9 items-center justify-center rounded-lg border transition-colors ${recyclable ? 'border-accent-gold bg-accent-gold text-text-on-accent' : 'border-border-default bg-background-surface text-transparent'}`}>
+            <FiCheck className="h-4 w-4" />
+          </span>
+          <span>
+            <span className="block text-sm font-bold text-text-primary">100% recyclable product</span>
+            <span className="block text-xs text-text-secondary">Display the recyclable attribute on the product page</span>
+          </span>
+        </span>
+        <span className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${recyclable ? 'bg-accent-gold' : 'bg-border-default'}`}>
+          <span className={`absolute top-1 h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${recyclable ? 'translate-x-6' : 'translate-x-1'}`} />
+        </span>
+      </button>
+      </section>
 
-      <div className="border-t border-slate-200 dark:border-slate-800 my-2" />
-      <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Media Assets</h4>
+      <section className="rounded-2xl border border-border-default/55 bg-background-surface/75 p-4 sm:p-5">
+        <div className="mb-5 flex items-center gap-3 border-b border-border-default/45 pb-3">
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-black-accent text-xs font-bold text-text-on-dark">3</span>
+          <div>
+            <h4 className="text-sm font-bold text-text-primary">Media Assets</h4>
+            <p className="text-xs text-text-secondary">Product gallery images and an optional interactive 3D model</p>
+          </div>
+        </div>
+
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
 
       {/* Product Images Uploader */}
       <div className="flex flex-col gap-2">
@@ -564,10 +626,10 @@ export default function AdminProductsScreen() {
           onDragOver={handleDragOverImages}
           onDragLeave={handleDragLeaveImages}
           onDrop={handleDropImages}
-          className={`border-2 border-dashed rounded-xl p-4 transition-all duration-300 flex flex-col items-center justify-center gap-3
-            ${isDraggingImages 
-              ? 'border-secondary bg-secondary/5 dark:bg-slate-900/40 scale-[1.01]' 
-              : 'border-slate-300 dark:border-slate-850 bg-slate-50/50 dark:bg-slate-950/20 hover:border-secondary/50'
+          className={`min-h-40 border-2 border-dashed rounded-xl p-4 transition-all duration-300 flex flex-col items-center justify-center gap-3
+            ${isDraggingImages
+              ? 'border-accent-gold bg-accent-gold/10 scale-[1.01]'
+              : 'border-border-default bg-background-primary/35 hover:border-accent-gold/60'
             }
           `}
         >
@@ -585,15 +647,15 @@ export default function AdminProductsScreen() {
               </div>
             ))}
             
-            <label className="h-16 w-20 rounded-lg border border-dashed border-slate-300 hover:border-secondary flex flex-col items-center justify-center cursor-pointer text-slate-400 hover:text-secondary transition-colors bg-white dark:bg-slate-900/50">
+            <label className="h-16 w-20 rounded-lg border border-dashed border-border-default hover:border-accent-gold flex flex-col items-center justify-center cursor-pointer text-text-secondary hover:text-accent-gold transition-colors bg-background-surface">
               <FiUpload className="h-5 w-5 mb-1" />
               <span className="text-[10px] font-bold">Choose</span>
               <input type="file" multiple accept="image/*" onChange={handleImageUpload} className="hidden" />
             </label>
           </div>
           
-          <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
-            Drag and drop your images here, or click <span className="text-secondary dark:text-accent font-bold">Choose</span> to select files from device
+          <p className="text-center text-[11px] font-medium text-text-secondary">
+            Drag and drop images here, or click <span className="font-bold text-accent-gold">Choose</span> to browse
           </p>
         </div>
         {uploadingImages && <span className="text-xs text-cyan-500 flex items-center gap-1.5 font-bold"><FiInfo className="animate-spin" /> Uploading images to gallery...</span>}
@@ -623,14 +685,14 @@ export default function AdminProductsScreen() {
             onDragOver={handleDragOverModel}
             onDragLeave={handleDragLeaveModel}
             onDrop={handleDropModel}
-            className={`w-full py-6 border-2 border-dashed rounded-xl flex flex-col items-center justify-center gap-2 cursor-pointer transition-all duration-300
-              ${isDraggingModel 
-                ? 'border-secondary bg-secondary/5 dark:bg-slate-900/40 scale-[1.01]' 
-                : 'border-slate-300 dark:border-slate-850 bg-slate-50/50 dark:bg-slate-950/20 hover:border-secondary/50'
+            className={`min-h-40 w-full py-6 border-2 border-dashed rounded-xl flex flex-col items-center justify-center gap-2 cursor-pointer transition-all duration-300
+              ${isDraggingModel
+                ? 'border-accent-gold bg-accent-gold/10 scale-[1.01]'
+                : 'border-border-default bg-background-primary/35 hover:border-accent-gold/60'
               }
             `}
           >
-            <label className="flex flex-col items-center justify-center cursor-pointer w-full text-slate-400 hover:text-secondary">
+            <label className="flex flex-col items-center justify-center cursor-pointer w-full text-text-secondary hover:text-accent-gold">
               <FiBox className="h-7 w-7 mb-1.5" />
               <span className="text-xs font-bold">Choose a 3D Model File (.glb, .gltf)</span>
               <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
@@ -642,6 +704,8 @@ export default function AdminProductsScreen() {
         )}
         {uploadingModel && <span className="text-xs text-cyan-500 flex items-center gap-1.5 font-bold"><FiInfo className="animate-spin" /> Processing 3D asset model...</span>}
       </div>
+      </div>
+      </section>
     </div>
   );
 
@@ -686,18 +750,24 @@ export default function AdminProductsScreen() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         title="Add New Catalog Product"
-        size="md"
+        size="xl"
+        className="max-h-[92vh]"
       >
-        <form onSubmit={handleAddProduct} className="flex flex-col gap-4">
+        <form onSubmit={handleAddProduct} className="flex flex-col gap-5">
           {productFormFields}
-          <Button
-            type="submit"
-            variant="primary"
-            className="w-full mt-4"
-            isLoading={isLoading}
-          >
-            Create Product Record
-          </Button>
+          <div className="flex flex-col-reverse items-stretch justify-between gap-3 rounded-xl border border-border-default/60 bg-background-primary/45 p-4 sm:flex-row sm:items-center">
+            <p className="hidden text-xs text-text-secondary sm:block">
+              Fields marked with <span className="font-bold text-red-500">*</span> are required
+            </p>
+            <div className="flex gap-3 sm:ml-auto">
+              <Button type="button" variant="outline" className="flex-1 sm:flex-none" onClick={() => setIsModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" variant="primary" icon={FiCheck} className="flex-1 sm:flex-none" isLoading={isLoading}>
+                Create Product
+              </Button>
+            </div>
+          </div>
         </form>
       </Modal>
 
@@ -706,18 +776,24 @@ export default function AdminProductsScreen() {
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         title="Edit Catalog Product"
-        size="md"
+        size="xl"
+        className="max-h-[92vh]"
       >
-        <form onSubmit={handleUpdateProduct} className="flex flex-col gap-4">
+        <form onSubmit={handleUpdateProduct} className="flex flex-col gap-5">
           {productFormFields}
-          <Button
-            type="submit"
-            variant="primary"
-            className="w-full mt-4"
-            isLoading={isLoading}
-          >
-            Save Product Changes
-          </Button>
+          <div className="flex flex-col-reverse items-stretch justify-between gap-3 rounded-xl border border-border-default/60 bg-background-primary/45 p-4 sm:flex-row sm:items-center">
+            <p className="hidden text-xs text-text-secondary sm:block">
+              Review product details before saving changes
+            </p>
+            <div className="flex gap-3 sm:ml-auto">
+              <Button type="button" variant="outline" className="flex-1 sm:flex-none" onClick={() => setIsEditModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" variant="primary" icon={FiCheck} className="flex-1 sm:flex-none" isLoading={isLoading}>
+                Save Changes
+              </Button>
+            </div>
+          </div>
         </form>
       </Modal>
     </div>

@@ -2,6 +2,8 @@ const Product = require('../models/Product');
 const ErrorResponse = require('../utils/errorResponse');
 const sendResponse = require('../utils/responseFormatter');
 
+const normalizeSku = (value) => typeof value === 'string' ? value.trim().toUpperCase() : value;
+
 // @desc    Get all products (with filters, pagination, sorting)
 // @route   GET /v1/products
 // @access  Public
@@ -103,6 +105,17 @@ exports.getProduct = async (req, res, next) => {
 // @access  Private/Admin/Vendor
 exports.createProduct = async (req, res, next) => {
   try {
+    req.body.sku = normalizeSku(req.body.sku);
+
+    if (!req.body.sku) {
+      return next(new ErrorResponse('Product SKU is required', 400));
+    }
+
+    const existingSku = await Product.exists({ sku: req.body.sku });
+    if (existingSku) {
+      return next(new ErrorResponse('This SKU is already assigned to another product', 400));
+    }
+
     // Add vendor logic if role is vendor
     if (req.user.role === 'vendor') {
       req.body.vendor = req.user.id;
@@ -129,6 +142,22 @@ exports.updateProduct = async (req, res, next) => {
     // Make sure user is product vendor or admin
     if (product.vendor && product.vendor.toString() !== req.user.id && req.user.role !== 'admin') {
       return next(new ErrorResponse(`User not authorized to update this product`, 401));
+    }
+
+    if (Object.prototype.hasOwnProperty.call(req.body, 'sku')) {
+      req.body.sku = normalizeSku(req.body.sku);
+
+      if (!req.body.sku) {
+        return next(new ErrorResponse('Product SKU is required', 400));
+      }
+
+      const existingSku = await Product.exists({
+        sku: req.body.sku,
+        _id: { $ne: req.params.id }
+      });
+      if (existingSku) {
+        return next(new ErrorResponse('This SKU is already assigned to another product', 400));
+      }
     }
 
     product = await Product.findByIdAndUpdate(req.params.id, req.body, {

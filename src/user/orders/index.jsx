@@ -262,7 +262,7 @@ export default function OrdersScreen() {
               columns={orderColumns}
               data={activeOrders}
               emptyMessage="You have not placed any e-commerce orders yet."
-              className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900"
+              className="border-border-default/70 bg-background-surface"
             />
           </motion.div>
         ) : (
@@ -271,7 +271,7 @@ export default function OrdersScreen() {
               columns={rfqColumns}
               data={rfqsList}
               emptyMessage="You have no pending B2B RFQs."
-              className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900"
+              className="border-border-default/70 bg-background-surface"
             />
           </motion.div>
         )}

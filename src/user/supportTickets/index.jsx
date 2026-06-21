@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { FiHelpCircle, FiSend, FiPlus, FiChevronDown } from 'react-icons/fi';
+import { FiSend, FiPlus, FiChevronDown } from 'react-icons/fi';
 import Card from '../../commonComponents/cards/Card';
 import Table from '../../commonComponents/tables/Table';
 import Button from '../../commonComponents/buttons/Button';
 import Textarea from '../../commonComponents/textareas/Textarea';
-import Input from '../../commonComponents/inputs/Input';
 import { fetchMyTickets, createTicket, selectAllTickets } from '../../redux/slices/ticketSlice';
 
 export default function SupportTicketsScreen() {
@@ -198,7 +197,7 @@ export default function SupportTicketsScreen() {
             columns={columns}
             data={activeTickets}
             emptyMessage="No helpdesk support tickets recorded."
-            className="border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900"
+            className="border-border-default/70 bg-background-surface"
           />
         </div>
       )}

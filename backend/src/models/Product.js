@@ -54,7 +54,13 @@ const productSchema = new mongoose.Schema({
   },
   sku: {
     type: String,
-    default: null
+    required: [true, 'Product SKU is required'],
+    trim: true,
+    uppercase: true,
+    unique: true,
+    sparse: true,
+    maxlength: [64, 'Product SKU cannot exceed 64 characters'],
+    match: [/^[A-Z0-9][A-Z0-9_-]*$/, 'Product SKU can only contain letters, numbers, hyphens, and underscores']
   },
   ply: {
     type: String,
@@ -154,7 +160,7 @@ productSchema.virtual('reviews', {
 });
 
 // Auto-generate slug from title if not provided
-productSchema.pre('validate', async function (next) {
+productSchema.pre('validate', function () {
   if (!this.slug && this.title) {
     const baseSlug = this.title
       .toLowerCase()
@@ -166,7 +172,6 @@ productSchema.pre('validate', async function (next) {
     const suffix = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
     this.slug = `${baseSlug}-${suffix}`;
   }
-  next();
 });
 
 module.exports = mongoose.model('Product', productSchema);

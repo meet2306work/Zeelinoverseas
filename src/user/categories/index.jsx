@@ -4,14 +4,16 @@ import { useSelector, useDispatch } from 'react-redux';
 import { FiBox, FiArrowRight, FiGrid } from 'react-icons/fi';
 import Card from '../../commonComponents/cards/Card';
 import { SkeletonCard } from '../../commonComponents/loaders/Skeleton';
-import { Reveal, StaggerGroup, StaggerItem } from '../../commonComponents/animations/ScrollReveal';
+import { Reveal } from '../../commonComponents/animations/ScrollReveal';
+import EmptyState from '../../commonComponents/layouts/EmptyState';
+import ErrorState from '../../commonComponents/layouts/ErrorState';
 import { fetchCategories } from '../../redux/slices/categorySlice';
 
 export default function CategoriesScreen() {
   const location = useLocation();
   const dispatch = useDispatch();
   const isPortal = location.pathname.startsWith('/user');
-  const { categoriesList, loading } = useSelector((state) => state.categories);
+  const { categoriesList, loading, error } = useSelector((state) => state.categories);
 
   useEffect(() => {
     dispatch(fetchCategories());
@@ -33,15 +35,29 @@ export default function CategoriesScreen() {
       </section>
 
       {/* Categories Grid */}
-      <StaggerGroup className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {loading ? (
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {loading && categoriesList.length === 0 ? (
           Array.from({ length: 6 }, (_, index) => <SkeletonCard key={index} />)
-        ) : (categoriesList || []).map((cat) => {
+        ) : error && categoriesList.length === 0 ? (
+          <ErrorState
+            title="Categories Could Not Load"
+            description={error}
+            onRetry={() => dispatch(fetchCategories())}
+            className="col-span-full"
+          />
+        ) : categoriesList.length === 0 ? (
+          <EmptyState
+            title="No Categories Available"
+            description="Active product categories will appear here after they are added."
+            className="col-span-full"
+          />
+        ) : categoriesList.map((cat) => {
           const Icon = FiBox; // Placeholder icon since icon names aren't in DB usually
           return (
-            <StaggerItem key={cat._id || cat.id} className="h-full"><Card
+            <Card
+              key={cat._id || cat.id}
               variant="glass" 
-              className="p-8 flex flex-col justify-between hover:-translate-y-1.5 transition-all duration-300 border-border-default/50 group relative overflow-hidden"
+              className="h-full p-8 flex flex-col justify-between hover:-translate-y-1.5 transition-all duration-300 border-border-default/50 group relative overflow-hidden"
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-accent-gold/5 to-accent-gold/5 rounded-full blur-2xl pointer-events-none group-hover:scale-125 transition-transform duration-500" />
               
@@ -52,7 +68,7 @@ export default function CategoriesScreen() {
                 
                 <div>
                   <span className="text-[10px] font-bold text-accent-gold uppercase tracking-wider mb-1 block">
-                    {cat.count || '0 Products'}
+                    {cat.count ?? 0} {cat.count === 1 ? 'Product' : 'Products'}
                   </span>
                   <h3 className="text-lg font-bold text-text-primary mb-2 group-hover:text-accent-gold transition-colors">
                     {cat.name}
@@ -73,10 +89,10 @@ export default function CategoriesScreen() {
                   <FiArrowRight className="h-4 w-4" />
                 </Link>
               </div>
-            </Card></StaggerItem>
+            </Card>
           );
         })}
-      </StaggerGroup>
+      </div>
 
       {/* Catalog Overview Banner */}
       <Reveal className="bg-black-accent rounded-3xl p-8 border border-border-default/20 relative overflow-hidden">
