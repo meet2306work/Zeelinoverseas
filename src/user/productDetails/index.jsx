@@ -14,6 +14,19 @@ import { fetchProductById, fetchProductReviews, createProductReview, clearProduc
 const ThreeDViewer = lazy(() => import('../../commonComponents/threeDViewer/ThreeDViewer'));
 
 const INQUIRY_THRESHOLD_QTY = 200;
+const BASE_PRICE_QTY = 25;
+const PRICE_TIER_QUANTITIES = [25, 50, 100, 200];
+
+const buildPriceTiers = (basePrice, unit) => PRICE_TIER_QUANTITIES.map((qty) => {
+  const totalPrice = basePrice * (qty / BASE_PRICE_QTY);
+
+  return {
+    qty,
+    label: `${qty} ${unit}`,
+    totalPrice,
+    unitPrice: qty > 0 ? totalPrice / qty : 0,
+  };
+});
 
 export default function ProductDetailsScreen() {
   const location = useLocation();
@@ -39,7 +52,7 @@ export default function ProductDetailsScreen() {
     name: 'Loading Product...',
     description: '',
     priceTiers: [
-      { qty: 25, label: '25 Units', price: '$0.00 / Unit' },
+      { qty: 25, label: '25 Units', totalPrice: 0, unitPrice: 0 },
     ],
     moq: '25 Units',
     specs: [],
@@ -47,16 +60,14 @@ export default function ProductDetailsScreen() {
     image: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=400&q=80',
   };
 
+  const baseTierPrice = Number(productDetails?.price) || 0;
+  const salesUnit = productDetails?.unit || 'pcs';
+
   const product = productDetails ? {
     id: productDetails._id,
     name: productDetails.title,
     description: productDetails.description,
-    priceTiers: [
-      { qty: 25, label: `25 ${productDetails.unit || 'pcs'}`, price: `$${productDetails.price?.toFixed(2)} / ${productDetails.unit || 'pcs'}` },
-      { qty: 50, label: `50 ${productDetails.unit || 'pcs'}`, price: `$${(productDetails.price * 0.95)?.toFixed(2)} / ${productDetails.unit || 'pcs'}` },
-      { qty: 100, label: `100 ${productDetails.unit || 'pcs'}`, price: `$${(productDetails.price * 0.90)?.toFixed(2)} / ${productDetails.unit || 'pcs'}` },
-      { qty: 200, label: `200 ${productDetails.unit || 'pcs'}`, price: `$${(productDetails.price * 0.85)?.toFixed(2)} / ${productDetails.unit || 'pcs'}` },
-    ],
+    priceTiers: buildPriceTiers(baseTierPrice, salesUnit),
     moq: `${productDetails.specifications?.find(s => s.key === 'moq')?.value || 25} ${productDetails.unit || 'pcs'}`,
     specs: [
       productDetails.sku && { key: 'SKU', value: productDetails.sku },
@@ -78,6 +89,7 @@ export default function ProductDetailsScreen() {
   } : fallbackProduct;
 
   useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
     dispatch(fetchProductById(id));
     dispatch(fetchProductReviews(id));
     return () => {
@@ -114,6 +126,7 @@ export default function ProductDetailsScreen() {
   };
 
   const needsInquiry = selectedQty > INQUIRY_THRESHOLD_QTY;
+  const selectedTier = product.priceTiers.find((tier) => tier.qty === selectedQty);
   const tabOptions = [
     { label: 'Specifications', value: 'specs' },
     { label: 'Shipping & Delivery', value: 'shipping' },
@@ -237,7 +250,14 @@ export default function ProductDetailsScreen() {
                   }`}
                 >
                   <span className="text-xs font-semibold text-brand-text-secondary">{tier.label}</span>
-                  <span className="text-sm font-extrabold text-brand-text-primary dark:text-white">{tier.price}</span>
+                  <span className="text-right">
+                    <span className="block text-sm font-extrabold text-brand-text-primary dark:text-white">
+                      ${tier.totalPrice.toFixed(2)} total
+                    </span>
+                    <span className="block text-[10px] font-semibold text-brand-text-secondary">
+                      ${tier.unitPrice.toFixed(2)} / {salesUnit}
+                    </span>
+                  </span>
                 </div>
               ))}
               {/* 200+ inquiry row */}
@@ -255,6 +275,19 @@ export default function ProductDetailsScreen() {
               <p className="mt-2 text-[11px] text-amber-600 dark:text-amber-400 font-semibold">
                 For quantities above 200, please send an inquiry for a custom quote.
               </p>
+            )}
+
+            {selectedTier && !needsInquiry && (
+              <div className="mt-3 flex items-center justify-between rounded-xl border border-secondary/35 bg-secondary/10 px-brand-md py-brand-sm">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-brand-text-secondary">Selected Order</p>
+                  <p className="text-xs font-semibold text-brand-text-primary">{selectedTier.label}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-lg font-extrabold text-brand-text-primary">${selectedTier.totalPrice.toFixed(2)}</p>
+                  <p className="text-[10px] text-brand-text-secondary">Estimated product total</p>
+                </div>
+              </div>
             )}
           </div>
 
@@ -317,14 +350,16 @@ export default function ProductDetailsScreen() {
         <Tabs tabs={tabOptions} activeTab={activeTab} onTabChange={setActiveTab} className="mb-brand-md" />
 
         {activeTab === 'specs' ? (
-          <StaggerGroup key="specifications" className="grid grid-cols-1 md:grid-cols-2 gap-brand-md max-w-4xl">
-            {product.specs.map((spec, idx) => (
-              <StaggerItem key={idx} className="flex justify-between items-center py-brand-sm border-b border-brand-border/40 dark:border-slate-800/40 text-sm">
+          <div className="grid max-w-4xl grid-cols-1 gap-brand-md md:grid-cols-2">
+            {product.specs.length > 0 ? product.specs.map((spec, idx) => (
+              <div key={`${spec.key}-${idx}`} className="flex items-center justify-between border-b border-brand-border/40 py-brand-sm text-sm dark:border-slate-800/40">
                 <span className="text-brand-text-secondary font-medium">{spec.key}</span>
                 <span className="text-brand-text-primary dark:text-white font-bold text-right ml-4">{spec.value}</span>
-              </StaggerItem>
-            ))}
-          </StaggerGroup>
+              </div>
+            )) : !loading ? (
+              <p className="text-sm text-brand-text-secondary">No product specifications are available.</p>
+            ) : null}
+          </div>
         ) : activeTab === 'shipping' ? (
           <p className="text-sm text-brand-text-secondary dark:text-slate-400 leading-relaxed max-w-2xl">
             {product.shipping}

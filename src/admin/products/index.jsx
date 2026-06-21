@@ -352,7 +352,7 @@ export default function AdminProductsScreen() {
     },
     { 
       key: 'price', 
-      label: 'Base Price',
+      label: '25-Unit Price',
       render: (val) => <span className="font-extrabold text-cyan-600 dark:text-cyan-400">{val}</span>
     },
     { 
@@ -444,12 +444,13 @@ export default function AdminProductsScreen() {
 
         <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Input
-          label="Base Price Rate ($)"
-          placeholder="e.g. 0.45"
+          label="Price for 25 Units ($)"
+          placeholder="e.g. 4.00"
           type="number"
           step="0.01"
           value={price}
           onChange={(e) => setPrice(e.target.value)}
+          helperText="The storefront scales this amount for larger quantities"
           required
         />
 

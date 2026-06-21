@@ -398,7 +398,7 @@ export default function ProductsScreen() {
 
                     <div>
                       <div className="flex items-center justify-between gap-3 text-sm font-extrabold text-accent-gold mb-brand-sm">
-                        <span>${p.price?.toFixed(2)}</span>
+                        <span>${p.price?.toFixed(2)} / 25 units</span>
                         <span className="text-xs text-accent-gold-hover">{(p.averageRating || p.rating || 0).toFixed(1)} ★</span>
                       </div>
 

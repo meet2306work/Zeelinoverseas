@@ -17,7 +17,7 @@ export default function Button({
 }) {
   const shouldReduceMotion = useReducedMotion();
   const isDisabled = disabled || isLoading;
-  const baseStyles = 'relative inline-flex items-center justify-center overflow-hidden font-semibold rounded-xl transition-[color,background-color,border-color,box-shadow] duration-brand-fast focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed select-none';
+  const baseStyles = 'relative inline-flex items-center justify-center overflow-hidden whitespace-nowrap font-semibold leading-none rounded-xl transition-[color,background-color,border-color,box-shadow] duration-brand-fast focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed select-none';
 
   const variants = {
     primary: 'bg-accent-gold hover:bg-accent-gold-hover text-text-on-accent shadow-md hover:shadow-lg focus:ring-accent-gold border border-accent-gold/20 font-bold',
@@ -31,10 +31,10 @@ export default function Button({
   };
 
   const sizes = {
-    sm: 'px-brand-sm py-brand-xs text-xs rounded-lg',
-    md: 'px-brand-md py-brand-sm text-sm',
-    lg: 'px-brand-lg py-brand-md text-base',
-    xl: 'px-brand-xl py-brand-lg text-lg rounded-2xl',
+    sm: 'min-h-9 px-3 py-2 text-xs rounded-lg',
+    md: 'min-h-11 px-4 py-2.5 text-sm',
+    lg: 'min-h-12 px-6 py-3 text-base',
+    xl: 'min-h-14 px-8 py-4 text-lg rounded-2xl',
   };
 
   return (
