@@ -10,13 +10,13 @@ export default function Card({
 }) {
   const shouldReduceMotion = useReducedMotion();
   const isInteractive = Boolean(onClick);
-  const baseClasses = 'rounded-2xl p-5 bg-primary-light border border-primary-border/60 transition-[border-color,box-shadow,background-color] duration-brand-base text-brand-text-primary';
+  const baseClasses = 'rounded-2xl p-5 bg-background-surface border border-border-default/60 transition-[border-color,box-shadow,background-color] duration-brand-base text-text-primary';
   
   const variants = {
-    default: 'shadow-premium hover:border-accent/30 hover:shadow-card-hover',
-    glass: 'glass-panel border-accent/15 dark:border-accent/15',
+    default: 'shadow-premium hover:border-accent-gold/40 hover:shadow-card-hover',
+    glass: 'glass-panel border-accent-gold/15',
     borderless: 'border-none shadow-none p-0 bg-transparent dark:bg-transparent text-inherit',
-    glow: 'shadow-premium border-accent/25 relative hover:border-accent/50 hover:shadow-[0_0_25px_rgba(212,164,55,0.15)]',
+    glow: 'shadow-premium border-accent-gold/25 relative hover:border-accent-gold/50 hover:shadow-[0_0_25px_rgba(201,154,62,0.15)]',
   };
 
   const hoverClasses = hover && variant !== 'borderless'

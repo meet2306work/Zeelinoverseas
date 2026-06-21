@@ -83,30 +83,30 @@ export default function UserLayout() {
   ];
 
   return (
-    <div className="min-h-screen flex bg-brand-bg font-sans text-slate-100">
+    <div className="min-h-screen flex bg-background-primary font-sans text-text-primary">
       {/* Collapsible Left Sidebar (Desktop only) */}
       <aside
-        className={`hidden lg:flex flex-col border-r border-primary-border bg-primary-light transition-all duration-300 h-screen sticky top-0
+        className={`hidden lg:flex flex-col border-r border-border-default/20 bg-black-accent transition-all duration-300 h-screen sticky top-0
           ${isSidebarCollapsed ? 'w-20' : 'w-64'}
         `}
       >
         {/* Logo Block */}
-        <div className={`h-16 flex items-center border-b border-primary-border/60 ${isSidebarCollapsed ? 'justify-center' : 'justify-between px-brand-md'}`}>
+        <div className={`h-16 flex items-center border-b border-border-default/20 ${isSidebarCollapsed ? 'justify-center' : 'justify-between px-brand-md'}`}>
           {!isSidebarCollapsed && (
-            <span className="text-lg font-bold tracking-tight text-slate-100">
-              ZEELIN<span className="text-accent font-black">PORTAL</span>
+            <span className="text-lg font-bold tracking-tight text-text-on-dark">
+              <span className="text-brand-mark font-black tracking-wide">ZEELIN</span><span className="text-text-on-dark font-medium ml-1">PORTAL</span>
             </span>
           )}
           <button
             onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-            className={`p-1.5 rounded-lg text-slate-400 hover:text-accent hover:bg-primary-medium/60 ${isSidebarCollapsed ? '' : 'ml-auto'}`}
+            className={`p-1.5 rounded-lg text-text-on-dark/70 hover:text-accent-gold hover:bg-black-accent/80 transition-colors cursor-pointer ${isSidebarCollapsed ? '' : 'ml-auto'}`}
           >
             <FiMenu className="h-5 w-5" />
           </button>
         </div>
 
         {/* Navigation Links */}
-        <nav className="flex-1 px-brand-sm py-brand-md flex flex-col gap-brand-xs overflow-y-auto scrollbar-thin">
+        <nav className="flex-1 px-brand-sm py-brand-md flex flex-col gap-brand-xs overflow-y-auto scrollbar-thin scrollbar-thumb-accent-gold/20">
           {sidebarLinks.map((link) => {
             const LinkIcon = link.icon;
             const isActive = location.pathname === link.path || 
@@ -117,18 +117,18 @@ export default function UserLayout() {
                 key={link.path}
                 to={link.path}
                 title={isSidebarCollapsed ? link.label : undefined}
-                className={`flex items-center rounded-xl transition-all duration-200
+                className={`flex items-center rounded-xl transition-all duration-200 border border-transparent
                   ${isSidebarCollapsed 
                     ? 'justify-center w-10 h-10 mx-auto' 
                     : 'gap-brand-md px-brand-md py-brand-sm text-sm font-semibold'
                   }
                   ${isActive
-                    ? 'bg-accent text-slate-950 shadow-md shadow-accent/15'
-                    : 'text-slate-400 hover:bg-primary-medium/60 hover:text-slate-100'
+                    ? 'bg-accent-gold border-accent-gold/20 text-text-on-accent shadow-md shadow-accent-gold/15'
+                    : 'text-text-on-dark/70 hover:bg-background-surface/10 hover:text-text-on-dark'
                   }
                 `}
               >
-                <LinkIcon className={`h-5 w-5 shrink-0 ${isActive ? 'text-slate-955' : 'text-slate-400'}`} />
+                <LinkIcon className={`h-5 w-5 shrink-0 ${isActive ? 'text-text-on-accent' : 'text-text-on-dark/60'}`} />
                 {!isSidebarCollapsed && <span>{link.label}</span>}
               </Link>
             );
@@ -136,7 +136,7 @@ export default function UserLayout() {
         </nav>
 
         {/* Footer actions */}
-        <div className="p-brand-sm border-t border-primary-border">
+        <div className="p-brand-sm border-t border-border-default/20">
           <button
             onClick={() => setIsLogoutDialogOpen(true)}
             title={isSidebarCollapsed ? "Sign Out" : undefined}
@@ -145,7 +145,7 @@ export default function UserLayout() {
                 ? 'justify-center w-10 h-10 mx-auto' 
                 : 'gap-brand-md w-full px-brand-md py-brand-sm text-sm font-semibold'
               }
-              text-slate-400 hover:text-brand-danger hover:bg-red-950/10
+              text-text-on-dark/60 hover:text-brand-danger hover:bg-red-950/10
             `}
           >
             <FiLogOut className="h-5 w-5 shrink-0" />
@@ -158,15 +158,15 @@ export default function UserLayout() {
       {isMobileOpen && (
         <div className="lg:hidden fixed inset-0 z-50 flex">
           {/* Backdrop */}
-          <div onClick={() => setIsMobileOpen(false)} className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs" />
+          <div onClick={() => setIsMobileOpen(false)} className="fixed inset-0 bg-slate-955/60 backdrop-blur-xs" />
           
           {/* Menu */}
-          <div className="relative w-64 bg-primary-light h-full flex flex-col p-brand-md border-r border-primary-border shadow-2xl glass-panel">
-            <div className="flex items-center justify-between mb-brand-lg">
-              <span className="text-lg font-bold text-slate-150">
-                ZEELIN<span className="text-accent font-black">PORTAL</span>
+          <div className="relative w-64 bg-black-accent h-full flex flex-col p-brand-md border-r border-border-default/20 shadow-2xl glass-panel text-text-on-dark">
+            <div className="flex items-center justify-between mb-brand-lg border-b border-border-default/10 pb-3">
+              <span className="text-lg font-bold">
+                <span className="text-brand-mark font-black tracking-wide">ZEELIN</span><span className="text-text-on-dark font-medium ml-1">PORTAL</span>
               </span>
-              <button onClick={() => setIsMobileOpen(false)} className="p-1.5 text-slate-400">
+              <button onClick={() => setIsMobileOpen(false)} className="p-1.5 text-text-on-dark/70 hover:text-text-on-dark">
                 <FiX className="h-6 w-6" />
               </button>
             </div>
@@ -182,14 +182,14 @@ export default function UserLayout() {
                     key={link.path}
                     to={link.path}
                     onClick={() => setIsMobileOpen(false)}
-                    className={`flex items-center gap-brand-md px-brand-md py-brand-sm text-sm font-semibold rounded-xl
+                    className={`flex items-center gap-brand-md px-brand-md py-brand-sm text-sm font-semibold rounded-xl border border-transparent
                       ${isActive
-                        ? 'bg-accent text-slate-950 shadow-md shadow-accent/15'
-                        : 'text-slate-400 hover:bg-primary-medium/60'
+                        ? 'bg-accent-gold border-accent-gold/20 text-text-on-accent shadow-md shadow-accent-gold/15'
+                        : 'text-text-on-dark/70 hover:bg-background-surface/10'
                       }
                     `}
                   >
-                    <LinkIcon className={`h-5 w-5 ${isActive ? 'text-slate-955' : 'text-slate-400'}`} />
+                    <LinkIcon className={`h-5 w-5 ${isActive ? 'text-text-on-accent' : 'text-text-on-dark/60'}`} />
                     <span>{link.label}</span>
                   </Link>
                 );
@@ -198,7 +198,7 @@ export default function UserLayout() {
 
             <button
               onClick={() => setIsLogoutDialogOpen(true)}
-              className="flex items-center gap-brand-md w-full px-brand-md py-brand-sm text-sm font-semibold text-slate-400 hover:text-brand-danger rounded-xl"
+              className="flex items-center gap-brand-md w-full px-brand-md py-brand-sm text-sm font-semibold text-text-on-dark/60 hover:text-brand-danger rounded-xl"
             >
               <FiLogOut className="h-5 w-5" />
               <span>Sign Out</span>
@@ -210,44 +210,44 @@ export default function UserLayout() {
       {/* Right Content Workspace */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Right Header */}
-        <header className="h-16 border-b border-primary-border bg-primary-light/90 backdrop-blur-md sticky top-0 z-30 px-brand-md flex items-center justify-between shadow-lg shadow-primary/10">
+        <header className="h-16 border-b border-border-default/20 bg-black-accent/90 backdrop-blur-md sticky top-0 z-30 px-brand-md flex items-center justify-between shadow-lg shadow-black-accent/5">
           <div className="flex items-center gap-brand-sm">
             <button
               onClick={() => setIsMobileOpen(true)}
-              className="lg:hidden p-2 rounded-lg text-slate-400 hover:bg-primary-medium/60 hover:text-accent"
+              className="lg:hidden p-2 rounded-lg text-text-on-dark/75 hover:bg-background-surface/10 hover:text-accent-gold"
             >
               <FiMenu className="h-6 w-6" />
             </button>
-            <h2 className="text-sm font-extrabold text-slate-100 hidden sm:block uppercase tracking-wider font-display">
+            <h2 className="text-sm font-extrabold text-text-on-dark hidden sm:block uppercase tracking-wider font-display">
               Global Trade Desk
             </h2>
           </div>
 
           <div className="flex items-center gap-brand-md">
-            <Link to="/user/inquiry-cart" className="relative p-2 text-slate-400 hover:text-accent transition-colors" title="Inquiry Follow-up">
+            <Link to="/user/inquiry-cart" className="relative p-2 text-text-on-dark/75 hover:text-accent-gold transition-colors" title="Inquiry Follow-up">
               <FiMessageSquare className="h-5.5 w-5.5" />
             </Link>
-            <Link to="/user/notifications" className="relative p-2 text-slate-400 hover:text-accent transition-colors">
+            <Link to="/user/notifications" className="relative p-2 text-text-on-dark/75 hover:text-accent-gold transition-colors">
               <FiBell className="h-5.5 w-5.5" />
-              <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-brand-danger ring-2 ring-primary-light" />
+              <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-brand-danger ring-2 ring-black-accent" />
             </Link>
 
             {/* Profile Dropdown */}
             <Dropdown
               trigger={
-                <div className="flex items-center gap-2.5 p-1 rounded-xl hover:bg-primary-medium/80 transition-colors cursor-pointer">
+                <div className="flex items-center gap-2.5 p-1 rounded-xl hover:bg-background-surface/10 transition-colors cursor-pointer">
                   {currentUser?.avatar ? (
                     <img
                       src={currentUser.avatar}
                       alt={fullName}
-                      className="h-8.5 w-8.5 rounded-full object-cover border border-accent/25 shadow-sm"
+                      className="h-8.5 w-8.5 rounded-full object-cover border border-accent-gold/25 shadow-sm"
                     />
                   ) : (
-                    <div className="h-8.5 w-8.5 rounded-full bg-primary-medium flex items-center justify-center font-bold text-accent">
+                    <div className="h-8.5 w-8.5 rounded-full bg-background-surface/10 flex items-center justify-center font-bold text-accent-gold border border-border-default/30">
                       {initials}
                     </div>
                   )}
-                  <span className="text-xs font-bold text-slate-205 hidden md:inline">
+                  <span className="text-xs font-bold text-text-on-dark hidden md:inline">
                     {fullName}
                   </span>
                 </div>

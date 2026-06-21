@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { FiAnchor, FiBriefcase, FiCompass, FiSend, FiFileText } from 'react-icons/fi';
+import { FiAnchor, FiBriefcase, FiCompass, FiSend, FiFileText, FiPhone, FiMail, FiLayers, FiDollarSign } from 'react-icons/fi';
 import Card from '../../commonComponents/cards/Card';
 import Input from '../../commonComponents/inputs/Input';
 import Dropdown from '../../commonComponents/dropdowns/Dropdown';
@@ -124,7 +124,7 @@ export default function RfqScreen() {
                 placeholder="e.g. +91 98765 43210"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                icon={FiAnchor}
+                icon={FiPhone}
                 required
               />
               <Input
@@ -133,7 +133,7 @@ export default function RfqScreen() {
                 placeholder="e.g. contact@company.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                icon={FiBriefcase}
+                icon={FiMail}
                 required
               />
             </div>
@@ -144,7 +144,7 @@ export default function RfqScreen() {
                 placeholder="e.g. 50 Tons, 10 Containers"
                 value={qty}
                 onChange={(e) => setQty(e.target.value)}
-                icon={FiAnchor}
+                icon={FiLayers}
                 required
               />
 
@@ -153,7 +153,7 @@ export default function RfqScreen() {
                 placeholder="e.g. $40,000 max"
                 value={targetPrice}
                 onChange={(e) => setTargetPrice(e.target.value)}
-                icon={FiBriefcase}
+                icon={FiDollarSign}
                 required
               />
             </div>

@@ -43,17 +43,17 @@ export default function AdminDashboardScreen() {
     { 
       key: 'id', 
       label: 'Shipment ID',
-      render: (val) => <span className="font-mono font-bold text-slate-500 dark:text-slate-400">{val}</span>
+      render: (val) => <span className="font-mono font-bold text-text-secondary">{val}</span>
     },
     { 
       key: 'customer', 
       label: 'Customer',
-      render: (val) => <span className="font-bold text-slate-900 dark:text-white">{val}</span>
+      render: (val) => <span className="font-bold text-text-primary">{val}</span>
     },
     { 
       key: 'route', 
       label: 'Route',
-      render: (val) => <span className="font-semibold text-slate-600 dark:text-slate-300">{val}</span>
+      render: (val) => <span className="font-semibold text-text-secondary">{val}</span>
     },
     {
       key: 'status',
@@ -84,24 +84,24 @@ export default function AdminDashboardScreen() {
     { 
       key: 'eta', 
       label: 'ETA',
-      render: (val) => <span className="font-semibold text-slate-500 dark:text-slate-400">{val}</span>
+      render: (val) => <span className="font-semibold text-text-secondary">{val}</span>
     },
   ];
 
   return (
     <div className="flex flex-col gap-8 py-2 animate-fade-in-up">
       {/* Welcome header */}
-      <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-5">
+      <div className="flex justify-between items-center border-b border-border-default/40 pb-5">
         <div>
-          <h1 className="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+          <h1 className="text-xl font-extrabold text-text-primary tracking-tight">
             Dashboard Overview
           </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+          <p className="text-xs text-text-secondary mt-1">
             Real-time analytics monitor for Zeelinoverseas leads pipelines and logistics milestones.
           </p>
         </div>
         
-        <Button variant="outline" size="sm" icon={FiActivity} className="border-slate-200 dark:border-slate-800 text-slate-500 hover:text-slate-800 dark:hover:text-white">
+        <Button variant="outline" size="sm" icon={FiActivity} className="border-border-default/50 text-text-secondary hover:text-text-primary">
           Generate System Report
         </Button>
       </div>
@@ -114,11 +114,11 @@ export default function AdminDashboardScreen() {
             variant="glass"
             className="p-5 relative overflow-hidden group hover:-translate-y-1 transition-all duration-300"
           >
-            <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block">
+            <span className="text-[11px] font-bold text-text-secondary uppercase tracking-widest block">
               {m.label}
             </span>
             <div className="flex items-baseline gap-2 mt-3 mb-1">
-              <span className="text-3xl font-black text-slate-900 dark:text-white">
+              <span className="text-3xl font-black text-text-primary">
                 {m.value}
               </span>
             </div>
@@ -132,10 +132,10 @@ export default function AdminDashboardScreen() {
       {/* Shipment Board */}
       <div className="flex flex-col gap-4 mt-4">
         <div>
-          <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+          <h3 className="text-xs font-bold text-text-secondary uppercase tracking-widest">
             Recent B2B Cargo Shipments
           </h3>
-          <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
+          <p className="text-xs text-text-secondary/80 mt-1">
             Active shipments tracking log in our freight logistics pipeline.
           </p>
         </div>
@@ -144,7 +144,7 @@ export default function AdminDashboardScreen() {
           columns={columns}
           data={recentShipments}
           emptyMessage="No pending shipments logs inside database."
-          className="text-slate-700 dark:text-slate-350"
+          className="text-text-secondary"
         />
       </div>
     </div>

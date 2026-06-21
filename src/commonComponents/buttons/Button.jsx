@@ -20,14 +20,14 @@ export default function Button({
   const baseStyles = 'relative inline-flex items-center justify-center overflow-hidden font-semibold rounded-xl transition-[color,background-color,border-color,box-shadow] duration-brand-fast focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed select-none';
 
   const variants = {
-    primary: 'bg-accent hover:bg-accent-light text-primary shadow-md hover:shadow-lg focus:ring-accent border border-accent/20 font-bold',
-    secondary: 'bg-primary-medium hover:bg-primary-light text-accent hover:text-accent-light focus:ring-accent border border-primary-border',
-    outline: 'border border-accent/40 text-accent hover:bg-accent/10 focus:ring-accent',
+    primary: 'bg-accent-gold hover:bg-accent-gold-hover text-text-on-accent shadow-md hover:shadow-lg focus:ring-accent-gold border border-accent-gold/20 font-bold',
+    secondary: 'bg-black-accent hover:bg-black-accent/90 text-text-on-dark focus:ring-black-accent border border-border-default/20',
+    outline: 'border border-accent-gold text-accent-gold hover:bg-accent-gold/10 focus:ring-accent-gold',
     danger: 'bg-brand-danger hover:bg-red-650 text-white focus:ring-brand-danger shadow-sm',
     success: 'bg-brand-success hover:bg-emerald-650 text-white focus:ring-brand-success shadow-sm',
-    ghost: 'text-primary-slate hover:text-white hover:bg-primary-medium/40',
-    gold: 'bg-accent hover:bg-accent-light text-primary font-bold focus:ring-accent shadow-sm shadow-accent/15 border border-accent/20',
-    brandGradient: 'bg-gradient-to-r from-accent to-accent-light text-primary font-extrabold shadow-lg shadow-accent/15 border border-accent/20 hover:from-accent-light hover:to-accent',
+    ghost: 'text-text-secondary hover:text-text-primary hover:bg-background-surface/40',
+    gold: 'bg-accent-gold hover:bg-accent-gold-hover text-text-on-accent font-bold focus:ring-accent-gold shadow-sm shadow-accent-gold/15 border border-accent-gold/20',
+    brandGradient: 'bg-gradient-to-r from-accent-gold to-accent-gold-hover text-text-on-accent font-extrabold shadow-lg shadow-accent-gold/15 border border-accent-gold/20',
   };
 
   const sizes = {
@@ -42,7 +42,7 @@ export default function Button({
       type={type}
       disabled={isDisabled}
       onClick={onClick}
-      whileHover={!shouldReduceMotion && !isDisabled ? { y: -2, scale: 1.02, boxShadow: '0 8px 20px -6px rgba(212,164,55,0.35)' } : undefined}
+      whileHover={!shouldReduceMotion && !isDisabled ? { y: -2, scale: 1.02, boxShadow: '0 8px 20px -6px rgba(201,154,62,0.35)' } : undefined}
       whileTap={!shouldReduceMotion && !isDisabled ? { scale: 0.98 } : undefined}
       transition={motionSprings.responsive}
       aria-busy={isLoading || undefined}

@@ -182,12 +182,12 @@ export default function ProductsScreen() {
 
   return (
     <div className="flex flex-col gap-brand-md py-brand-sm">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-brand-md border-b border-brand-border/40 dark:border-slate-800/40 pb-md">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-brand-md border-b border-border-default/40 pb-md">
         <div>
-          <h1 className="text-2xl font-extrabold text-brand-text-primary dark:text-white tracking-tight mb-1">
+          <h1 className="text-2xl font-extrabold text-text-primary tracking-tight mb-1">
             {selectedCategory ? selectedCategory.name : 'Global Trade Catalog'}
           </h1>
-          <p className="text-xs text-brand-text-secondary dark:text-slate-400">
+          <p className="text-xs text-text-secondary">
             {selectedCategory
               ? `Browse ${selectedCategory.name.toLowerCase()} with live MOQ, export-ready pricing, and supplier details.`
               : 'Source premium packaging products with certified suppliers, MOQ filters, and RFQ support.'}
@@ -204,16 +204,16 @@ export default function ProductsScreen() {
       <div className="flex flex-col lg:flex-row gap-brand-lg">
         {/* Filters Sidebar */}
         <aside className="w-full lg:w-64 shrink-0 flex flex-col gap-brand-md">
-          <Card variant="glass" hover={false} className="p-brand-md flex flex-col gap-brand-md border-brand-border/40 dark:border-slate-800/40">
+          <Card variant="glass" hover={false} className="p-brand-md flex flex-col gap-brand-md border-border-default/40">
             <div className="flex items-center justify-between gap-3">
-              <h3 className="text-sm font-bold text-brand-text-primary dark:text-white uppercase tracking-wider flex items-center gap-brand-sm">
-                <FiSliders className="h-4.5 w-4.5 text-brand-text-secondary" /> Filters
+              <h3 className="text-sm font-bold text-text-primary uppercase tracking-wider flex items-center gap-brand-sm">
+                <FiSliders className="h-4.5 w-4.5 text-text-secondary" /> Filters
               </h3>
               {hasActiveFilters && (
                 <button
                   type="button"
                   onClick={resetFilters}
-                  className="inline-flex items-center gap-1 text-xs font-bold text-secondary hover:text-blue-700"
+                  className="inline-flex items-center gap-1 text-xs font-bold text-accent-gold hover:text-accent-gold-hover"
                 >
                   <FiX className="h-3.5 w-3.5" /> Clear
                 </button>
@@ -320,13 +320,13 @@ export default function ProductsScreen() {
         {/* Product Grid */}
         <div className="flex-1 flex flex-col gap-brand-md">
           {hasSearch && (
-            <div className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
+            <div className="rounded-2xl border border-border-default/50 bg-background-surface p-4">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <h2 className="text-sm font-extrabold text-brand-text-primary dark:text-white">
+                  <h2 className="text-sm font-extrabold text-text-primary">
                     Search results for "{search.trim()}"
                   </h2>
-                  <p className="mt-1 text-xs text-brand-text-secondary dark:text-slate-400">
+                  <p className="mt-1 text-xs text-text-secondary">
                     Found {filteredProducts.length} product{filteredProducts.length === 1 ? '' : 's'}
                     {matchingCategories.length > 0 ? ` across ${matchingCategories.length} matching categor${matchingCategories.length === 1 ? 'y' : 'ies'}.` : '.'}
                   </p>
@@ -337,7 +337,7 @@ export default function ProductsScreen() {
                       <Link
                         key={cat.slug}
                         to={`${isPortal ? '/user/products' : '/products'}?category=${cat.slug}`}
-                        className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-bold text-secondary transition hover:bg-blue-100 dark:border-blue-500/20 dark:bg-blue-500/10 dark:text-blue-300"
+                        className="rounded-full border border-border-default/50 bg-background-surface px-3 py-1 text-xs font-bold text-accent-gold transition hover:bg-accent-gold/10"
                       >
                         {cat.name}
                       </Link>
@@ -353,20 +353,20 @@ export default function ProductsScreen() {
               {Array.from({ length: 6 }, (_, index) => <SkeletonCard key={index} />)}
             </div>
           ) : filteredProducts.length === 0 ? (
-            <Reveal className="text-center py-20 border border-dashed border-brand-border dark:border-slate-800 rounded-2xl bg-brand-card dark:bg-slate-900">
-              <FiBox className="h-10 w-10 text-brand-text-secondary mx-auto mb-3" />
-              <h3 className="text-base font-bold text-brand-text-primary dark:text-white mb-1">
+            <Reveal className="text-center py-20 border border-dashed border-border-default rounded-2xl bg-background-surface">
+              <FiBox className="h-10 w-10 text-text-secondary mx-auto mb-3" />
+              <h3 className="text-base font-bold text-text-primary mb-1">
                 Not available in products or categories
               </h3>
-              <p className="text-xs text-brand-text-secondary">
+              <p className="text-xs text-text-secondary">
                 Try another keyword, browse all categories, or request a custom quotation.
               </p>
             </Reveal>
           ) : (
             <StaggerGroup key={searchParams.toString()} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-brand-md">
               {filteredProducts.map((p) => (
-                <StaggerItem key={p._id || p.id} className="h-full"><TiltCard variant="default" className="flex flex-col h-full p-brand-md group">
-                  <div className="relative aspect-video rounded-xl overflow-hidden bg-primary-medium mb-brand-md border border-brand-border/20">
+                <StaggerItem key={p._id || p.id} className="h-full"><TiltCard variant="default" className="flex flex-col h-full p-brand-md border border-border-default/50 hover:border-accent-gold/45 group">
+                  <div className="relative aspect-video rounded-xl overflow-hidden bg-background-primary mb-brand-md border border-border-default/40">
                     <img
                       src={p.images && p.images.length > 0 ? p.images[0].url : p.image}
                       alt={p.title || p.name}
@@ -376,30 +376,30 @@ export default function ProductsScreen() {
                       }}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
-                    <div className="absolute top-2 left-2 px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-primary/80 text-brand-text-primary backdrop-blur-xs uppercase tracking-wider">
+                    <div className="absolute top-2 left-2 px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-background-surface/85 text-text-primary border border-border-default/30 backdrop-blur-xs uppercase tracking-wider">
                       3D Model
                     </div>
                   </div>
 
                     <div className="flex-1 flex flex-col justify-between gap-brand-sm">
                     <div>
-                      <h4 className="text-sm font-bold text-brand-text-primary line-clamp-2 group-hover:text-accent transition-colors font-display">
+                      <h4 className="text-sm font-bold text-text-primary line-clamp-2 group-hover:text-accent-gold transition-colors font-display">
                         {p.title || p.name}
                       </h4>
-                      <p className="text-xs text-brand-text-secondary mt-1">
-                        Category: <span className="font-semibold text-brand-text-primary">{p.category?.name || 'Uncategorized'}</span>
+                      <p className="text-xs text-text-secondary mt-1">
+                        Category: <span className="font-semibold text-text-primary">{p.category?.name || 'Uncategorized'}</span>
                       </p>
                       <div className="mt-3 flex flex-wrap gap-1.5">
-                        <span className="rounded-md bg-primary-medium/80 border border-brand-border/40 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-brand-text-secondary">
+                        <span className="rounded-md bg-background-primary/80 border border-border-default/45 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-text-secondary">
                             {p.stock > 0 ? 'Ready Stock' : 'Out of Stock'}
                         </span>
                       </div>
                     </div>
 
                     <div>
-                      <div className="flex items-center justify-between gap-3 text-sm font-extrabold text-accent mb-brand-sm">
+                      <div className="flex items-center justify-between gap-3 text-sm font-extrabold text-accent-gold mb-brand-sm">
                         <span>${p.price?.toFixed(2)}</span>
-                        <span className="text-xs text-amber-600 dark:text-amber-300">{(p.averageRating || p.rating || 0).toFixed(1)} ★</span>
+                        <span className="text-xs text-accent-gold-hover">{(p.averageRating || p.rating || 0).toFixed(1)} ★</span>
                       </div>
 
                       <Link to={isPortal ? `/user/products/${p._id || p.id}` : `/products/${p._id || p.id}`}>

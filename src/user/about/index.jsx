@@ -30,11 +30,11 @@ export default function AboutScreen() {
   return (
     <div className="flex flex-col gap-12 py-4 animate-fade-in-up">
       {/* Hero Headline Section */}
-      <section className="text-center md:text-left border-b border-brand-border/40 dark:border-slate-800/40 pb-6">
-        <h1 className="text-display-md font-extrabold text-slate-900 dark:text-white tracking-tight mb-2">
+      <section className="text-center md:text-left border-b border-border-default/40 pb-6">
+        <h1 className="text-display-md font-extrabold text-text-primary tracking-tight mb-2">
           About Zeelinoverseas
         </h1>
-        <p className="text-body-md text-slate-500 dark:text-slate-400 max-w-2xl">
+        <p className="text-body-md text-text-secondary max-w-2xl">
           Leading B2B import-export logistics and enterprise e-commerce systems. Mapped to bridge intermodal shipping pipelines with customized digital contract processing.
         </p>
       </section>
@@ -44,16 +44,16 @@ export default function AboutScreen() {
         {stats.map((stat, idx) => {
           const Icon = stat.icon;
           return (
-            <Card key={idx} variant="glass" className="p-6 border-slate-200/40 dark:border-slate-800/40">
+            <Card key={idx} variant="glass" className="p-6 border-border-default/50">
               <div className="flex items-center gap-4">
-                <div className="rounded-xl p-3 bg-secondary/10 text-secondary dark:text-accent">
+                <div className="rounded-xl p-3 bg-accent-gold/15 text-accent-gold">
                   <Icon className="h-6 w-6" />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-extrabold text-slate-900 dark:text-white leading-none mb-1">
+                  <h3 className="text-2xl font-extrabold text-text-primary leading-none mb-1">
                     {stat.value}
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">
+                  <p className="text-xs text-text-secondary font-semibold uppercase tracking-wider">
                     {stat.label}
                   </p>
                 </div>
@@ -64,23 +64,23 @@ export default function AboutScreen() {
       </section>
 
       {/* Corporate Strategy block */}
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center bg-white dark:bg-slate-900/60 p-8 rounded-3xl border border-slate-250/20 dark:border-slate-800/30">
+      <section className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center bg-background-surface p-8 rounded-3xl border border-border-default/35">
         <div className="flex flex-col gap-4">
-          <span className="text-label-sm text-secondary dark:text-accent tracking-widest font-bold">
+          <span className="text-label-sm text-accent-gold tracking-widest font-bold">
             Corporate Statement
           </span>
-          <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-snug">
+          <h2 className="text-2xl font-extrabold text-text-primary tracking-tight leading-snug">
             Streamlining Global Commerce with Intelligent Workflows
           </h2>
-          <p className="text-body-md text-slate-500 dark:text-slate-400 leading-relaxed">
+          <p className="text-body-md text-text-secondary leading-relaxed">
             Zeelinoverseas drives end-to-end import and export operations. From custom manufacturing tooling specs and raw material sourcing to sea-port shipping manifests, our network ensures verified, on-time contract fulfillment.
           </p>
         </div>
-        <div className="relative aspect-video rounded-2xl overflow-hidden bg-slate-950 border border-slate-800 flex items-center justify-center p-6 text-center">
+        <div className="relative aspect-video rounded-2xl overflow-hidden bg-black-accent border border-border-default/20 flex items-center justify-center p-6 text-center">
           <div className="absolute inset-0 bg-cover bg-center opacity-40" style={{ backgroundImage: `url('https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=800&q=80')` }} />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-slate-950/40" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black-accent via-black-accent/80 to-black-accent/40" />
           <div className="relative flex flex-col gap-2 z-10">
-            <FiShield className="h-10 w-10 text-cyan-400 mx-auto" />
+            <FiShield className="h-10 w-10 text-accent-gold mx-auto" />
             <h4 className="text-sm font-bold text-white uppercase tracking-wider">SGS Audit Verified</h4>
             <p className="text-[11px] text-slate-300 max-w-xs leading-relaxed font-medium">
               Consistently audited trade practices ensuring full compliance with international maritime logistics security guidelines.
@@ -91,21 +91,21 @@ export default function AboutScreen() {
 
       {/* Core Values grid */}
       <section className="flex flex-col gap-6">
-        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest text-center md:text-left">
+        <h3 className="text-xs font-bold text-text-secondary uppercase tracking-widest text-center md:text-left">
           Our Core Operations Pillars
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {values.map((v, idx) => {
             const Icon = v.icon;
             return (
-              <Card key={idx} variant="default" className="p-6 flex flex-col gap-3">
-                <div className="h-10 w-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-355 flex items-center justify-center">
-                  <Icon className="h-5.5 w-5.5 text-secondary dark:text-accent" />
+              <Card key={idx} variant="default" className="p-6 flex flex-col gap-3 border border-border-default/45">
+                <div className="h-10 w-10 rounded-xl bg-background-primary text-text-primary flex items-center justify-center">
+                  <Icon className="h-5.5 w-5.5 text-accent-gold" />
                 </div>
-                <h4 className="text-base font-bold text-slate-900 dark:text-white">
+                <h4 className="text-base font-bold text-text-primary">
                   {v.title}
                 </h4>
-                <p className="text-xs text-slate-550 dark:text-slate-400 leading-relaxed">
+                <p className="text-xs text-text-secondary leading-relaxed">
                   {v.desc}
                 </p>
               </Card>

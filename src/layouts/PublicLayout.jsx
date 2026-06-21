@@ -54,15 +54,15 @@ export default function PublicLayout() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-brand-bg">
+    <div className="min-h-screen flex flex-col bg-background-primary text-text-primary">
       {/* Premium Glass Header */}
-      <motion.header layout={!shouldReduceMotion} transition={motionTransitions.admin} className={`sticky top-0 z-40 w-full border-b backdrop-blur-xl transition-[background-color,border-color,box-shadow] ${isScrolled ? 'border-accent/20 bg-primary-light/95 shadow-lg shadow-accent/5' : 'border-primary-border/60 bg-primary/90'}`}>
+      <motion.header layout={!shouldReduceMotion} transition={motionTransitions.admin} className={`sticky top-0 z-40 w-full border-b backdrop-blur-xl transition-[background-color,border-color,box-shadow] ${isScrolled ? 'border-accent-gold/20 bg-black-accent/95 shadow-lg shadow-accent-gold/5' : 'border-border-default/40 bg-black-accent/90'}`}>
         <div className={`${isScrolled ? 'h-14' : 'h-16'} w-full px-brand-md sm:px-brand-lg lg:px-brand-xl flex items-center justify-between transition-[height] duration-brand-fast`}>
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
             <span className="text-xl font-extrabold tracking-tight">
-              <span className="text-accent font-black tracking-wide">ZEELIN</span>
-              <span className="text-slate-200 font-medium">OVERSEAS</span>
+              <span className="text-brand-mark font-black tracking-wide">ZEELIN</span>
+              <span className="text-text-on-dark font-medium ml-1">OVERSEAS</span>
             </span>
           </Link>
 
@@ -76,14 +76,14 @@ export default function PublicLayout() {
                   to={link.path}
                   className={`text-xs uppercase tracking-widest font-bold transition-colors relative py-1
                     ${isActive 
-                      ? 'text-accent' 
-                      : 'text-slate-400 hover:text-accent'
+                      ? 'text-accent-gold' 
+                      : 'text-text-on-dark/70 hover:text-accent-gold'
                     }
                   `}
                 >
                   {link.label}
                   {isActive && (
-                    <motion.span layoutId="activeNavLine" className="absolute bottom-0 left-0 right-0 h-[2px] bg-accent" transition={motionTransitions.interface} />
+                    <motion.span layoutId="activeNavLine" className="absolute bottom-0 left-0 right-0 h-[2px] bg-accent-gold" transition={motionTransitions.interface} />
                   )}
                 </Link>
               );
@@ -93,7 +93,7 @@ export default function PublicLayout() {
           {/* Action Icons */}
           <div className="hidden md:flex items-center gap-brand-md">
             {isAuthenticated && (
-              <Link to="/inquiry-cart" className="relative p-2 text-slate-400 hover:text-accent transition-colors" title="Inquiry Follow-up">
+              <Link to="/inquiry-cart" className="relative p-2 text-text-on-dark/70 hover:text-accent-gold transition-colors" title="Inquiry Follow-up">
                 <FiMessageSquare className="h-5 w-5" />
               </Link>
             )}
@@ -122,7 +122,7 @@ export default function PublicLayout() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg text-slate-400 hover:text-accent hover:bg-primary-medium transition-colors"
+            className="md:hidden p-2 rounded-lg text-text-on-dark/70 hover:text-accent-gold hover:bg-black-accent/80 transition-colors"
           >
             {isMobileMenuOpen ? <FiX className="h-6 w-6" /> : <FiMenu className="h-6 w-6" />}
           </button>
@@ -132,21 +132,21 @@ export default function PublicLayout() {
       {/* Mobile Drawer Menu */}
       <AnimatePresence>
       {isMobileMenuOpen && (
-        <motion.div initial={{ opacity: 0, y: shouldReduceMotion ? 0 : -12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: shouldReduceMotion ? 0 : -12 }} transition={shouldReduceMotion ? { duration: 0 } : motionTransitions.interface} className="md:hidden fixed inset-x-0 top-16 z-30 bg-primary-light border-b border-primary-border p-brand-md flex flex-col gap-brand-md shadow-2xl">
+        <motion.div initial={{ opacity: 0, y: shouldReduceMotion ? 0 : -12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: shouldReduceMotion ? 0 : -12 }} transition={shouldReduceMotion ? { duration: 0 } : motionTransitions.interface} className="md:hidden fixed inset-x-0 top-16 z-30 bg-black-accent/95 border-b border-border-default/20 p-brand-md flex flex-col gap-brand-md shadow-2xl">
           <nav className="flex flex-col gap-brand-sm">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="text-sm uppercase tracking-wider font-bold text-slate-300 hover:text-accent py-1"
+                className="text-sm uppercase tracking-wider font-bold text-text-on-dark/80 hover:text-accent-gold py-1"
               >
                 {link.label}
               </Link>
             ))}
           </nav>
           
-          <div className="h-px bg-primary-border my-1" />
+          <div className="h-px bg-border-default/20 my-1" />
 
           <div className="flex flex-col gap-brand-sm">
             {isAuthenticated && (
@@ -198,46 +198,46 @@ export default function PublicLayout() {
       </main>
 
       {/* Premium Footer */}
-      <footer className="bg-primary text-slate-400 border-t border-slate-800 py-brand-xl">
+      <footer className="bg-black-accent text-text-on-dark/70 border-t border-border-default/20 py-brand-xl">
         <PageContainer className="grid grid-cols-1 md:grid-cols-4 gap-brand-lg mb-brand-xl">
           <div className="flex flex-col gap-brand-sm">
-            <span className="text-lg font-bold tracking-tight text-white">
-              ZEELIN<span className="text-accent font-medium">OVERSEAS</span>
+            <span className="text-lg font-bold tracking-tight text-text-on-dark">
+              <span className="text-brand-mark font-black">ZEELIN</span><span className="text-text-on-dark font-medium ml-1">OVERSEAS</span>
             </span>
-            <p className="text-xs text-slate-400 max-w-xs leading-relaxed">
+            <p className="text-xs text-text-on-dark/65 max-w-xs leading-relaxed">
               Global import-export and customized manufacturing solutions. Supporting enterprises with high-fidelity logistics and custom CRM order processing.
             </p>
           </div>
           <div>
-            <h5 className="text-sm font-semibold text-white uppercase tracking-wider mb-brand-sm">Services</h5>
+            <h5 className="text-sm font-semibold text-text-on-dark uppercase tracking-wider mb-brand-sm">Services</h5>
             <ul className="flex flex-col gap-brand-xs text-xs">
-              <li><Link to="/services" className="hover:text-accent">Freight Forwarding</Link></li>
-              <li><Link to="/services" className="hover:text-accent">Custom Brokerage</Link></li>
-              <li><Link to="/services" className="hover:text-accent">Quality Inspections</Link></li>
+              <li><Link to="/services" className="hover:text-accent-gold">Freight Forwarding</Link></li>
+              <li><Link to="/services" className="hover:text-accent-gold">Custom Brokerage</Link></li>
+              <li><Link to="/services" className="hover:text-accent-gold">Quality Inspections</Link></li>
             </ul>
           </div>
           <div>
-            <h5 className="text-sm font-semibold text-white uppercase tracking-wider mb-brand-sm">Support</h5>
+            <h5 className="text-sm font-semibold text-text-on-dark uppercase tracking-wider mb-brand-sm">Support</h5>
             <ul className="flex flex-col gap-brand-xs text-xs">
-              <li><Link to="/faq" className="hover:text-accent">FAQs</Link></li>
-              <li><Link to="/support" className="hover:text-accent">Submit Ticket</Link></li>
-              <li><Link to="/terms" className="hover:text-accent">Terms of Use</Link></li>
+              <li><Link to="/faq" className="hover:text-accent-gold">FAQs</Link></li>
+              <li><Link to="/support" className="hover:text-accent-gold">Submit Ticket</Link></li>
+              <li><Link to="/terms" className="hover:text-accent-gold">Terms of Use</Link></li>
             </ul>
           </div>
           <div>
-            <h5 className="text-sm font-semibold text-white uppercase tracking-wider mb-brand-sm">Newsletter</h5>
+            <h5 className="text-sm font-semibold text-text-on-dark uppercase tracking-wider mb-brand-sm">Newsletter</h5>
             <div className="flex gap-brand-sm">
               <input
                 type="email"
                 placeholder="Enter Email"
-                className="rounded-lg bg-slate-800 border-none text-xs text-white px-brand-md py-brand-sm outline-none focus:ring-1 focus:ring-accent w-full"
+                className="rounded-lg bg-background-surface/15 text-text-on-dark placeholder:text-text-on-dark/40 border border-border-default/20 text-xs px-brand-md py-brand-sm outline-none focus:ring-1 focus:ring-accent-gold w-full"
               />
-              <Button variant="secondary" size="sm" className="whitespace-nowrap">Join</Button>
+              <Button variant="gold" size="sm" className="whitespace-nowrap">Join</Button>
             </div>
           </div>
         </PageContainer>
-        <div className="border-t border-slate-850 pt-md">
-          <PageContainer className="flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 gap-brand-sm">
+        <div className="border-t border-border-default/10 pt-md">
+          <PageContainer className="flex flex-col sm:flex-row justify-between items-center text-xs text-text-on-dark/40 gap-brand-sm">
             <span>&copy; {new Date().getFullYear()} Zeelinoverseas. All rights reserved.</span>
             <div className="flex gap-brand-md">
               <Link to="/privacy" className="hover:underline">Privacy Policy</Link>

@@ -5,56 +5,37 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  /* Core brand palette: Premium Deep Navy & Gold */
-  --color-primary: #04263F; /* Navy primary background */
-  --color-primary-light: #0B2C46; /* Navy medium background */
-  --color-primary-medium: #0F3757; /* Lighter navy surface */
-  --color-primary-blue: #16466E;
-  --color-primary-slate: #8BA8C2; /* Muted blue-grey */
-  --color-primary-soft: #F4EFE6; /* Warm cream/off-white */
-  --color-primary-border: #163A57;
+  /* Centralized Color System Tokens */
+  --color-background-primary: #ECDFC4;   /* Cream (primary background) */
+  --color-background-surface: #F5EEDD;   /* Card/surface cream (secondary) */
+  --color-accent-gold: #C99A3E;          /* Gold / amber (base) */
+  --color-accent-gold-hover: #E0B85B;    /* Gold hover */
+  --color-accent-gold-active: #A67D2E;   /* Gold active */
+  --color-text-primary: #1B1B1B;         /* Black / charcoal (primary text) */
+  --color-text-secondary: #5C5640;       /* Muted text / secondary text */
+  --color-text-on-dark: #ECDFC4;         /* Cream text on black surfaces */
+  --color-text-on-accent: #1B1404;       /* Near-black on gold surfaces */
+  --color-border-default: #C9BC9A;       /* Hairline borders / dividers */
+  --color-brand-mark: #1D4D3A;           /* Forest green (logo wordmark ONLY) */
+  --color-black-accent: #161616;         /* Accent black/charcoal sections */
+  --color-kraft-brown: #BC8E5A;          /* Product frame container tone */
 
-  --color-accent: #D4A437; /* Warm Gold accent */
-  --color-accent-amber: #F0B94A;
-  --color-accent-darkest: #1D1502;
-  --color-accent-dark: #8F6E20;
-  --color-accent-light: #FCDA82;
-  --color-accent-soft: #FFFBEF;
-  --color-accent-lightest: #FFFDF9;
-
-  /* Overrides to match amber/gold secondary */
-  --color-secondary: #D4A437;
-
-  /* Restrained premium accent */
-  --color-brand-accent: #D4A437;
-  --color-brand-accent-hover: #B88A24;
-  --color-brand-accent-soft: #FFFBEF;
-
-  /* Semantic surfaces */
-  --color-brand-surface: #0A2E4B; /* Dark navy card surface */
-  --color-brand-surface-muted: #04263F;
-  --color-brand-surface-raised: #0F3757;
-  --color-brand-surface-inverse: #FAF6EE;
-  --color-brand-text-inverse: #04263F;
-
-  /* Success Palette */
-  --color-brand-success: #10B981;
-  --color-brand-success-dark: #064E3B;
-  --color-brand-success-light: #D1FAE5;
-
-  /* Danger Palette */
+  /* Compatibility Mapping: Keeps legacy classes working as fallbacks */
+  --color-primary: var(--color-background-primary);
+  --color-primary-light: var(--color-background-surface);
+  --color-primary-medium: var(--color-background-surface);
+  --color-primary-slate: var(--color-text-secondary);
+  --color-primary-border: var(--color-border-default);
+  --color-secondary: var(--color-accent-gold);
+  --color-accent: var(--color-accent-gold);
+  --color-accent-light: var(--color-accent-gold-hover);
+  --color-brand-accent: var(--color-accent-gold);
+  --color-brand-bg: var(--color-background-primary);
+  --color-brand-card: var(--color-background-surface);
+  --color-brand-text-primary: var(--color-text-primary);
+  --color-brand-text-secondary: var(--color-text-secondary);
+  --color-brand-border: var(--color-border-default);
   --color-brand-danger: #EF4444;
-  --color-brand-danger-light: #FEE2E2;
-
-  /* Info Palette */
-  --color-brand-info: #D4A437;
-  --color-brand-info-light: #FFFBEF;
-
-  --color-brand-bg: #041D30;
-  --color-brand-card: #0F3354; /* Slightly lighter navy for cards/panels to sit visibly above bg */
-  --color-brand-text-primary: #FAF6EE;
-  --color-brand-text-secondary: #8BA8C2;
-  --color-brand-border: #163A57;
 
   /* Global Color redirects to standard Tailwind slate/teal colors */
   --color-teal-50: #fdfbf7;
@@ -69,18 +50,17 @@
   --color-teal-900: #1d1502;
   --color-teal-950: #0f0a01;
 
-  --color-slate-50: #0a2a44;
-  --color-slate-100: #0b2c46;
-  --color-slate-200: #163a57;
-  --color-slate-300: #194b73;
-  --color-slate-400: #64748b;
-  --color-slate-500: #8ba8c2;
-  --color-slate-650: #ccd9e3;
-  --color-slate-600: #a3b8cc;
-  --color-slate-700: #b0c0d1;
-  --color-slate-800: #faf6ee;
-  --color-slate-900: #FAF8F5;
-  --color-slate-950: #FAF8F5;
+  --color-slate-50: #ECDFC4;
+  --color-slate-100: #F5EEDD;
+  --color-slate-200: #C9BC9A;
+  --color-slate-300: #C9BC9A;
+  --color-slate-400: #5C5640;
+  --color-slate-500: #5C5640;
+  --color-slate-600: #5C5640;
+  --color-slate-700: #1B1B1B;
+  --color-slate-800: #1B1B1B;
+  --color-slate-900: #161616;
+  --color-slate-950: #161616;
 
   /* Typography Override: Elegant serif headings and modern body text */
   --font-sans: 'DM Sans', system-ui, -apple-system, sans-serif;
@@ -106,11 +86,11 @@
   --radius-2xl: 24px;
   
   /* Shadow & Blur Enhancements */
-  --shadow-glass: 0 8px 32px 0 rgba(4, 38, 63, 0.35);
-  --shadow-premium: 0 10px 40px -10px rgba(4, 38, 63, 0.25);
-  --shadow-card: 0 12px 32px -18px rgba(4, 38, 63, 0.4);
-  --shadow-card-hover: 0 22px 48px -24px rgba(212, 164, 55, 0.15);
-  --shadow-focus: 0 0 0 4px rgba(212, 164, 55, 0.25);
+  --shadow-glass: 0 8px 32px 0 rgba(22, 22, 22, 0.08);
+  --shadow-premium: 0 10px 40px -10px rgba(92, 86, 64, 0.12);
+  --shadow-card: 0 12px 32px -18px rgba(92, 86, 64, 0.15);
+  --shadow-card-hover: 0 22px 48px -24px rgba(201, 154, 62, 0.2);
+  --shadow-focus: 0 0 0 4px rgba(201, 154, 62, 0.25);
 
   /* Shared motion tokens */
   --ease-brand: cubic-bezier(0.16, 1, 0.3, 1);
@@ -143,7 +123,7 @@
   }
 
   body {
-    @apply antialiased bg-brand-bg text-brand-text-primary dark:bg-slate-950 dark:text-slate-50 transition-colors duration-300;
+    @apply antialiased bg-background-primary text-text-primary transition-colors duration-300;
     font-family: var(--font-sans);
   }
 
@@ -154,31 +134,31 @@
   }
 
   :focus-visible {
-    outline: 2px solid var(--color-secondary);
+    outline: 2px solid var(--color-accent-gold);
     outline-offset: 3px;
   }
 
   ::selection {
-    color: var(--color-brand-text-inverse);
-    background-color: var(--color-secondary);
+    color: var(--color-text-on-accent);
+    background-color: var(--color-accent-gold);
   }
 }
 
 /* Glassmorphism utility helpers */
 .glass-panel {
-  @apply backdrop-blur-md bg-white/75 border border-brand-border/40 shadow-glass dark:bg-slate-900/70 dark:border-slate-800/20;
+  @apply backdrop-blur-md bg-background-surface/85 border border-border-default/45 shadow-glass;
 }
 
 .glass-card {
-  @apply backdrop-blur-lg bg-white/50 border border-brand-border/50 dark:bg-slate-800/40 dark:border-slate-700/30 shadow-premium hover:shadow-xl transition-all duration-300;
+  @apply backdrop-blur-lg bg-background-surface/65 border border-border-default/50 shadow-premium hover:shadow-xl transition-all duration-300;
 }
 
 .text-gradient {
-  @apply bg-gradient-to-r from-amber-200 via-accent to-amber-500 text-transparent bg-clip-text;
+  @apply bg-gradient-to-r from-accent-gold via-accent-gold-hover to-accent-gold text-transparent bg-clip-text;
 }
 
 .hero-gradient {
-  background-image: radial-gradient(ellipse at top, #04263F 0%, #041D30 70%, #021626 100%);
+  background-image: radial-gradient(ellipse at top, #F5EEDD 0%, #ECDFC4 70%, #DFCEAA 100%);
 }
 
 .skeleton-shimmer {
