@@ -36,7 +36,6 @@ export default function useHeroAnimation(heroRef) {
 
           gsap.to('[data-hero-item]', {
             yPercent: 10,
-            opacity: 0.35,
             ease: 'none',
             scrollTrigger: {
               trigger: root,
