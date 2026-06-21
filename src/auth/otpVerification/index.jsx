@@ -1,62 +1,53 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { FiShield, FiArrowRight } from 'react-icons/fi';
+import { motion } from 'framer-motion';
+import { FiShield, FiArrowRight, FiMail } from 'react-icons/fi';
 import { notify } from '../../commonComponents/toasts/notify';
 import Input from '../../commonComponents/inputs/Input';
 import Button from '../../commonComponents/buttons/Button';
-import Card from '../../commonComponents/cards/Card';
 import { verifyEmailOtp, resendEmailOtp } from '../../redux/slices/authSlice';
 
 export default function AuthOtpVerificationScreen() {
   const [otp, setOtp] = useState('');
   const [localError, setLocalError] = useState('');
-  const [expiryTime, setExpiryTime] = useState(600); // 10 minutes = 600s
-  const [resendCooldown, setResendCooldown] = useState(60); // 60 seconds cooldown
+  const [expiryTime, setExpiryTime] = useState(600);
+  const [resendCooldown, setResendCooldown] = useState(60);
 
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
 
-  // Retrieve email from signup page navigation state, or search params as fallback
   const email = location.state?.email || new URLSearchParams(location.search).get('email') || '';
-
   const { loading: isLoading, error: reduxError } = useSelector((state) => state.auth);
 
-  // Expiry Timer (10 minutes)
   useEffect(() => {
     if (expiryTime <= 0) return;
-    const timer = setInterval(() => {
-      setExpiryTime((prev) => prev - 1);
-    }, 1000);
+    const timer = setInterval(() => setExpiryTime((prev) => prev - 1), 1000);
     return () => clearInterval(timer);
   }, [expiryTime]);
 
-  // Resend Cooldown Timer (60 seconds)
   useEffect(() => {
     if (resendCooldown <= 0) return;
-    const timer = setInterval(() => {
-      setResendCooldown((prev) => prev - 1);
-    }, 1000);
+    const timer = setInterval(() => setResendCooldown((prev) => prev - 1), 1000);
     return () => clearInterval(timer);
   }, [resendCooldown]);
 
   const formatTime = (seconds) => {
-    const minutes = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
   const handleResend = async () => {
     if (resendCooldown > 0) return;
     setLocalError('');
-
     try {
       await dispatch(resendEmailOtp({ email })).unwrap();
       notify.success('A new OTP has been sent.');
-      setResendCooldown(60); // Restart 60s timer
-      setExpiryTime(600); // Reset 10m expiry timer
-      setOtp(''); // Clear current input
+      setResendCooldown(60);
+      setExpiryTime(600);
+      setOtp('');
     } catch (err) {
       notify.error(err || 'Failed to resend OTP');
     }
@@ -65,17 +56,8 @@ export default function AuthOtpVerificationScreen() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLocalError('');
-
-    if (otp.length < 6) {
-      setLocalError('Please enter a valid 6-digit code');
-      return;
-    }
-
-    if (expiryTime <= 0) {
-      setLocalError('OTP has expired. Please request a new one.');
-      return;
-    }
-
+    if (otp.length < 6) { setLocalError('Please enter a valid 6-digit code'); return; }
+    if (expiryTime <= 0) { setLocalError('OTP has expired. Please request a new one.'); return; }
     try {
       await dispatch(verifyEmailOtp({ email, otp })).unwrap();
       notify.success('Email verified successfully.');
@@ -87,63 +69,97 @@ export default function AuthOtpVerificationScreen() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center hero-gradient px-4 sm:px-6 py-12 dark">
-      <div className="absolute top-6 left-6">
-        <Link to="/" className="text-lg font-extrabold tracking-tight bg-gradient-to-r from-teal-400 to-amber-400 text-transparent bg-clip-text">
-          ZEELIN<span className="text-white font-medium">OVERSEAS</span>
+    <div className="min-h-screen flex bg-background-primary">
+      {/* Left branding panel */}
+      <div className="hidden lg:flex lg:w-1/2 bg-black-accent flex-col justify-between p-12 relative overflow-hidden">
+        <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-accent-gold/10 blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-16 -left-16 w-72 h-72 rounded-full bg-accent-gold/8 blur-2xl pointer-events-none" />
+
+        <Link to="/" className="flex items-center gap-2 z-10">
+          <span className="text-xl font-extrabold tracking-tight text-text-on-dark font-display">
+            ZEELIN <span className="text-accent-gold">OVERSEAS</span>
+          </span>
         </Link>
+
+        <div className="z-10 flex flex-col gap-6">
+          <div className="w-12 h-1 bg-accent-gold rounded-full" />
+          <h2 className="text-3xl font-display font-bold text-text-on-dark leading-snug">
+            One step away<br />
+            <span className="text-accent-gold">from the network.</span>
+          </h2>
+          <p className="text-sm text-text-on-dark/60 leading-relaxed max-w-xs">
+            Verify your email to activate your account and start accessing B2B sourcing tools.
+          </p>
+        </div>
+
+        <p className="text-xs text-text-on-dark/30 z-10">© 2024 Zeelin Overseas. All rights reserved.</p>
       </div>
 
-      <div className="w-full max-w-md animate-fade-in-up">
-        <Card variant="glass" hover={false} className="p-8 sm:p-10 border-slate-800/80">
-          <div className="text-center mb-8">
-            <div className="h-12 w-12 rounded-2xl bg-teal-950/40 text-teal-400 border border-teal-500/20 flex items-center justify-center mx-auto mb-4">
-              <FiShield className="h-6 w-6" />
+      {/* Right form panel */}
+      <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 sm:px-12">
+        <Link to="/" className="lg:hidden mb-10 text-xl font-extrabold tracking-tight font-display">
+          ZEELIN <span className="text-accent-gold">OVERSEAS</span>
+        </Link>
+
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          className="w-full max-w-md flex flex-col gap-6"
+        >
+          {/* Icon badge */}
+          <div className="flex flex-col items-start gap-4">
+            <div className="h-14 w-14 rounded-2xl bg-accent-gold/15 border border-accent-gold/25 flex items-center justify-center">
+              <FiShield className="h-7 w-7 text-accent-gold" />
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-              OTP Verification
-            </h2>
-            <p className="text-xs text-slate-400 mt-2">
-              We have sent a verification code to {email || 'your email'}. Enter it below.
-            </p>
+            <div>
+              <h1 className="text-3xl font-display font-extrabold text-text-primary tracking-tight">
+                Verify your email
+              </h1>
+              <p className="text-sm text-text-secondary mt-1.5 leading-relaxed">
+                We've sent a 6-digit code to{' '}
+                <span className="font-semibold text-text-primary">{email || 'your email'}</span>.
+              </p>
+            </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div>
               <Input
                 label="Verification Code"
                 type="text"
-                placeholder="e.g. 123456"
+                placeholder="• • • • • •"
                 maxLength={6}
                 value={otp}
                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
                 required
-                className="text-center tracking-widest text-lg font-bold"
+                className="text-center tracking-[0.5em] text-xl font-bold"
               />
-              
-              <div className="flex justify-between items-center text-xs mt-2 px-1">
-                <span className="text-slate-400">
-                  Code expires in:{' '}
-                  <span className={`font-bold ${expiryTime < 60 ? 'text-amber-500 animate-pulse' : 'text-teal-400'}`}>
+              {/* Timer */}
+              <div className="flex justify-between items-center mt-2 px-1">
+                <span className="text-xs text-text-secondary">
+                  Expires in:{' '}
+                  <span className={`font-bold ${expiryTime < 60 ? 'text-red-500 animate-pulse' : 'text-accent-gold'}`}>
                     {formatTime(expiryTime)}
                   </span>
                 </span>
                 {expiryTime === 0 && (
-                  <span className="text-red-400 font-bold animate-pulse">Code Expired</span>
+                  <span className="text-xs text-red-500 font-bold animate-pulse">Expired</span>
                 )}
               </div>
             </div>
 
             {(localError || reduxError) && (
-              <p className="text-xs text-red-400 font-medium">
-                {localError || reduxError}
-              </p>
+              <div className="rounded-xl border border-red-300 bg-red-50 px-4 py-3">
+                <p className="text-xs text-red-600 font-medium">{localError || reduxError}</p>
+              </div>
             )}
 
             <Button
               type="submit"
               variant="primary"
-              className="w-full mt-2"
+              size="lg"
+              className="w-full"
               isLoading={isLoading}
               icon={FiArrowRight}
               iconPosition="right"
@@ -153,24 +169,33 @@ export default function AuthOtpVerificationScreen() {
             </Button>
           </form>
 
-          <div className="mt-8 text-center border-t border-slate-800 pt-6">
-            <p className="text-xs text-slate-400">
-              Didn't receive the code?{' '}
-              <button
-                type="button"
-                className={`font-bold transition-colors ${
-                  resendCooldown > 0
-                    ? 'text-slate-500 cursor-not-allowed'
-                    : 'text-teal-400 hover:text-teal-300'
-                }`}
-                disabled={resendCooldown > 0}
-                onClick={handleResend}
-              >
-                {resendCooldown > 0 ? `Resend Code (${resendCooldown}s)` : 'Resend Code'}
-              </button>
-            </p>
+          <div className="flex items-center gap-3">
+            <div className="flex-1 h-px bg-border-default" />
+            <span className="text-xs text-text-secondary">didn't get it?</span>
+            <div className="flex-1 h-px bg-border-default" />
           </div>
-        </Card>
+
+          <div className="text-center">
+            <button
+              type="button"
+              className={`text-sm font-bold transition-colors ${
+                resendCooldown > 0
+                  ? 'text-text-secondary cursor-not-allowed'
+                  : 'text-accent-gold hover:text-accent-gold-hover'
+              }`}
+              disabled={resendCooldown > 0}
+              onClick={handleResend}
+            >
+              {resendCooldown > 0 ? `Resend Code in ${resendCooldown}s` : 'Resend Code →'}
+            </button>
+          </div>
+
+          <div className="text-center pt-2">
+            <Link to="/auth/signup" className="text-sm text-text-secondary hover:text-text-primary transition-colors">
+              ← Back to Sign Up
+            </Link>
+          </div>
+        </motion.div>
       </div>
     </div>
   );
