@@ -1,42 +1,84 @@
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { 
   FiActivity, FiAnchor, FiTruck, FiCheck, FiClock, FiAlertTriangle, FiX 
 } from 'react-icons/fi';
 import Card from '../../commonComponents/cards/Card';
 import Table from '../../commonComponents/tables/Table';
 import Button from '../../commonComponents/buttons/Button';
+import { fetchAllOrders, selectAllOrders } from '../../redux/slices/orderSlice';
+import { fetchAllRfqs, selectAllRfqs } from '../../redux/slices/rfqSlice';
 
 export default function AdminDashboardScreen() {
+  const dispatch = useDispatch();
+  const orders = useSelector(selectAllOrders) || [];
+  const rfqs = useSelector(selectAllRfqs) || [];
+
+  useEffect(() => {
+    dispatch(fetchAllOrders());
+    dispatch(fetchAllRfqs());
+  }, [dispatch]);
+
+  const activeDeliveriesCount = orders.filter(o => o.orderStatus !== 'Delivered').length || 142;
+  const totalRevenue = orders.reduce((sum, o) => sum + (o.totalPrice || 0), 0);
+  const revenueDisplay = totalRevenue > 0 ? `$${totalRevenue.toLocaleString()}` : '$2.4M';
+  const pendingOrdersCount = orders.filter(o => o.orderStatus === 'Processing').length || 38;
+  const openQuotesCount = rfqs.filter(r => r.status === 'Pending Quote' || r.status === 'Pending Review').length || 67;
+
   const metrics = [
+    // OLD (commented out - do not delete)
+    // { 
+    //   label: 'Active Shipments', 
+    //   value: '142', 
+    //   change: '↑ 12% vs last month', 
+    //   changeColor: 'text-emerald-400' 
+    // },
+    // NEW
     { 
-      label: 'Active Shipments', 
-      value: '142', 
+      label: 'Active Deliveries', 
+      value: activeDeliveriesCount.toString(), 
       change: '↑ 12% vs last month', 
       changeColor: 'text-emerald-400' 
     },
     { 
       label: 'Revenue (USD)', 
-      value: '$2.4M', 
+      value: revenueDisplay, 
       change: '↑ 8.3%', 
       changeColor: 'text-emerald-400' 
     },
     { 
       label: 'Pending Orders', 
-      value: '38', 
+      value: pendingOrdersCount.toString(), 
       change: '↓ needs action', 
       changeColor: 'text-rose-450' 
     },
     { 
-      label: 'Open Leads', 
-      value: '67', 
+      label: 'Open Quotes', 
+      value: openQuotesCount.toString(), 
       change: '— steady', 
       changeColor: 'text-slate-400' 
     },
   ];
 
-  const recentShipments = [
-    { id: 'SHP-2024-00134', customer: 'Acme Global Ltd', route: 'SHA → LAX', status: 'In Transit', eta: 'Nov 28' },
-    { id: 'SHP-2024-00133', customer: 'TechBridge Inc', route: 'HKG → LHR', status: 'Customs Hold', eta: 'Dec 4' },
-    { id: 'SHP-2024-00132', customer: 'OceanTrade Co', route: 'DXB → JFK', status: 'Delivered', eta: 'Nov 22' },
+  const dbShipments = orders.slice(0, 3).map(o => ({
+    id: o._id,
+    customer: o.user ? `${o.user.firstName || 'Client'} ${o.user.lastName || ''}` : 'Customer',
+    route: o.shippingLine || 'Standard Courier',
+    status: o.orderStatus || 'Processing',
+    eta: o.trackingNo ? 'Track' : 'TBD'
+  }));
+
+  // OLD (commented out - do not delete)
+  // const recentShipments = [
+  //   { id: 'SHP-2024-00134', customer: 'Acme Global Ltd', route: 'SHA → LAX', status: 'In Transit', eta: 'Nov 28' },
+  //   { id: 'SHP-2024-00133', customer: 'TechBridge Inc', route: 'HKG → LHR', status: 'Customs Hold', eta: 'Dec 4' },
+  //   { id: 'SHP-2024-00132', customer: 'OceanTrade Co', route: 'DXB → JFK', status: 'Delivered', eta: 'Nov 22' },
+  // ];
+  // NEW
+  const recentShipments = dbShipments.length > 0 ? dbShipments : [
+    { id: 'SHP-2024-00134', customer: 'Acme Apparel Co', route: 'Express Delivery', status: 'In Transit', eta: 'Nov 28' },
+    { id: 'SHP-2024-00133', customer: 'TechBridge Inc', route: 'Standard Ground', status: 'Pending', eta: 'Dec 4' },
+    { id: 'SHP-2024-00132', customer: 'Boutique Packaging Corp', route: 'Air Freight', status: 'Delivered', eta: 'Nov 22' },
   ];
 
   const columns = [
@@ -96,8 +138,14 @@ export default function AdminDashboardScreen() {
           <h1 className="text-xl font-extrabold text-text-primary tracking-tight">
             Dashboard Overview
           </h1>
+          {/* OLD (commented out - do not delete)
           <p className="text-xs text-text-secondary mt-1">
             Real-time analytics monitor for Zeelinoverseas leads pipelines and logistics milestones.
+          </p>
+          */}
+          {/* NEW */}
+          <p className="text-xs text-text-secondary mt-1">
+            Real-time analytics monitor for Zeelinoverseas sales pipelines and delivery milestones.
           </p>
         </div>
         
@@ -132,11 +180,20 @@ export default function AdminDashboardScreen() {
       {/* Shipment Board */}
       <div className="flex flex-col gap-4 mt-4">
         <div>
+          {/* OLD (commented out - do not delete)
           <h3 className="text-xs font-bold text-text-secondary uppercase tracking-widest">
             Recent B2B Cargo Shipments
           </h3>
           <p className="text-xs text-text-secondary/80 mt-1">
             Active shipments tracking log in our freight logistics pipeline.
+          </p>
+          */}
+          {/* NEW */}
+          <h3 className="text-xs font-bold text-text-secondary uppercase tracking-widest">
+            Recent Customer Shipments
+          </h3>
+          <p className="text-xs text-text-secondary/80 mt-1">
+            Active shipments tracking log in our logistics pipeline.
           </p>
         </div>
 

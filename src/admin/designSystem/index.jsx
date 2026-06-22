@@ -98,7 +98,11 @@ export default function AdminDesignSystemScreen() {
           </div>
           <div>
             <h1 className="text-display-md font-extrabold text-[#0F1729] dark:text-white tracking-tight">BoxPrototype</h1>
+            {/* OLD (commented out - do not delete)
             <p className="text-body-sm text-slate-500 dark:text-slate-400 font-medium">Design System · v1.0 · Import Export + E-Commerce + CRM</p>
+            */}
+            {/* NEW */}
+            <p className="text-body-sm text-slate-500 dark:text-slate-400 font-medium">Design System · v1.0 · Custom Packaging + E-Commerce + CRM</p>
           </div>
         </div>
       </div>
@@ -593,11 +597,19 @@ export default function AdminDesignSystemScreen() {
             <div>
               <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-4">Breadcrumbs</span>
               <div className="flex items-center gap-2 text-xs font-semibold bg-white dark:bg-slate-900 p-4 border border-slate-200 dark:border-slate-800 rounded-xl">
+                {/* OLD (commented out - do not delete)
                 <span className="text-slate-400 hover:text-slate-600 cursor-pointer">Admin</span>
                 <FiChevronRight className="h-3.5 w-3.5 text-slate-300" />
                 <span className="text-slate-400 hover:text-slate-600 cursor-pointer">Cargo Logistics</span>
                 <FiChevronRight className="h-3.5 w-3.5 text-slate-300" />
                 <span className="text-slate-800 dark:text-white">Shipment Tracking</span>
+                */}
+                {/* NEW */}
+                <span className="text-slate-400 hover:text-slate-600 cursor-pointer">Admin</span>
+                <FiChevronRight className="h-3.5 w-3.5 text-slate-300" />
+                <span className="text-slate-400 hover:text-slate-600 cursor-pointer">Packaging Orders</span>
+                <FiChevronRight className="h-3.5 w-3.5 text-slate-300" />
+                <span className="text-slate-800 dark:text-white">Order Delivery</span>
               </div>
             </div>
 

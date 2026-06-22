@@ -1,33 +1,81 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { FiArchive, FiSearch, FiSliders, FiPlus, FiMinus, FiAlertCircle } from 'react-icons/fi';
+import { fetchProducts, adminUpdateProduct } from '../../redux/slices/productSlice';
 import Card from '../../commonComponents/cards/Card';
 import Table from '../../commonComponents/tables/Table';
 import Button from '../../commonComponents/buttons/Button';
 import Input from '../../commonComponents/inputs/Input';
 
 export default function AdminInventoryScreen() {
+  const dispatch = useDispatch();
   const [search, setSearch] = useState('');
-  const [stockLevels, setStockLevels] = useState([
-    { sku: 'SKU-EQP-001', name: 'Standard Shipping ISO Cargo Container', category: 'Heavy Equipment & Machinery', stock: 12, safety: 3, status: 'In Stock' },
-    { sku: 'SKU-RAW-002', name: 'Cold-Rolled Structural Steel Rebar TMT', category: 'Raw Materials & Spares', stock: 140, safety: 20, status: 'In Stock' },
-    { sku: 'SKU-TEX-003', name: 'Raw Combed Egyptian Cotton Fiber Bales', category: 'Specialty Textiles & Fiber', stock: 8, safety: 10, status: 'Low Stock' },
-    { sku: 'SKU-EQP-004', name: 'Reinforced Industrial Polyethylene Tarps', category: 'Heavy Equipment & Machinery', stock: 245, safety: 15, status: 'In Stock' },
+  
+  const { products, loading } = useSelector((state) => state.products);
+
+  // Fallback items state (if no database products exist yet or for mock demonstration)
+  const [mockStockLevels, setMockStockLevels] = useState([
+    { id: 'mock-1', sku: 'SKU-EQP-001', name: 'Custom Kraft Mailer Boxes', category: 'Mailer Boxes', stock: 12, safety: 3, status: 'In Stock', isReal: false },
+    { id: 'mock-2', sku: 'SKU-RAW-002', name: 'Eco-Friendly Bubble Wrap Rolls', category: 'Wrapping & Protection', stock: 140, safety: 20, status: 'In Stock', isReal: false },
+    { id: 'mock-3', sku: 'SKU-TEX-003', name: 'Premium Corrugated Box Bundles', category: 'Corrugated Boxes', stock: 8, safety: 10, status: 'Low Stock', isReal: false },
+    { id: 'mock-4', sku: 'SKU-EQP-004', name: 'Self-Sealing Poly Mailers', category: 'Poly Mailers', stock: 245, safety: 15, status: 'In Stock', isReal: false },
   ]);
 
-  const handleAdjustStock = (sku, delta) => {
-    setStockLevels(stockLevels.map(item => {
-      if (item.sku === sku) {
-        const nextStock = Math.max(0, item.stock + delta);
-        let status = 'In Stock';
-        if (nextStock === 0) status = 'Out of Stock';
-        else if (nextStock <= item.safety) status = 'Low Stock';
-        return { ...item, stock: nextStock, status };
-      }
-      return item;
-    }));
+  useEffect(() => {
+    dispatch(fetchProducts('?limit=100'));
+  }, [dispatch]);
+
+  const mappedProducts = (products || []).map((p) => {
+    const moqVal = parseInt(p.specifications?.find(s => s.key === 'moq')?.value || '100') || 100;
+    const safetyVal = Math.round(moqVal * 0.1) || 10;
+    const stockVal = p.stock !== undefined ? p.stock : 50;
+    let status = 'In Stock';
+    if (stockVal === 0) status = 'Out of Stock';
+    else if (stockVal <= safetyVal) status = 'Low Stock';
+
+    return {
+      id: p._id,
+      sku: p.sku || `SKU-${p._id.slice(-6).toUpperCase()}`,
+      name: p.title,
+      category: p.category?.name || p.category?.slug || p.category || 'Mailer Boxes',
+      stock: stockVal,
+      safety: safetyVal,
+      status: status,
+      isReal: true,
+    };
+  });
+
+  const activeStock = [...mappedProducts, ...mockStockLevels];
+
+  const handleAdjustStock = (row, delta) => {
+    if (row.isReal) {
+      const nextStock = Math.max(0, row.stock + delta);
+      dispatch(adminUpdateProduct({
+        id: row.id,
+        stock: nextStock
+      }))
+        .unwrap()
+        .then(() => {
+          alert('Database product stock adjusted successfully!');
+        })
+        .catch(err => {
+          alert(err || 'Failed to update stock');
+        });
+    } else {
+      setMockStockLevels(prev => prev.map(item => {
+        if (item.sku === row.sku) {
+          const nextStock = Math.max(0, item.stock + delta);
+          let status = 'In Stock';
+          if (nextStock === 0) status = 'Out of Stock';
+          else if (nextStock <= item.safety) status = 'Low Stock';
+          return { ...item, stock: nextStock, status };
+        }
+        return item;
+      }));
+    }
   };
 
-  const filteredStock = stockLevels.filter(item =>
+  const filteredStock = activeStock.filter(item =>
     item.sku.toLowerCase().includes(search.toLowerCase()) ||
     item.name.toLowerCase().includes(search.toLowerCase()) ||
     item.category.toLowerCase().includes(search.toLowerCase())
@@ -83,16 +131,16 @@ export default function AdminInventoryScreen() {
           <Button 
             variant="outline" 
             size="sm" 
-            className="p-2 border-slate-200 dark:border-slate-800 text-slate-500 hover:text-slate-800 dark:hover:text-white"
-            onClick={() => handleAdjustStock(row.sku, 1)}
+            className="p-2 border-slate-200 dark:border-slate-800 text-slate-550 hover:text-slate-850 dark:hover:text-white"
+            onClick={() => handleAdjustStock(row, 1)}
           >
             <FiPlus className="h-3.5 w-3.5" />
           </Button>
           <Button 
             variant="outline" 
             size="sm" 
-            className="p-2 border-slate-200 dark:border-slate-800 text-slate-500 hover:text-slate-800 dark:hover:text-white"
-            onClick={() => handleAdjustStock(row.sku, -1)}
+            className="p-2 border-slate-200 dark:border-slate-800 text-slate-550 hover:text-slate-850 dark:hover:text-white"
+            onClick={() => handleAdjustStock(row, -1)}
             disabled={row.stock === 0}
           >
             <FiMinus className="h-3.5 w-3.5" />
@@ -117,7 +165,7 @@ export default function AdminInventoryScreen() {
       </div>
 
       {/* Low Stock Banner Warning */}
-      {stockLevels.some(i => i.status === 'Low Stock' || i.status === 'Out of Stock') && (
+      {activeStock.some(i => i.status === 'Low Stock' || i.status === 'Out of Stock') && (
         <div className="flex items-center gap-3 bg-rose-50 border border-rose-200/60 dark:bg-red-500/10 dark:border-red-500/25 rounded-2xl p-4 text-xs text-rose-700 dark:text-red-400">
           <FiAlertCircle className="h-5.5 w-5.5 shrink-0" />
           <div>
@@ -142,6 +190,7 @@ export default function AdminInventoryScreen() {
       <Table
         columns={columns}
         data={filteredStock}
+        isLoading={loading && products.length === 0}
         emptyMessage="No inventory items log found."
         className="text-slate-700 dark:text-slate-350"
       />

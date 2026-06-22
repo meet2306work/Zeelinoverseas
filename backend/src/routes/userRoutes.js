@@ -7,10 +7,14 @@ const {
   deleteAddress,
   getWishlist,
   addToWishlist,
-  removeFromWishlist
+  removeFromWishlist,
+  // Administrative controllers
+  getAllUsers,
+  updateUserAdmin,
+  deleteUserAdmin,
 } = require('../controllers/userController');
 
-const { protect } = require('../middlewares/auth');
+const { protect, authorize } = require('../middlewares/auth');
 
 const router = express.Router();
 
@@ -33,5 +37,13 @@ router.route('/wishlist')
 
 router.route('/wishlist/:productId')
   .delete(removeFromWishlist);
+
+// Admin-only user management routes
+router.route('/')
+  .get(authorize('admin'), getAllUsers);
+
+router.route('/:id')
+  .put(authorize('admin'), updateUserAdmin)
+  .delete(authorize('admin'), deleteUserAdmin);
 
 module.exports = router;

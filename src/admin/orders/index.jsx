@@ -25,10 +25,17 @@ export default function AdminOrdersScreen() {
     dispatch(fetchAllOrders());
   }, [dispatch]);
 
+  // OLD (commented out - do not delete)
+  // const fallbackOrdersList = [
+  //   { id: 'ORD-80012', customer: 'Herman Miller Inc', value: '$8,400', date: 'June 09, 2026', shippingLine: 'Maersk Line', tracking: 'MSK902840', status: 'Processing' },
+  //   { id: 'ORD-80011', customer: 'Acme Logistics Co', value: '$22,500', date: 'June 07, 2026', shippingLine: 'MSC Cargo', tracking: 'MSC110293', status: 'Shipped' },
+  //   { id: 'ORD-80010', customer: 'Grains Trade LLC', value: '$35,000', date: 'June 05, 2026', shippingLine: 'COSCO Shipping', tracking: 'COSCO9902', status: 'Customs Hold' },
+  // ];
+  // NEW
   const fallbackOrdersList = [
-    { id: 'ORD-80012', customer: 'Herman Miller Inc', value: '$8,400', date: 'June 09, 2026', shippingLine: 'Maersk Line', tracking: 'MSK902840', status: 'Processing' },
-    { id: 'ORD-80011', customer: 'Acme Logistics Co', value: '$22,500', date: 'June 07, 2026', shippingLine: 'MSC Cargo', tracking: 'MSC110293', status: 'Shipped' },
-    { id: 'ORD-80010', customer: 'Grains Trade LLC', value: '$35,000', date: 'June 05, 2026', shippingLine: 'COSCO Shipping', tracking: 'COSCO9902', status: 'Customs Hold' },
+    { id: 'ORD-80012', customer: 'Herman Miller Inc', value: '$8,400', date: 'June 09, 2026', shippingLine: 'FedEx Express', tracking: 'FDX902840', status: 'Processing' },
+    { id: 'ORD-80011', customer: 'Acme Apparel Co', value: '$22,500', date: 'June 07, 2026', shippingLine: 'DHL Freight', tracking: 'DHL110293', status: 'Shipped' },
+    { id: 'ORD-80010', customer: 'Boutique Packaging Corp', value: '$35,000', date: 'June 05, 2026', shippingLine: 'UPS Ground', tracking: 'UPS9902', status: 'Processing' },
   ];
 
   const mappedOrders = ordersList.map((order) => ({
@@ -93,9 +100,16 @@ export default function AdminOrdersScreen() {
       label: 'Order ID',
       render: (val) => <span className="font-mono font-bold text-slate-500 dark:text-slate-400">{val}</span>
     },
+    // OLD (commented out - do not delete)
+    // { 
+    //   key: 'customer', 
+    //   label: 'B2B Customer',
+    //   render: (val) => <span className="font-bold text-slate-900 dark:text-white">{val}</span>
+    // },
+    // NEW
     { 
       key: 'customer', 
-      label: 'B2B Customer',
+      label: 'Customer',
       render: (val) => <span className="font-bold text-slate-900 dark:text-white">{val}</span>
     },
     { 
@@ -108,9 +122,21 @@ export default function AdminOrdersScreen() {
       label: 'Order Date',
       render: (val) => <span className="text-xs text-slate-500 dark:text-slate-400">{val}</span>
     },
+    // OLD (commented out - do not delete)
+    // { 
+    //   key: 'shippingLine', 
+    //   label: 'Logistics Courier',
+    //   render: (val, row) => (
+    //     <div className="flex flex-col">
+    //       <span className="font-medium text-slate-750 dark:text-slate-300">{val}</span>
+    //       <span className="text-[10px] font-mono text-slate-500 dark:text-slate-450">Track: {row.tracking}</span>
+    //     </div>
+    //   )
+    // },
+    // NEW
     { 
       key: 'shippingLine', 
-      label: 'Logistics Courier',
+      label: 'Shipping Courier',
       render: (val, row) => (
         <div className="flex flex-col">
           <span className="font-medium text-slate-750 dark:text-slate-300">{val}</span>
@@ -166,8 +192,14 @@ export default function AdminOrdersScreen() {
           <h1 className="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">
             Client Orders Registry
           </h1>
+          {/* OLD (commented out - do not delete)
           <p className="text-xs text-slate-500 dark:text-slate-400">
             Track and process maritime intermodal transport shipments, custom clearance statuses, and logistic tracking parameters.
+          </p>
+          */}
+          {/* NEW */}
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            Track and process customer orders, shipping status, and courier logistics parameters.
           </p>
         </div>
       </div>
@@ -218,9 +250,20 @@ export default function AdminOrdersScreen() {
               searchable={false}
             />
 
+            {/* OLD (commented out - do not delete)
             <Input
               label="Shipping Carrier Line"
               placeholder="e.g. Maersk Cargo"
+              icon={FiAnchor}
+              value={shippingLine}
+              onChange={(e) => setShippingLine(e.target.value)}
+              required
+            />
+            */}
+            {/* NEW */}
+            <Input
+              label="Shipping Courier / Carrier"
+              placeholder="e.g. FedEx, DHL, UPS"
               icon={FiAnchor}
               value={shippingLine}
               onChange={(e) => setShippingLine(e.target.value)}

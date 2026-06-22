@@ -1,15 +1,17 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
-import { useParams, useLocation, Link } from 'react-router-dom';
+import { useParams, useLocation, Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { FiHeart, FiCheck, FiShield, FiShoppingCart, FiMessageCircle, FiStar } from 'react-icons/fi';
 import Button from '../../commonComponents/buttons/Button';
 import Tabs from '../../commonComponents/layouts/Tabs';
 import Skeleton from '../../commonComponents/loaders/Skeleton';
+import LoginRedirectModal from '../../commonComponents/modals/LoginRedirectModal';
 import { Reveal, StaggerGroup, StaggerItem } from '../../commonComponents/animations/ScrollReveal';
 import { motionTransitions } from '../../config/motion';
 import { addProductToWishlist, removeProductFromWishlist, selectIsInWishlist } from '../../redux/slices/wishlistSlice';
 import { fetchProductById, fetchProductReviews, createProductReview, clearProductDetails } from '../../redux/slices/productSlice';
+import { addToCart } from '../../redux/slices/cartSlice';
 
 const ThreeDViewer = lazy(() => import('../../commonComponents/threeDViewer/ThreeDViewer'));
 
@@ -40,6 +42,8 @@ export default function ProductDetailsScreen() {
   const [isAdded, setIsAdded] = useState(false);
   const [activeTab, setActiveTab] = useState('specs');
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const navigate = useNavigate();
   const shouldReduceMotion = useReducedMotion();
 
 
@@ -84,7 +88,10 @@ export default function ProductDetailsScreen() {
       productDetails.burstingFactor && { key: 'Bursting Factor (BF)', value: productDetails.burstingFactor },
       ...(productDetails.specifications || [])
     ].filter(Boolean),
-    shipping: 'Vessel shipment to designated Port of Destination. Standard loading duration is 5-7 business days from order release.',
+    // OLD (commented out - do not delete)
+    // shipping: 'Vessel shipment to designated Port of Destination. Standard loading duration is 5-7 business days from order release.',
+    // NEW
+    shipping: 'Express shipping to your door or warehouse. Standard delivery duration is 5-7 business days from order confirmation.',
     image: productDetails.images && productDetails.images.length > 0 ? productDetails.images[0].url : fallbackProduct.image,
   } : fallbackProduct;
 
@@ -113,11 +120,31 @@ export default function ProductDetailsScreen() {
   };
 
   const handleAddInquiry = () => {
-    setIsAdded(true);
-    setTimeout(() => setIsAdded(false), 2000);
+    if (!user) {
+      setIsLoginModalOpen(true);
+      return;
+    }
+    if (selectedTier) {
+      dispatch(addToCart({
+        id: product.id || id,
+        name: product.name,
+        price: selectedTier.totalPrice,
+        qty: 1,
+        image: productImages[0] || product.image
+      }));
+      setIsAdded(true);
+      setTimeout(() => {
+        setIsAdded(false);
+        navigate('/user/cart');
+      }, 800);
+    }
   };
 
   const handleWishlistToggle = () => {
+    if (!user) {
+      setIsLoginModalOpen(true);
+      return;
+    }
     if (isInWishlist) {
       dispatch(removeProductFromWishlist(id));
     } else {
@@ -198,8 +225,14 @@ export default function ProductDetailsScreen() {
             <h1 className="text-2xl sm:text-3xl font-extrabold text-brand-text-primary dark:text-white tracking-tight leading-tight">
               {product.name}
             </h1>
+            {/* OLD (commented out - do not delete)
             <p className="text-xs text-secondary dark:text-accent font-semibold mt-2.5 inline-flex items-center gap-brand-sm bg-secondary/10 dark:bg-slate-800 px-2.5 py-1 rounded-md">
               <FiShield className="h-4 w-4" /> Certification: SGS Verified Commodity
+            </p>
+            */}
+            {/* NEW */}
+            <p className="text-xs text-secondary dark:text-accent font-semibold mt-2.5 inline-flex items-center gap-brand-sm bg-secondary/10 dark:bg-slate-800 px-2.5 py-1 rounded-md">
+              <FiShield className="h-4 w-4" /> Certification: Quality &amp; Specs Verified
             </p>
           </div>
 
@@ -209,8 +242,14 @@ export default function ProductDetailsScreen() {
 
           {/* Wholesale Pricing Tiers with Qty buttons */}
           <div className="border-t border-b border-brand-border dark:border-slate-800 py-brand-md">
+            {/* OLD (commented out - do not delete)
             <h4 className="text-xs font-bold text-brand-text-secondary uppercase tracking-wider mb-brand-sm">
               Wholesale Pricing Tiers
+            </h4>
+            */}
+            {/* NEW */}
+            <h4 className="text-xs font-bold text-brand-text-secondary uppercase tracking-wider mb-brand-sm">
+              Bulk Quantity Pricing Tiers
             </h4>
             {/* Qty selector */}
             <div className="flex flex-wrap gap-2 mb-3">
@@ -271,9 +310,17 @@ export default function ProductDetailsScreen() {
               </div>
             </div>
 
+            {/* OLD (commented out - do not delete)
             {needsInquiry && (
               <p className="mt-2 text-[11px] text-amber-600 dark:text-amber-400 font-semibold">
                 For quantities above 200, please send an inquiry for a custom quote.
+              </p>
+            )}
+            */}
+            {/* NEW */}
+            {needsInquiry && (
+              <p className="mt-2 text-[11px] text-amber-600 dark:text-amber-400 font-semibold">
+                For quantities above 200, contact us for a wholesale print or custom volume quote.
               </p>
             )}
 
@@ -301,10 +348,29 @@ export default function ProductDetailsScreen() {
 
           {/* Action buttons */}
           <div className="flex flex-col gap-brand-sm mt-brand-sm">
+            {/* OLD (commented out - do not delete)
             {needsInquiry ? (
               <Link to={isPortal ? "/user/rfq" : "/rfq"} className="flex-1">
                 <Button variant="gold" size="lg" className="w-full" icon={FiMessageCircle}>
                   Send Inquiry for 200+ Units
+                </Button>
+              </Link>
+            ) : (
+            */}
+            {/* NEW */}
+            {needsInquiry ? (
+              <Link
+                to={isPortal ? "/user/rfq" : "/rfq"}
+                className="flex-1"
+                onClick={(e) => {
+                  if (!user) {
+                    e.preventDefault();
+                    setIsLoginModalOpen(true);
+                  }
+                }}
+              >
+                <Button variant="gold" size="lg" className="w-full" icon={FiMessageCircle}>
+                  Get Bulk Quote for 200+ Units
                 </Button>
               </Link>
             ) : (
@@ -319,9 +385,26 @@ export default function ProductDetailsScreen() {
                   >
                     {isAdded ? 'Added!' : 'Buy Now'}
                   </Button>
+                  {/* OLD (commented out - do not delete)
                   <Link to={isPortal ? "/user/rfq" : "/rfq"} className="flex-1">
                     <Button variant="gold" size="lg" className="w-full">
                       Request Quote
+                    </Button>
+                  </Link>
+                  */}
+                  {/* NEW */}
+                  <Link
+                    to={isPortal ? "/user/rfq" : "/rfq"}
+                    className="flex-1"
+                    onClick={(e) => {
+                      if (!user) {
+                        e.preventDefault();
+                        setIsLoginModalOpen(true);
+                      }
+                    }}
+                  >
+                    <Button variant="gold" size="lg" className="w-full">
+                      Get Custom Quote
                     </Button>
                   </Link>
                 </div>
@@ -414,6 +497,12 @@ export default function ProductDetailsScreen() {
           </div>
         )}
       </Reveal>
+
+      <LoginRedirectModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        actionName="shop products, request custom print quotes, and track orders"
+      />
     </div>
   );
 }

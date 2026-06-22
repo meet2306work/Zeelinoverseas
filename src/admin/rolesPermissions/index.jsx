@@ -10,14 +10,20 @@ export default function AdminRolesPermissionsScreen() {
   const roles = [
     { id: 'admin', label: 'Administrator', desc: 'Full core administrative settings access, logs auditing, database credentials, and roles assignment.' },
     { id: 'sales', label: 'Sales Executive', desc: 'Interact with CRM leads, process product inquiries, negotiate customer RFQ prices.' },
-    { id: 'logistics', label: 'Logistics Coordinator', desc: 'Manage client orders cargo statuses, update ocean line tracking details, check thresholds.' },
+    // OLD (commented out - do not delete)
+    // { id: 'logistics', label: 'Logistics Coordinator', desc: 'Manage client orders cargo statuses, update ocean line tracking details, check thresholds.' },
+    // NEW
+    { id: 'logistics', label: 'Logistics Coordinator', desc: 'Manage client orders delivery statuses, update shipping tracking details, check thresholds.' },
   ];
 
   const permissions = [
     { key: 'read-catalog', label: 'Browse Products Catalog', desc: 'Allows viewing and searching in-stock catalog.' },
     { key: 'edit-catalog', label: 'Write & Edit Catalog', desc: 'Allows inserting, updating, or deleting products/categories.' },
     { key: 'manage-leads', label: 'CRM Leads Management', desc: 'Allows viewing, updating, and assigning leads in the CRM database.' },
-    { key: 'manage-orders', label: 'Process Logistics Orders', desc: 'Allows updating shipping line numbers and eta coordinates.' },
+    // OLD (commented out - do not delete)
+    // { key: 'manage-orders', label: 'Process Logistics Orders', desc: 'Allows updating shipping line numbers and eta coordinates.' },
+    // NEW
+    { key: 'manage-orders', label: 'Process Logistics Orders', desc: 'Allows updating shipping tracking numbers and delivery dates.' },
     { key: 'audit-logs', label: 'View System Audit Logs', desc: 'Allows viewing database security entries and actor actions.' },
   ];
 

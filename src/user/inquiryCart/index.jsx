@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { FiAnchor, FiBriefcase, FiTrash2, FiSend, FiPlus, FiArrowRight, FiFileText } from 'react-icons/fi';
 import Card from '../../commonComponents/cards/Card';
 import Button from '../../commonComponents/buttons/Button';
@@ -7,43 +8,47 @@ import Input from '../../commonComponents/inputs/Input';
 import Dropdown from '../../commonComponents/dropdowns/Dropdown';
 import Textarea from '../../commonComponents/textareas/Textarea';
 import FileUpload from '../../commonComponents/fileUploads/FileUpload';
+import LoginRedirectModal from '../../commonComponents/modals/LoginRedirectModal';
 
 export default function InquiryCartScreen() {
   const location = useLocation();
   const isPortal = location.pathname.startsWith('/user');
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  
   const [success, setSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   
-  // Custom B2B items in Inquiry Cart
+  // Custom packaging items in Inquiry Cart
   const [inquiryItems, setInquiryItems] = useState([
     {
       id: 'inq-item-1',
-      name: 'Cold-Rolled Structural Steel Rebar TMT',
-      category: 'steel',
-      qty: '100 Tons',
-      targetPrice: '62000',
+      name: 'Custom Printed Kraft Mailers',
+      category: 'boxes',
+      qty: '5,000 Units',
+      targetPrice: '1200',
       port: 'USHOU',
-      specs: 'Standard BS 4449 Grade 500B rebar. Tagged and bundled for marine shipping carriage.',
+      specs: 'Matte black external print with custom brand logo center. 320 GSM recycled paperboard.',
       attachment: null
     },
     {
       id: 'inq-item-2',
-      name: 'Raw Combed Egyptian Cotton Fiber Bales',
-      category: 'fiber',
-      qty: '10 Tons',
-      targetPrice: '22000',
+      name: 'Eco-Friendly Corrugated Boxes',
+      category: 'boxes',
+      qty: '2,000 Units',
+      targetPrice: '900',
       port: 'NLRTM',
-      specs: 'High grade combed cotton fiber. Staple length 32mm. Packaged in custom density bales.',
+      specs: 'Double-walled shipping boxes. Brown kraft finish. Custom dimensions: 300x200x150mm.',
       attachment: null
     }
   ]);
 
   const portOptions = [
-    { label: 'Port of Rotterdam (Netherlands)', value: 'NLRTM' },
-    { label: 'Port of Singapore (Singapore)', value: 'SGSGP' },
-    { label: 'Port of Houston (United States)', value: 'USHOU' },
-    { label: 'Port of Shanghai (China)', value: 'CNSHA' },
-    { label: 'Port of Mumbai / JNPT (India)', value: 'INBOM' },
+    { label: 'Region: North America Depot', value: 'USHOU' },
+    { label: 'Region: Europe Logistics Depot', value: 'NLRTM' },
+    { label: 'Region: Asia-Pacific Depot', value: 'SGSGP' },
+    { label: 'Region: China Sourcing Hub', value: 'CNSHA' },
+    { label: 'Region: India Manufacturing Hub', value: 'INBOM' },
   ];
 
   const handleUpdateItem = (id, key, value) => {
@@ -56,6 +61,10 @@ export default function InquiryCartScreen() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!isAuthenticated) {
+      setIsLoginModalOpen(true);
+      return;
+    }
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
@@ -69,10 +78,10 @@ export default function InquiryCartScreen() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-brand-border/40 dark:border-slate-800/40 pb-5">
         <div>
           <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-1">
-            B2B Bulk Inquiry Cart
+            Custom Packaging Inquiry Cart
           </h1>
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            Submit specifications for multiple custom commodities to receive a consolidated invoice quote.
+            Submit specifications for multiple custom packaging designs to receive a wholesale quote.
           </p>
         </div>
       </div>
@@ -83,14 +92,14 @@ export default function InquiryCartScreen() {
             <FiFileText className="h-8 w-8" />
           </div>
           <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-1">
-            Master Inquiry Submitted
+            Quote Request Submitted
           </h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 mb-8 max-w-md mx-auto leading-relaxed">
-            Your bulk trade requests have been compiled into active leads. A designated sales broker will log specifications and draft quotes shortly.
+            Your custom packaging quote requests have been received. Our manufacturing team will evaluate specifications and send a wholesale quote shortly.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link to="/user/orders">
-              <Button variant="primary">View My RFQs</Button>
+              <Button variant="primary">View My Quotes</Button>
             </Link>
             <Link to={isPortal ? "/user/products" : "/products"}>
               <Button variant="outline">Browse Catalog</Button>
@@ -107,11 +116,11 @@ export default function InquiryCartScreen() {
               Inquiry Cart is Empty
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mb-6">
-              Search for bulk products and add them to your inquiry cart to coordinate specifications.
+              Search for wholesale packaging products and add them to your inquiry cart to coordinate specifications.
             </p>
             <Link to={isPortal ? "/user/products" : "/products"}>
               <Button variant="primary" icon={FiArrowRight} iconPosition="right">
-                View Trade Catalog
+                View Packaging Catalog
               </Button>
             </Link>
           </div>
@@ -142,7 +151,7 @@ export default function InquiryCartScreen() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <Input
                     label="Target Quantity"
-                    placeholder="e.g. 50 Tons"
+                    placeholder="e.g. 5,000 Units"
                     value={item.qty}
                     onChange={(e) => handleUpdateItem(item.id, 'qty', e.target.value)}
                     icon={FiAnchor}
@@ -151,7 +160,7 @@ export default function InquiryCartScreen() {
 
                   <Input
                     label="Target Price ($ USD)"
-                    placeholder="e.g. 40000"
+                    placeholder="e.g. 1200"
                     value={item.targetPrice}
                     onChange={(e) => handleUpdateItem(item.id, 'targetPrice', e.target.value)}
                     icon={FiBriefcase}
@@ -159,7 +168,7 @@ export default function InquiryCartScreen() {
                   />
 
                   <Dropdown
-                    label="Destination Port"
+                    label="Delivery Depot"
                     value={item.port}
                     onChange={(e) => handleUpdateItem(item.id, 'port', e.target.value)}
                     options={portOptions}
@@ -170,19 +179,19 @@ export default function InquiryCartScreen() {
                 {/* Specs and Technical Drawing Upload */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <Textarea
-                    label="Specifications & Custom Markings"
-                    placeholder="Provide details about compliance standards, packaging cargo marks, certification requirements."
+                    label="Specifications & Branding Outlines"
+                    placeholder="Provide details about size requirements, logo printing options, cardboard thickness, and customization."
                     value={item.specs}
                     onChange={(e) => handleUpdateItem(item.id, 'specs', e.target.value)}
                     required
                   />
                   <div className="flex flex-col justify-end">
                     <FileUpload
-                      label="Attach CAD or Technical drawings (.dwg, .pdf)"
+                      label="Attach Logo files or outlines (.dwg, .pdf, .png)"
                       selectedFile={item.attachment}
                       onFileSelect={(file) => handleUpdateItem(item.id, 'attachment', file)}
                       onClear={() => handleUpdateItem(item.id, 'attachment', null)}
-                      accept=".pdf,.dwg"
+                      accept=".pdf,.dwg,.png"
                     />
                   </div>
                 </div>
@@ -193,11 +202,11 @@ export default function InquiryCartScreen() {
           {/* Form Actions */}
           <div className="flex flex-wrap gap-4 justify-between items-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-2xl shadow-xs">
             <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold">
-              Consolidating {inquiryItems.length} requests into 1 sales lead portfolio.
+              Consolidating {inquiryItems.length} requests into 1 wholesale quote lead.
             </span>
             <div className="flex gap-3">
               <Link to={isPortal ? "/user/products" : "/products"}>
-                <Button variant="outline" type="button" icon={FiPlus}>Add Another Product</Button>
+                <Button variant="outline" type="button" icon={FiPlus}>Add Another Item</Button>
               </Link>
               <Button
                 variant="gold"
@@ -212,6 +221,12 @@ export default function InquiryCartScreen() {
           </div>
         </form>
       )}
+
+      <LoginRedirectModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        actionName="submit a master inquiry quote"
+      />
     </div>
   );
 }

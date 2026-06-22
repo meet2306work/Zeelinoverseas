@@ -35,9 +35,15 @@ export default function SupportTicketsScreen() {
   const isOther = selectedTopic === 'Other';
   const effectiveSubject = isOther ? otherText : selectedTopic;
 
+  // OLD (commented out - do not delete)
+  // const fallbackTickets = [
+  //   { id: 'TCK-2026-982', date: 'Jun 11, 2026', subject: 'Inquiry status update on Cotton Bales re-route', status: 'Open' },
+  //   { id: 'TCK-2026-981', date: 'May 30, 2026', subject: 'Bill of Lading documentation format change', status: 'Resolved' },
+  // ];
+  // NEW
   const fallbackTickets = [
-    { id: 'TCK-2026-982', date: 'Jun 11, 2026', subject: 'Inquiry status update on Cotton Bales re-route', status: 'Open' },
-    { id: 'TCK-2026-981', date: 'May 30, 2026', subject: 'Bill of Lading documentation format change', status: 'Resolved' },
+    { id: 'TCK-2026-982', date: 'Jun 11, 2026', subject: 'Inquiry status update on Custom Mailers shipment', status: 'Open' },
+    { id: 'TCK-2026-981', date: 'May 30, 2026', subject: 'Customized packaging design specifications review', status: 'Resolved' },
   ];
 
   const activeTickets = [...ticketsList, ...fallbackTickets];

@@ -13,10 +13,17 @@ export default function AdminInquiriesScreen() {
   const [search, setSearch] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  // OLD (commented out - do not delete)
+  // const [inquiries, setInquiries] = useState([
+  //   { id: 'INQ-4921', client: 'Jürgen Klopp', company: 'Westside Logistics', product: 'Standard Shipping ISO Cargo Container', qty: '4 Units', date: 'June 10, 2026', status: 'Pending Response', email: 'jklopp@westside.de' },
+  //   { id: 'INQ-4920', client: 'Ramesh Patel', company: 'Gujarat Cotton Mills', product: 'Raw Combed Egyptian Cotton Fiber Bales', qty: '1,200 kg', date: 'June 09, 2026', status: 'Replied', email: 'ramesh@gujaratcotton.in' },
+  //   { id: 'INQ-4919', client: 'Jane Smith', company: 'Apex Structural Steel', product: 'Cold-Rolled Structural Steel Rebar TMT', qty: '15 Tons', date: 'June 08, 2026', status: 'Replied', email: 'j.smith@apexsteel.com' },
+  // ]);
+  // NEW
   const [inquiries, setInquiries] = useState([
-    { id: 'INQ-4921', client: 'Jürgen Klopp', company: 'Westside Logistics', product: 'Standard Shipping ISO Cargo Container', qty: '4 Units', date: 'June 10, 2026', status: 'Pending Response', email: 'jklopp@westside.de' },
-    { id: 'INQ-4920', client: 'Ramesh Patel', company: 'Gujarat Cotton Mills', product: 'Raw Combed Egyptian Cotton Fiber Bales', qty: '1,200 kg', date: 'June 09, 2026', status: 'Replied', email: 'ramesh@gujaratcotton.in' },
-    { id: 'INQ-4919', client: 'Jane Smith', company: 'Apex Structural Steel', product: 'Cold-Rolled Structural Steel Rebar TMT', qty: '15 Tons', date: 'June 08, 2026', status: 'Replied', email: 'j.smith@apexsteel.com' },
+    { id: 'INQ-4921', client: 'Jürgen Klopp', company: 'Westside Clothing', product: 'Custom Kraft Mailer Boxes', qty: '400 Units', date: 'June 10, 2026', status: 'Pending Response', email: 'jklopp@westside.de' },
+    { id: 'INQ-4920', client: 'Ramesh Patel', company: 'Gujarat Apparel Co', product: 'Premium Corrugated Box Bundles', qty: '120 Packs', date: 'June 09, 2026', status: 'Replied', email: 'ramesh@gujaratcotton.in' },
+    { id: 'INQ-4919', client: 'Jane Smith', company: 'Apex Tech Gear', product: 'Eco-Friendly Bubble Wrap Rolls', qty: '50 Rolls', date: 'June 08, 2026', status: 'Replied', email: 'j.smith@apexsteel.com' },
   ]);
 
   const handleOpenReply = (inq) => {
@@ -164,7 +171,10 @@ export default function AdminInquiriesScreen() {
                 Compose Email Reply
               </label>
               <textarea
-                placeholder="Dear B2B customer, we can fulfill this order under standard ocean transport timelines..."
+                // OLD (commented out - do not delete)
+                // placeholder="Dear B2B customer, we can fulfill this order under standard ocean transport timelines..."
+                // NEW
+                placeholder="Dear customer, we can fulfill this order under standard express delivery timelines..."
                 value={replyMessage}
                 onChange={(e) => setReplyMessage(e.target.value)}
                 required

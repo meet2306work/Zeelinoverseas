@@ -17,11 +17,19 @@ const fadeUp = {
   show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.16, 1, 0.3, 1] } },
 };
 
+// OLD (commented out - do not delete)
+// const PERKS = [
+//   'Submit B2B RFQs and get quotes in 24h',
+//   'Track orders and shipment status live',
+//   'Access exclusive wholesale pricing tiers',
+//   'Dedicated trade desk support',
+// ];
+// NEW
 const PERKS = [
-  'Submit B2B RFQs and get quotes in 24h',
-  'Track orders and shipment status live',
+  'Submit custom specs and get quotes in 24h',
+  'Track orders and delivery status live',
   'Access exclusive wholesale pricing tiers',
-  'Dedicated trade desk support',
+  'Dedicated customer support desk',
 ];
 
 export default function AuthSignupScreen() {
@@ -71,12 +79,22 @@ export default function AuthSignupScreen() {
         {/* Value proposition */}
         <div className="z-10 flex flex-col gap-6">
           <div className="w-12 h-1 bg-accent-gold rounded-full" />
+          {/* OLD (commented out - do not delete)
           <h2 className="text-3xl font-display font-bold text-text-on-dark leading-snug">
             Join the<br />
             <span className="text-accent-gold">Zeelin Network.</span>
           </h2>
           <p className="text-sm text-text-on-dark/60 leading-relaxed max-w-xs">
             Get access to verified commodities, real-time shipment tracking, and B2B tools built for serious importers.
+          </p>
+          */}
+          {/* NEW */}
+          <h2 className="text-3xl font-display font-bold text-text-on-dark leading-snug">
+            Join the<br />
+            <span className="text-accent-gold">Zeelin Store.</span>
+          </h2>
+          <p className="text-sm text-text-on-dark/60 leading-relaxed max-w-xs">
+            Get access to premium packaging products, real-time order tracking, and volume tools built for bulk and individual buyers.
           </p>
 
           {/* Perks list */}

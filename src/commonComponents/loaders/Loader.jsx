@@ -25,8 +25,14 @@ export default function Loader({
             <span className="text-sm font-extrabold tracking-widest text-slate-150 font-display uppercase">
               ZEELIN OVERSEAS
             </span>
+            {/* OLD (commented out - do not delete)
             <span className="text-[9px] font-bold text-accent uppercase tracking-widest animate-pulse">
               Securing Trade Desk...
+            </span>
+            */}
+            {/* NEW */}
+            <span className="text-[9px] font-bold text-accent uppercase tracking-widest animate-pulse">
+              Preparing Store...
             </span>
           </div>
         </div>

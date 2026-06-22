@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { FiHome, FiShoppingBag, FiHeart, FiSettings, FiUser, FiBell, FiLogOut, FiMenu, FiX, FiHelpCircle, FiBox, FiFileText, FiGrid, FiMessageSquare } from 'react-icons/fi';
+import { FiHome, FiShoppingBag, FiHeart, FiSettings, FiUser, FiBell, FiLogOut, FiMenu, FiX, FiHelpCircle, FiBox, FiFileText, FiGrid, FiMessageSquare, FiShoppingCart } from 'react-icons/fi';
 import Breadcrumb from '../commonComponents/breadcrumbs/Breadcrumb';
 import Dropdown from '../commonComponents/dropdowns/Dropdown';
 import PageContainer from '../commonComponents/layouts/PageContainer';
@@ -21,6 +21,7 @@ export default function UserLayout() {
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const role = useSelector(selectUserRole);
   const currentUser = useSelector(selectCurrentUser);
+  const { totalQuantity } = useSelector((state) => state.cart);
   const { categoriesList } = useSelector((state) => state.categories);
 
   const fullName = currentUser ? `${currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim() || 'User' : 'User';
@@ -38,7 +39,11 @@ export default function UserLayout() {
     { label: 'Dashboard', path: '/user/home', icon: FiHome },
     { label: 'Products Catalog', path: '/user/products', icon: FiBox },
     { label: 'Categories', path: '/user/categories', icon: FiGrid },
-    { label: 'B2B Custom RFQs', path: '/user/rfq', icon: FiFileText },
+    // OLD (commented out - do not delete)
+    // { label: 'B2B Custom RFQs', path: '/user/rfq', icon: FiFileText },
+    // NEW
+    { label: 'Bulk Order Quotes', path: '/user/rfq', icon: FiFileText },
+    { label: 'Shopping Cart', path: '/user/cart', icon: FiShoppingCart },
     { label: 'My Orders', path: '/user/orders', icon: FiShoppingBag },
     { label: 'Wishlist', path: '/user/wishlist', icon: FiHeart },
     { label: 'Support Tickets', path: '/user/support', icon: FiHelpCircle },
@@ -59,7 +64,10 @@ export default function UserLayout() {
       link = '/user/orders';
     }
     let label = segment.charAt(0).toUpperCase() + segment.slice(1).replace('-', ' ');
-    if (segment.toLowerCase() === 'rfq') label = 'RFQ';
+    // OLD (commented out - do not delete)
+    // if (segment.toLowerCase() === 'rfq') label = 'RFQ';
+    // NEW
+    if (segment.toLowerCase() === 'rfq') label = 'Bulk Orders';
     if (segment.toLowerCase() === 'crm') label = 'CRM';
     
     breadcrumbItems.push({ label, link });
@@ -111,7 +119,8 @@ export default function UserLayout() {
             const LinkIcon = link.icon;
             const isActive = location.pathname === link.path || 
               (link.path === '/user/orders' && location.pathname.startsWith('/user/order-tracking')) ||
-              (link.path === '/user/products' && (location.pathname.startsWith('/user/products/') || location.pathname.startsWith('/user/categories')));
+              (link.path === '/user/products' && location.pathname.startsWith('/user/products/')) ||
+              (link.path === '/user/cart' && location.pathname === '/user/cart');
             return (
               <Link
                 key={link.path}
@@ -176,7 +185,8 @@ export default function UserLayout() {
                 const LinkIcon = link.icon;
                 const isActive = location.pathname === link.path || 
                   (link.path === '/user/orders' && location.pathname.startsWith('/user/order-tracking')) ||
-                  (link.path === '/user/products' && (location.pathname.startsWith('/user/products/') || location.pathname.startsWith('/user/categories')));
+                  (link.path === '/user/products' && location.pathname.startsWith('/user/products/')) ||
+                  (link.path === '/user/cart' && location.pathname === '/user/cart');
                 return (
                   <Link
                     key={link.path}
@@ -218,14 +228,32 @@ export default function UserLayout() {
             >
               <FiMenu className="h-6 w-6" />
             </button>
+            {/* OLD (commented out - do not delete)
             <h2 className="text-sm font-extrabold text-text-on-dark hidden sm:block uppercase tracking-wider font-display">
               Global Trade Desk
+            </h2>
+            */}
+            {/* NEW */}
+            <h2 className="text-sm font-extrabold text-text-on-dark hidden sm:block uppercase tracking-wider font-display">
+              Wholesale Shop Desk
             </h2>
           </div>
 
           <div className="flex items-center gap-brand-md">
+            {/* OLD (commented out - do not delete)
             <Link to="/user/inquiry-cart" className="relative p-2 text-text-on-dark/75 hover:text-accent-gold transition-colors" title="Inquiry Follow-up">
+            */}
+            {/* NEW */}
+            <Link to="/user/inquiry-cart" className="relative p-2 text-text-on-dark/75 hover:text-accent-gold transition-colors" title="My Inquiries">
               <FiMessageSquare className="h-5.5 w-5.5" />
+            </Link>
+            <Link to="/user/cart" className="relative p-2 text-text-on-dark/75 hover:text-accent-gold transition-colors" title="Shopping Cart">
+              <FiShoppingCart className="h-5.5 w-5.5" />
+              {totalQuantity > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 bg-accent-gold text-text-on-accent text-[9px] font-black h-4 w-4 rounded-full flex items-center justify-center ring-2 ring-black-accent">
+                  {totalQuantity}
+                </span>
+              )}
             </Link>
             <Link to="/user/notifications" className="relative p-2 text-text-on-dark/75 hover:text-accent-gold transition-colors">
               <FiBell className="h-5.5 w-5.5" />

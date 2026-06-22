@@ -53,33 +53,46 @@ export default function CategoriesScreen() {
           />
         ) : categoriesList.map((cat) => {
           const Icon = FiBox; // Placeholder icon since icon names aren't in DB usually
+          const fallbackImage = 'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&w=400&q=80';
           return (
             <Card
               key={cat._id || cat.id}
               variant="glass" 
-              className="h-full p-8 flex flex-col justify-between hover:-translate-y-1.5 transition-all duration-300 border-border-default/50 group relative overflow-hidden"
+              className="h-full p-5 flex flex-col justify-between hover:-translate-y-1.5 transition-all duration-300 border-border-default/50 group relative overflow-hidden"
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-accent-gold/5 to-accent-gold/5 rounded-full blur-2xl pointer-events-none group-hover:scale-125 transition-transform duration-500" />
               
-              <div className="flex flex-col gap-6 relative z-10">
-                <div className="h-12 w-12 rounded-2xl bg-accent-gold/10 text-accent-gold flex items-center justify-center transition-colors duration-300">
-                  <Icon className="h-6 w-6" />
+              <div className="flex flex-col gap-5 relative z-10">
+                {/* Category Image Header */}
+                <div className="relative h-44 w-full rounded-2xl overflow-hidden bg-background-primary border border-border-default/30">
+                  <img
+                    src={cat.image || fallbackImage}
+                    alt={cat.name}
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = fallbackImage;
+                    }}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute top-3 left-3 h-10 w-10 rounded-xl bg-black-accent/80 backdrop-blur-xs text-accent-gold flex items-center justify-center border border-accent-gold/15">
+                    <Icon className="h-5 w-5" />
+                  </div>
                 </div>
-                
+
                 <div>
                   <span className="text-[10px] font-bold text-accent-gold uppercase tracking-wider mb-1 block">
                     {cat.count ?? 0} {cat.count === 1 ? 'Product' : 'Products'}
                   </span>
-                  <h3 className="text-lg font-bold text-text-primary mb-2 group-hover:text-accent-gold transition-colors">
+                  <h3 className="text-lg font-bold text-text-primary mb-2 group-hover:text-accent-gold transition-colors font-display">
                     {cat.name}
                   </h3>
-                  <p className="text-xs text-text-secondary leading-relaxed">
+                  <p className="text-xs text-text-secondary leading-relaxed line-clamp-3">
                     {cat.description || cat.desc}
                   </p>
                 </div>
               </div>
 
-              <div className="mt-8 pt-4 border-t border-border-default/30 flex justify-end relative z-10">
+              <div className="mt-6 pt-4 border-t border-border-default/30 flex justify-end relative z-10">
                 <Link 
                   to={isPortal ? `/user/products?category=${cat.slug}` : `/products?category=${cat.slug}`} 
                   className="flex items-center gap-1.5 text-xs font-bold text-accent-gold hover:gap-2.5 transition-all"
@@ -101,11 +114,20 @@ export default function CategoriesScreen() {
         
         <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="text-center md:text-left">
+            {/* OLD (commented out - do not delete)
             <h2 className="text-xl font-bold text-text-on-dark tracking-tight mb-2">
               Browse the Entire Global Trade Catalog
             </h2>
             <p className="text-xs text-text-on-dark/70 max-w-md leading-relaxed">
               Explore our full range of manufactured components, steel spares, heavy machines, and raw cotton commodities in one place.
+            </p>
+            */}
+            {/* NEW */}
+            <h2 className="text-xl font-bold text-text-on-dark tracking-tight mb-2">
+              Browse the Entire Packaging Catalog
+            </h2>
+            <p className="text-xs text-text-on-dark/70 max-w-md leading-relaxed">
+              Explore our full range of custom corrugated boxes, bubble wraps, mailers, and eco-friendly packing supplies in one place.
             </p>
           </div>
           

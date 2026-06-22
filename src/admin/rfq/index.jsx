@@ -52,14 +52,26 @@ export default function AdminRfqScreen() {
       label: 'RFQ ID',
       render: (val) => <span className="font-mono font-bold text-slate-500 dark:text-slate-400">{val}</span>
     },
+    // OLD (commented out - do not delete)
+    // { 
+    //   key: 'company', 
+    //   label: 'B2B Client',
+    //   render: (val) => <span className="font-bold text-slate-900 dark:text-white">{val}</span>
+    // },
+    // { 
+    //   key: 'port', 
+    //   label: 'Delivery Port',
+    //   render: (val) => <span className="font-semibold text-slate-700 dark:text-slate-300">{val}</span>
+    // },
+    // NEW
     { 
       key: 'company', 
-      label: 'B2B Client',
+      label: 'Client / Customer',
       render: (val) => <span className="font-bold text-slate-900 dark:text-white">{val}</span>
     },
     { 
       key: 'port', 
-      label: 'Delivery Port',
+      label: 'Shipping Destination / Depot',
       render: (val) => <span className="font-semibold text-slate-700 dark:text-slate-300">{val}</span>
     },
     { 
@@ -148,7 +160,11 @@ export default function AdminRfqScreen() {
               <span className="text-[10px] font-bold text-slate-500 dark:text-slate-450 uppercase tracking-wider">RFQ Target Specifications</span>
               <p className="text-sm font-semibold text-slate-900 dark:text-white mt-1">{selectedRfq.company}</p>
               <div className="grid grid-cols-2 gap-4 text-xs mt-2 text-slate-600 dark:text-slate-400">
+                {/* OLD (commented out - do not delete)
                 <div>Port: <span className="font-medium text-slate-900 dark:text-slate-200">{selectedRfq.port}</span></div>
+                */}
+                {/* NEW */}
+                <div>Shipping Depot: <span className="font-medium text-slate-900 dark:text-slate-200">{selectedRfq.port}</span></div>
                 <div>Quantity: <span className="font-medium text-slate-900 dark:text-slate-200">{selectedRfq.qty}</span></div>
                 <div>Target Budget: <span className="font-medium text-amber-600 dark:text-amber-400">{selectedRfq.targetBudget}</span></div>
                 <div>Status: <span className="font-medium text-slate-900 dark:text-slate-200">{selectedRfq.status}</span></div>

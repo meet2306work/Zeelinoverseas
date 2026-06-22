@@ -22,12 +22,22 @@ export default function AuthEmailVerificationScreen() {
 
         <div className="z-10 flex flex-col gap-6">
           <div className="w-12 h-1 bg-accent-gold rounded-full" />
+          {/* OLD (commented out - do not delete)
           <h2 className="text-3xl font-display font-bold text-text-on-dark leading-snug">
             You're in the<br />
             <span className="text-accent-gold">Zeelin Network.</span>
           </h2>
           <p className="text-sm text-text-on-dark/60 leading-relaxed max-w-xs">
             Your account is now fully activated. Start submitting RFQs, browsing the catalog, and managing your B2B orders.
+          </p>
+          */}
+          {/* NEW */}
+          <h2 className="text-3xl font-display font-bold text-text-on-dark leading-snug">
+            Welcome to<br />
+            <span className="text-accent-gold">Zeelin Store.</span>
+          </h2>
+          <p className="text-sm text-text-on-dark/60 leading-relaxed max-w-xs">
+            Your account is now fully activated. Start submitting custom quotes, browsing the catalog, and managing your orders.
           </p>
         </div>
 
@@ -55,8 +65,14 @@ export default function AuthEmailVerificationScreen() {
             <h1 className="text-3xl font-display font-extrabold text-text-primary tracking-tight">
               Email Verified!
             </h1>
+            {/* OLD (commented out - do not delete)
             <p className="text-sm text-text-secondary mt-2 leading-relaxed max-w-xs">
               Your email address has been successfully verified. Your trade workspace profile is fully activated and ready to use.
+            </p>
+            */}
+            {/* NEW */}
+            <p className="text-sm text-text-secondary mt-2 leading-relaxed max-w-xs">
+              Your email address has been successfully verified. Your customer profile is fully activated and ready to use.
             </p>
           </div>
 

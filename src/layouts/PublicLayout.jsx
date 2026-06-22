@@ -8,10 +8,13 @@ import PageContainer from '../commonComponents/layouts/PageContainer';
 import PageTransition from '../commonComponents/layouts/PageTransition';
 import { logout, selectIsAuthenticated, selectUserRole } from '../redux/slices/authSlice';
 import WhatsAppFloatingButton from '../commonComponents/buttons/WhatsAppFloatingButton';
+import LoginRedirectModal from '../commonComponents/modals/LoginRedirectModal';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { motionTransitions } from '../config/motion';
 
 export default function PublicLayout() {
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [modalAction, setModalAction] = useState('request a bulk order quote');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const shouldReduceMotion = useReducedMotion();
@@ -34,7 +37,10 @@ export default function PublicLayout() {
     { label: 'Categories', path: '/categories' },
     { label: 'Products', path: '/products' },
     { label: 'Services', path: '/services' },
-    { label: 'Submit RFQ', path: '/rfq' },
+    // OLD (commented out - do not delete)
+    // { label: 'Submit RFQ', path: '/rfq' },
+    // NEW
+    { label: 'Bulk Order Quote', path: '/rfq' },
     { label: 'About', path: '/about' },
   ];
   const selectedCategory = (categoriesList || []).find((cat) => cat.slug === searchParams.get('category'));
@@ -44,7 +50,10 @@ export default function PublicLayout() {
   const breadcrumbItems = pathSegments.map((segment, index) => {
     const link = '/' + pathSegments.slice(0, index + 1).join('/');
     let label = segment.charAt(0).toUpperCase() + segment.slice(1).replace('-', ' ');
-    if (segment.toLowerCase() === 'rfq') label = 'RFQ';
+    // OLD (commented out - do not delete)
+    // if (segment.toLowerCase() === 'rfq') label = 'RFQ';
+    // NEW
+    if (segment.toLowerCase() === 'rfq') label = 'Bulk Orders';
     if (segment.toLowerCase() === 'crm') label = 'CRM';
     return { label, link };
   });
@@ -74,6 +83,13 @@ export default function PublicLayout() {
                 <Link
                   key={link.path}
                   to={link.path}
+                  onClick={(e) => {
+                    if (link.path === '/rfq' && !isAuthenticated) {
+                      e.preventDefault();
+                      setModalAction('request a bulk order quote');
+                      setIsLoginModalOpen(true);
+                    }
+                  }}
                   className={`text-xs uppercase tracking-widest font-bold transition-colors relative py-1
                     ${isActive 
                       ? 'text-accent-gold' 
@@ -93,7 +109,10 @@ export default function PublicLayout() {
           {/* Action Icons */}
           <div className="hidden md:flex items-center gap-brand-md">
             {isAuthenticated && (
-              <Link to="/inquiry-cart" className="relative p-2 text-text-on-dark/70 hover:text-accent-gold transition-colors" title="Inquiry Follow-up">
+              // OLD (commented out - do not delete)
+              // <Link to="/inquiry-cart" className="relative p-2 text-text-on-dark/70 hover:text-accent-gold transition-colors" title="Inquiry Follow-up">
+              // NEW
+              <Link to="/inquiry-cart" className="relative p-2 text-text-on-dark/70 hover:text-accent-gold transition-colors" title="My Inquiries">
                 <FiMessageSquare className="h-5 w-5" />
               </Link>
             )}
@@ -138,7 +157,15 @@ export default function PublicLayout() {
               <Link
                 key={link.path}
                 to={link.path}
-                onClick={() => setIsMobileMenuOpen(false)}
+                onClick={(e) => {
+                  if (link.path === '/rfq' && !isAuthenticated) {
+                    e.preventDefault();
+                    setModalAction('request a bulk order quote');
+                    setIsLoginModalOpen(true);
+                  } else {
+                    setIsMobileMenuOpen(false);
+                  }
+                }}
                 className="text-sm uppercase tracking-wider font-bold text-text-on-dark/80 hover:text-accent-gold py-1"
               >
                 {link.label}
@@ -151,8 +178,14 @@ export default function PublicLayout() {
           <div className="flex flex-col gap-brand-sm">
             {isAuthenticated && (
               <Link to="/inquiry-cart" onClick={() => setIsMobileMenuOpen(false)}>
+                {/* OLD (commented out - do not delete)
                 <Button variant="outline" className="w-full" icon={FiMessageSquare}>
                   Inquiry Follow-up
+                </Button>
+                */}
+                {/* NEW */}
+                <Button variant="outline" className="w-full" icon={FiMessageSquare}>
+                  My Inquiries
                 </Button>
               </Link>
             )}
@@ -204,16 +237,30 @@ export default function PublicLayout() {
             <span className="text-lg font-bold tracking-tight text-text-on-dark">
               <span className="text-brand-mark font-black">ZEELIN</span><span className="text-text-on-dark font-medium ml-1">OVERSEAS</span>
             </span>
+            {/* OLD (commented out - do not delete)
             <p className="text-xs text-text-on-dark/65 max-w-xs leading-relaxed">
               Global import-export and customized manufacturing solutions. Supporting enterprises with high-fidelity logistics and custom CRM order processing.
+            </p>
+            */}
+            {/* NEW */}
+            <p className="text-xs text-text-on-dark/65 max-w-xs leading-relaxed">
+              Premium packaging and custom order solutions. Supporting online sellers and retail brands with flexible shipping and wholesale pricing.
             </p>
           </div>
           <div>
             <h5 className="text-sm font-semibold text-text-on-dark uppercase tracking-wider mb-brand-sm">Services</h5>
+            {/* OLD (commented out - do not delete)
             <ul className="flex flex-col gap-brand-xs text-xs">
               <li><Link to="/services" className="hover:text-accent-gold">Freight Forwarding</Link></li>
               <li><Link to="/services" className="hover:text-accent-gold">Custom Brokerage</Link></li>
               <li><Link to="/services" className="hover:text-accent-gold">Quality Inspections</Link></li>
+            </ul>
+            */}
+            {/* NEW */}
+            <ul className="flex flex-col gap-brand-xs text-xs">
+              <li><Link to="/services" className="hover:text-accent-gold">Express Shipping</Link></li>
+              <li><Link to="/services" className="hover:text-accent-gold">Custom Printing</Link></li>
+              <li><Link to="/services" className="hover:text-accent-gold">Bulk Quality Checks</Link></li>
             </ul>
           </div>
           <div>
@@ -248,6 +295,12 @@ export default function PublicLayout() {
       </footer>
 
       <WhatsAppFloatingButton />
+
+      <LoginRedirectModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        actionName={modalAction}
+      />
     </div>
   );
 }

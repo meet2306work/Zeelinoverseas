@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link, useSearchParams, useLocation } from 'react-router-dom';
 import { FiSearch, FiSliders, FiBox, FiArrowRight, FiX } from 'react-icons/fi';
+import LoginRedirectModal from '../../commonComponents/modals/LoginRedirectModal';
 import Card from '../../commonComponents/cards/Card';
 import Input from '../../commonComponents/inputs/Input';
 import Dropdown from '../../commonComponents/dropdowns/Dropdown';
@@ -43,7 +44,9 @@ export default function ProductsScreen() {
   const sortBy = searchParams.get('sort') || 'relevance';
   const { categoriesList } = useSelector((state) => state.categories);
   const { products, loading } = useSelector((state) => state.products);
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const selectedCategory = (categoriesList || []).find((cat) => cat.slug === category);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   useEffect(() => {
     dispatch(fetchCategories());
@@ -99,7 +102,10 @@ export default function ProductsScreen() {
       product.material,
       product.tradeTerm,
       product.region,
-      product.stock === 'ready' ? 'Ready stock' : product.stock === 'custom' ? 'Custom order' : 'Limited stock',
+      // OLD (commented out - do not delete)
+      // product.stock === 'ready' ? 'Ready stock' : product.stock === 'custom' ? 'Custom order' : 'Limited stock',
+      // NEW
+      product.stock === 'ready' ? 'In Stock' : product.stock === 'custom' ? 'Pre-Order/Custom' : 'Limited Stock',
     ]),
     ...(categoriesList || []).flatMap((cat) => [cat.name, cat.slug, cat.desc]),
   ].filter(Boolean);
@@ -109,20 +115,42 @@ export default function ProductsScreen() {
     { label: '4.7 and above', value: '4.7' },
     { label: '4.5 and above', value: '4.5' },
   ];
+  // OLD (commented out - do not delete)
+  // const tradeTermOptions = [
+  //   { label: 'All Trade Terms', value: '' },
+  //   { label: 'FOB', value: 'FOB' },
+  //   { label: 'CIF', value: 'CIF' },
+  //   { label: 'EXW', value: 'EXW' },
+  // ];
+  // NEW
   const tradeTermOptions = [
-    { label: 'All Trade Terms', value: '' },
-    { label: 'FOB', value: 'FOB' },
-    { label: 'CIF', value: 'CIF' },
-    { label: 'EXW', value: 'EXW' },
+    { label: 'All Shipping Options', value: '' },
+    { label: 'Standard Shipping (FOB)', value: 'FOB' },
+    { label: 'Freight Delivery (CIF)', value: 'CIF' },
+    { label: 'Ex-Factory Pickup (EXW)', value: 'EXW' },
   ];
+  // OLD (commented out - do not delete)
+  // const regionOptions = [
+  //   { label: 'All Supplier Regions', value: '' },
+  //   ...Array.from(new Set((products || []).map((p) => p.region).filter(Boolean))).map((value) => ({ label: value, value })),
+  // ];
+  // NEW
   const regionOptions = [
-    { label: 'All Supplier Regions', value: '' },
+    { label: 'All Shipping Locations', value: '' },
     ...Array.from(new Set((products || []).map((p) => p.region).filter(Boolean))).map((value) => ({ label: value, value })),
   ];
+  // OLD (commented out - do not delete)
+  // const stockOptions = [
+  //   { label: 'All Stock Status', value: '' },
+  //   { label: 'Ready Stock', value: 'ready' },
+  //   { label: 'Custom Order', value: 'custom' },
+  //   { label: 'Limited Stock', value: 'limited' },
+  // ];
+  // NEW
   const stockOptions = [
     { label: 'All Stock Status', value: '' },
-    { label: 'Ready Stock', value: 'ready' },
-    { label: 'Custom Order', value: 'custom' },
+    { label: 'In Stock', value: 'ready' },
+    { label: 'Custom/Pre-Order', value: 'custom' },
     { label: 'Limited Stock', value: 'limited' },
   ];
   const sortOptions = [
@@ -183,6 +211,7 @@ export default function ProductsScreen() {
   return (
     <div className="flex flex-col gap-brand-md py-brand-sm">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-brand-md border-b border-border-default/40 pb-md">
+        {/* OLD (commented out - do not delete)
         <div>
           <h1 className="text-2xl font-extrabold text-text-primary tracking-tight mb-1">
             {selectedCategory ? selectedCategory.name : 'Global Trade Catalog'}
@@ -197,6 +226,32 @@ export default function ProductsScreen() {
         <Link to={isPortal ? "/user/rfq" : "/rfq"}>
           <Button variant="gold" size="md">
             Request Custom Quotation
+          </Button>
+        </Link>
+        */}
+        {/* NEW */}
+        <div>
+          <h1 className="text-2xl font-extrabold text-text-primary tracking-tight mb-1">
+            {selectedCategory ? selectedCategory.name : 'Packaging Catalog'}
+          </h1>
+          <p className="text-xs text-text-secondary">
+            {selectedCategory
+              ? `Browse ${selectedCategory.name.toLowerCase()} with clear wholesale quantities, direct shop pricing, and warehouse details.`
+              : 'Shop premium packaging products with wholesale pricing, MOQ filters, and custom print support.'}
+          </p>
+        </div>
+        
+        <Link 
+          to={isPortal ? "/user/rfq" : "/rfq"}
+          onClick={(e) => {
+            if (!isPortal && !isAuthenticated) {
+              e.preventDefault();
+              setIsLoginModalOpen(true);
+            }
+          }}
+        >
+          <Button variant="gold" size="md">
+            Get Custom Print Quote
           </Button>
         </Link>
       </div>
@@ -291,8 +346,18 @@ export default function ProductsScreen() {
               searchable={false}
             />
 
+            {/* OLD (commented out - do not delete)
             <Dropdown
               label="Supplier Region"
+              value={region}
+              onChange={(e) => setFilterParam('region', e.target.value)}
+              options={regionOptions}
+              searchable={false}
+            />
+            */}
+            {/* NEW */}
+            <Dropdown
+              label="Shipping Location"
               value={region}
               onChange={(e) => setFilterParam('region', e.target.value)}
               options={regionOptions}
@@ -353,15 +418,29 @@ export default function ProductsScreen() {
               {Array.from({ length: 6 }, (_, index) => <SkeletonCard key={index} />)}
             </div>
           ) : filteredProducts.length === 0 ? (
-            <Reveal className="text-center py-20 border border-dashed border-border-default rounded-2xl bg-background-surface">
-              <FiBox className="h-10 w-10 text-text-secondary mx-auto mb-3" />
-              <h3 className="text-base font-bold text-text-primary mb-1">
-                Not available in products or categories
-              </h3>
-              <p className="text-xs text-text-secondary">
-                Try another keyword, browse all categories, or request a custom quotation.
-              </p>
-            </Reveal>
+            <>
+              {/* OLD (commented out - do not delete)
+              <Reveal className="text-center py-20 border border-dashed border-border-default rounded-2xl bg-background-surface">
+                <FiBox className="h-10 w-10 text-text-secondary mx-auto mb-3" />
+                <h3 className="text-base font-bold text-text-primary mb-1">
+                  Not available in products or categories
+                </h3>
+                <p className="text-xs text-text-secondary">
+                  Try another keyword, browse all categories, or request a custom quotation.
+                </p>
+              </Reveal>
+              */}
+              {/* NEW */}
+              <Reveal className="text-center py-20 border border-dashed border-border-default rounded-2xl bg-background-surface">
+                <FiBox className="h-10 w-10 text-text-secondary mx-auto mb-3" />
+                <h3 className="text-base font-bold text-text-primary mb-1">
+                  No products or categories found
+                </h3>
+                <p className="text-xs text-text-secondary">
+                  Try another keyword, browse all categories, or request a custom print quote.
+                </p>
+              </Reveal>
+            </>
           ) : (
             <StaggerGroup key={searchParams.toString()} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-brand-md">
               {filteredProducts.map((p) => (
@@ -390,8 +469,14 @@ export default function ProductsScreen() {
                         Category: <span className="font-semibold text-text-primary">{p.category?.name || 'Uncategorized'}</span>
                       </p>
                       <div className="mt-3 flex flex-wrap gap-1.5">
+                        {/* OLD (commented out - do not delete)
                         <span className="rounded-md bg-background-primary/80 border border-border-default/45 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-text-secondary">
                             {p.stock > 0 ? 'Ready Stock' : 'Out of Stock'}
+                        </span>
+                        */}
+                        {/* NEW */}
+                        <span className="rounded-md bg-background-primary/80 border border-border-default/45 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-text-secondary">
+                            {p.stock > 0 ? 'In Stock' : 'Out of Stock'}
                         </span>
                       </div>
                     </div>
@@ -402,9 +487,17 @@ export default function ProductsScreen() {
                         <span className="text-xs text-accent-gold-hover">{(p.averageRating || p.rating || 0).toFixed(1)} ★</span>
                       </div>
 
+                      {/* OLD (commented out - do not delete)
                       <Link to={isPortal ? `/user/products/${p._id || p.id}` : `/products/${p._id || p.id}`}>
                         <Button variant="outline" className="w-full justify-between" size="md" icon={FiArrowRight} iconPosition="right">
                           View details
+                        </Button>
+                      </Link>
+                      */}
+                      {/* NEW */}
+                      <Link to={isPortal ? `/user/products/${p._id || p.id}` : `/products/${p._id || p.id}`}>
+                        <Button variant="outline" className="w-full justify-between" size="md" icon={FiArrowRight} iconPosition="right">
+                          Shop Product
                         </Button>
                       </Link>
                     </div>
@@ -415,6 +508,11 @@ export default function ProductsScreen() {
           )}
         </div>
       </div>
+      <LoginRedirectModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        actionName="request a custom print quote"
+      />
     </div>
   );
 }

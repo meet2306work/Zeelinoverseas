@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { useDispatch, useSelector } from 'react-redux';
 import { FiHeart, FiTrash2, FiArrowRight, FiInfo, FiShoppingCart } from 'react-icons/fi';
@@ -12,6 +12,7 @@ import { motionTransitions } from '../../config/motion';
 
 export default function WishlistScreen() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const wishlistItems = useSelector(selectWishlistItems);
   const shouldReduceMotion = useReducedMotion();
 
@@ -26,6 +27,7 @@ export default function WishlistScreen() {
   const handleMoveToCart = (item) => {
     dispatch(addToCart({ id: item.id, name: item.name, price: item.price, qty: 1, image: item.image }));
     dispatch(removeProductFromWishlist(item.id));
+    navigate('/user/cart');
   };
 
   return (

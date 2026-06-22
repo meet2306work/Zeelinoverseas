@@ -59,12 +59,22 @@ export default function AuthLoginScreen() {
         {/* Centre quote */}
         <div className="z-10 flex flex-col gap-6">
           <div className="w-12 h-1 bg-accent-gold rounded-full" />
+          {/* OLD (commented out - do not delete)
           <blockquote className="text-3xl font-display font-bold text-text-on-dark leading-snug">
             Your Gateway to<br />
             <span className="text-accent-gold">Global Trade.</span>
           </blockquote>
           <p className="text-sm text-text-on-dark/60 leading-relaxed max-w-xs">
             Manage import-export shipments, submit RFQs, and track contracts — all from one intelligent B2B platform.
+          </p>
+          */}
+          {/* NEW */}
+          <blockquote className="text-3xl font-display font-bold text-text-on-dark leading-snug">
+            Your Gateway to<br />
+            <span className="text-accent-gold">Custom Packaging.</span>
+          </blockquote>
+          <p className="text-sm text-text-on-dark/60 leading-relaxed max-w-xs">
+            Shop premium boxes and mailers, configure custom print orders, and track your shipments — all in one place.
           </p>
 
           {/* Stats row */}

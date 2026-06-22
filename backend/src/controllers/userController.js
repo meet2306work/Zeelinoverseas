@@ -176,3 +176,62 @@ exports.removeFromWishlist = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Get all users (Admin only)
+// @route   GET /v1/users
+// @access  Private/Admin
+exports.getAllUsers = async (req, res, next) => {
+  try {
+    const users = await User.find().select('-password');
+    sendResponse(res, 200, 'Users fetched successfully', users);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Update user status/role (Admin only)
+// @route   PUT /v1/users/:id
+// @access  Private/Admin
+exports.updateUserAdmin = async (req, res, next) => {
+  try {
+    const { role, status } = req.body;
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      return next(new ErrorResponse('User not found', 404));
+    }
+
+    if (role) user.role = role;
+    if (status) user.status = status;
+
+    await user.save();
+
+    sendResponse(res, 200, 'User updated successfully', user);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Delete user (Admin only)
+// @route   DELETE /v1/users/:id
+// @access  Private/Admin
+exports.deleteUserAdmin = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      return next(new ErrorResponse('User not found', 404));
+    }
+
+    // Do not allow deleting yourself
+    if (user.id.toString() === req.user.id.toString()) {
+      return next(new ErrorResponse('You cannot delete your own administrative account', 400));
+    }
+
+    await User.findByIdAndDelete(req.params.id);
+
+    sendResponse(res, 200, 'User deleted successfully', null);
+  } catch (error) {
+    next(error);
+  }
+};

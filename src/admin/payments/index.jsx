@@ -7,11 +7,19 @@ import Input from '../../commonComponents/inputs/Input';
 export default function AdminPaymentsScreen() {
   const [search, setSearch] = useState('');
 
+  // OLD (commented out - do not delete)
+  // const payments = [
+  //   { id: 'TXN-90284', client: 'Jürgen Klopp', company: 'Westside Logistics', amount: '$4,200.00', method: 'Telegraphic Transfer (T/T)', date: 'June 10, 2026', status: 'Cleared' },
+  //   { id: 'TXN-90283', client: 'Ramesh Patel', company: 'Gujarat Cotton Mills', amount: '$5,500.00', method: 'Letter of Credit (L/C)', date: 'June 09, 2026', status: 'Cleared' },
+  //   { id: 'TXN-90282', client: 'Jane Smith', company: 'Apex Structural Steel', amount: '$7,200.00', method: 'Credit Card', date: 'June 08, 2026', status: 'Cleared' },
+  //   { id: 'TXN-90281', client: 'Herman Miller Inc', amount: '$8,400.00', company: 'Herman Miller Inc', method: 'Escrow Account Wire', date: 'June 07, 2026', status: 'Pending Verification' },
+  // ];
+  // NEW
   const payments = [
-    { id: 'TXN-90284', client: 'Jürgen Klopp', company: 'Westside Logistics', amount: '$4,200.00', method: 'Telegraphic Transfer (T/T)', date: 'June 10, 2026', status: 'Cleared' },
-    { id: 'TXN-90283', client: 'Ramesh Patel', company: 'Gujarat Cotton Mills', amount: '$5,500.00', method: 'Letter of Credit (L/C)', date: 'June 09, 2026', status: 'Cleared' },
-    { id: 'TXN-90282', client: 'Jane Smith', company: 'Apex Structural Steel', amount: '$7,200.00', method: 'Credit Card', date: 'June 08, 2026', status: 'Cleared' },
-    { id: 'TXN-90281', client: 'Herman Miller Inc', amount: '$8,400.00', company: 'Herman Miller Inc', method: 'Escrow Account Wire', date: 'June 07, 2026', status: 'Pending Verification' },
+    { id: 'TXN-90284', client: 'Jürgen Klopp', company: 'Westside Clothing', amount: '$4,200.00', method: 'Bank Transfer', date: 'June 10, 2026', status: 'Cleared' },
+    { id: 'TXN-90283', client: 'Ramesh Patel', company: 'Gujarat Apparel Co', amount: '$5,500.00', method: 'Bank Transfer', date: 'June 09, 2026', status: 'Cleared' },
+    { id: 'TXN-90282', client: 'Jane Smith', company: 'Apex Tech Gear', amount: '$7,200.00', method: 'Credit Card', date: 'June 08, 2026', status: 'Cleared' },
+    { id: 'TXN-90281', client: 'Herman Miller Inc', amount: '$8,400.00', company: 'Herman Miller Inc', method: 'Wire Transfer', date: 'June 07, 2026', status: 'Pending Verification' },
   ];
 
   const filteredPayments = payments.filter(p =>
