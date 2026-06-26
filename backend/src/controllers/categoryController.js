@@ -8,10 +8,45 @@ const sendResponse = require('../utils/responseFormatter');
 // @access  Public
 exports.getCategories = async (req, res, next) => {
   try {
-    const categories = await Category.find({ isActive: true })
-      .populate('subCategories')
-      .populate('count');
-    sendResponse(res, 200, 'Categories fetched successfully', categories);
+    let filter = { isActive: true };
+
+    if (req.query.search) {
+      const searchRegex = { $regex: req.query.search, $options: 'i' };
+      filter.$or = [
+        { name: searchRegex },
+        { slug: searchRegex },
+        { description: searchRegex }
+      ];
+    }
+
+    let query = Category.find(filter);
+
+    // Populate subCategories and product count
+    query = query.populate('subCategories').populate('count');
+
+    // Check if pagination parameters are provided
+    if (req.query.page || req.query.limit) {
+      const page = parseInt(req.query.page, 10) || 1;
+      const limit = parseInt(req.query.limit, 10) || 10;
+      const startIndex = (page - 1) * limit;
+      const total = await Category.countDocuments(filter);
+
+      query = query.skip(startIndex).limit(limit);
+
+      const categories = await query;
+
+      const pagination = {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit)
+      };
+
+      sendResponse(res, 200, 'Categories fetched successfully', categories, pagination);
+    } else {
+      const categories = await query;
+      sendResponse(res, 200, 'Categories fetched successfully', categories);
+    }
   } catch (error) {
     next(error);
   }

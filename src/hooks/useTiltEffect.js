@@ -42,6 +42,9 @@ export default function useTiltEffect(maxTilt = 10) {
       rotateY,
       scale,
       transformStyle: 'preserve-3d',
+      backfaceVisibility: 'hidden',
+      WebkitBackfaceVisibility: 'hidden',
+      willChange: 'transform',
     },
   };
 }

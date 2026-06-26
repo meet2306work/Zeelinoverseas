@@ -174,4 +174,14 @@ productSchema.pre('validate', function () {
   }
 });
 
+// Auto-update availabilityStatus based on stock
+productSchema.pre('save', function (next) {
+  if (this.stock === 0) {
+    this.availabilityStatus = 'Out Of Stock';
+  } else if (this.stock > 0 && this.availabilityStatus === 'Out Of Stock') {
+    this.availabilityStatus = 'In Stock';
+  }
+  next();
+});
+
 module.exports = mongoose.model('Product', productSchema);

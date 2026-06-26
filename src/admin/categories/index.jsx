@@ -6,12 +6,16 @@ import Table from '../../commonComponents/tables/Table';
 import Button from '../../commonComponents/buttons/Button';
 import Modal from '../../commonComponents/modals/Modal';
 import Input from '../../commonComponents/inputs/Input';
-import { addCategory, updateCategory, deleteCategory, fetchCategories } from '../../redux/slices/categorySlice';
+import { addCategory, updateCategory, deleteCategory, fetchCategories, fetchPaginatedCategories } from '../../redux/slices/categorySlice';
 import apiClient from '../../services/apiClient';
+import Pagination from '../../commonComponents/pagination/Pagination';
 
 export default function AdminCategoriesScreen() {
   const dispatch = useDispatch();
-  const { categoriesList } = useSelector((state) => state.categories);
+  const [page, setPage] = useState(1);
+  const limit = 10;
+
+  const { categories, pagination } = useSelector((state) => state.categories);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
@@ -25,8 +29,8 @@ export default function AdminCategoriesScreen() {
   const [isDraggingImage, setIsDraggingImage] = useState(false);
 
   useEffect(() => {
-    dispatch(fetchCategories());
-  }, [dispatch]);
+    dispatch(fetchPaginatedCategories(`?page=${page}&limit=${limit}&search=${search}`));
+  }, [dispatch, page, search]);
 
   const uploadCategoryImageFile = async (file) => {
     if (!file) return;
@@ -124,6 +128,7 @@ export default function AdminCategoriesScreen() {
       setSlug('');
       setImageUrl('');
       setDescription('');
+      dispatch(fetchPaginatedCategories(`?page=${page}&limit=${limit}&search=${search}`));
     } catch (error) {
       alert(error || 'Failed to save category');
     } finally {
@@ -135,16 +140,14 @@ export default function AdminCategoriesScreen() {
     if (window.confirm('Are you sure you want to delete this category?')) {
       try {
         await dispatch(deleteCategory(id)).unwrap();
+        dispatch(fetchPaginatedCategories(`?page=${page}&limit=${limit}&search=${search}`));
       } catch (error) {
         alert(error || 'Failed to delete category');
       }
     }
   };
 
-  const filteredCategories = (categoriesList || []).filter(c => 
-    (c.name || '').toLowerCase().includes(search.toLowerCase()) || 
-    (c.slug || '').toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredCategories = categories || [];
 
   const columns = [
     { 
@@ -241,7 +244,10 @@ export default function AdminCategoriesScreen() {
           <Input
             placeholder="Search categories..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
             icon={FiSearch}
           />
         </div>
@@ -253,6 +259,13 @@ export default function AdminCategoriesScreen() {
         data={filteredCategories}
         emptyMessage="No product categories found matching filters."
         className="text-slate-700 dark:text-slate-350"
+      />
+
+      <Pagination
+        currentPage={pagination?.page || 1}
+        totalPages={pagination?.pages || 1}
+        onPageChange={(p) => setPage(p)}
+        className="mt-4"
       />
 
       {/* Creation/Editing Modal */}

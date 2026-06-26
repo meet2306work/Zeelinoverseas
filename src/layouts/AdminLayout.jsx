@@ -57,6 +57,8 @@ export default function AdminLayout() {
     { label: 'System Settings', path: '/admin/settings', icon: FiSettings },
   ];
 
+  const { productDetails } = useSelector((state) => state.products || {});
+
   // Derive breadcrumbs based on pathname
   const pathSegments = location.pathname.split('/').filter(Boolean);
   const breadcrumbItems = [];
@@ -67,6 +69,14 @@ export default function AdminLayout() {
     
     const link = '/' + pathSegments.slice(0, index + 1).join('/');
     let label = segment.charAt(0).toUpperCase() + segment.slice(1).replace('-', ' ');
+    
+    // Check if the segment is a 24-character hexadecimal string (ObjectId)
+    const isObjectId = /^[0-9a-fA-F]{24}$/.test(segment);
+    if (isObjectId && productDetails && productDetails._id === segment) {
+      // NEW: display product name (title) or fallback to SKU/original label
+      label = productDetails.title || productDetails.sku || label;
+    }
+
     if (segment.toLowerCase() === 'rfq') label = 'RFQ';
     if (segment.toLowerCase() === 'crm') label = 'CRM';
     

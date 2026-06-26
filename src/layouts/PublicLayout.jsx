@@ -44,12 +44,21 @@ export default function PublicLayout() {
     { label: 'About', path: '/about' },
   ];
   const selectedCategory = (categoriesList || []).find((cat) => cat.slug === searchParams.get('category'));
+  const { productDetails } = useSelector((state) => state.products || {});
 
   // Derive breadcrumbs based on pathname
   const pathSegments = location.pathname.split('/').filter(Boolean);
   const breadcrumbItems = pathSegments.map((segment, index) => {
     const link = '/' + pathSegments.slice(0, index + 1).join('/');
     let label = segment.charAt(0).toUpperCase() + segment.slice(1).replace('-', ' ');
+    
+    // Check if the segment is a 24-character hexadecimal string (ObjectId)
+    const isObjectId = /^[0-9a-fA-F]{24}$/.test(segment);
+    if (isObjectId && productDetails && productDetails._id === segment) {
+      // NEW: display product name (title) or fallback to SKU/original label
+      label = productDetails.title || productDetails.sku || label;
+    }
+
     // OLD (commented out - do not delete)
     // if (segment.toLowerCase() === 'rfq') label = 'RFQ';
     // NEW

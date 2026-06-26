@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link, useSearchParams, useLocation } from 'react-router-dom';
 import { FiSearch, FiSliders, FiBox, FiArrowRight, FiX } from 'react-icons/fi';
@@ -11,8 +11,11 @@ import { SkeletonCard } from '../../commonComponents/loaders/Skeleton';
 import { Reveal, StaggerGroup, StaggerItem } from '../../commonComponents/animations/ScrollReveal';
 import { fetchProducts } from '../../redux/slices/productSlice';
 import { fetchCategories } from '../../redux/slices/categorySlice';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import useTiltEffect from '../../hooks/useTiltEffect';
+import Pagination from '../../commonComponents/pagination/Pagination';
+
+const fallbackImage = 'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?auto=format&fit=crop&w=400&q=80';
 
 function TiltCard({ children, ...props }) {
   const { tiltProps, style } = useTiltEffect(6);
@@ -24,6 +27,80 @@ function TiltCard({ children, ...props }) {
     </motion.div>
   );
 }
+
+const CardImageSlider = ({ images, defaultImage, alt, hasThreeD }) => {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+  const timerRef = useRef(null);
+
+  const productImages = images && images.length > 0 
+    ? images.map(img => img.url).filter(Boolean) 
+    : [defaultImage].filter(Boolean);
+
+  useEffect(() => {
+    if (isHovered && productImages.length > 1) {
+      timerRef.current = setInterval(() => {
+        setActiveIndex((prev) => (prev + 1) % productImages.length);
+      }, 1500);
+    } else {
+      setActiveIndex(0);
+      if (timerRef.current) clearInterval(timerRef.current);
+    }
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [isHovered, productImages.length]);
+
+  return (
+    <div
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className="relative aspect-video rounded-xl overflow-hidden bg-white dark:bg-slate-950 mb-brand-md border border-border-default/40 w-full flex items-center justify-center p-2"
+    >
+      <div className="w-full h-full flex items-center justify-center">
+        <AnimatePresence mode="wait">
+          <motion.img
+            key={activeIndex}
+            src={productImages[activeIndex] || fallbackImage}
+            alt={alt}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            onError={(e) => {
+              e.currentTarget.onerror = null;
+              e.currentTarget.src = fallbackImage;
+            }}
+            className="max-h-full max-w-full object-contain"
+          />
+        </AnimatePresence>
+      </div>
+
+      {/* Dots overlay for multiple images */}
+      {productImages.length > 1 && (
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 z-20 bg-black/30 px-2.5 py-1 rounded-full backdrop-blur-xs">
+          {productImages.map((_, idx) => (
+            <div
+              key={idx}
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                idx === activeIndex
+                  ? 'w-3.5 bg-accent-gold'
+                  : 'w-1.5 bg-white/60'
+              }`}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* 3D Model Badge */}
+      {hasThreeD && (
+        <div className="absolute top-2 left-2 px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-background-surface/85 text-text-primary border border-border-default/30 backdrop-blur-xs uppercase tracking-wider z-10">
+          3D Model
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default function ProductsScreen() {
   const location = useLocation();
@@ -42,16 +119,45 @@ export default function ProductsScreen() {
   const region = searchParams.get('region') || '';
   const stockStatus = searchParams.get('stock') || '';
   const sortBy = searchParams.get('sort') || 'relevance';
+  const page = parseInt(searchParams.get('page') || '1', 10);
+  const limit = 9;
+
   const { categoriesList } = useSelector((state) => state.categories);
-  const { products, loading } = useSelector((state) => state.products);
+  const { products, pagination, loading } = useSelector((state) => state.products);
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const selectedCategory = (categoriesList || []).find((cat) => cat.slug === category);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   useEffect(() => {
     dispatch(fetchCategories());
-    dispatch(fetchProducts());
   }, [dispatch]);
+
+  useEffect(() => {
+    const params = new URLSearchParams();
+    params.set('page', page.toString());
+    params.set('limit', limit.toString());
+
+    if (search.trim()) {
+      params.set('search', search.trim());
+    }
+    if (category) {
+      params.set('category', category);
+    }
+    if (minPrice) {
+      params.set('minPrice', minPrice);
+    }
+    if (maxPrice) {
+      params.set('maxPrice', maxPrice);
+    }
+    if (minRating) {
+      params.set('rating', minRating);
+    }
+    if (sortBy && sortBy !== 'relevance') {
+      params.set('sort', sortBy);
+    }
+
+    dispatch(fetchProducts(`?${params.toString()}`));
+  }, [dispatch, page, search, category, minPrice, maxPrice, minRating, sortBy]);
 
   const handleCategoryChange = (e) => {
     const newVal = e.target.value;
@@ -61,6 +167,7 @@ export default function ProductsScreen() {
     } else {
       nextParams.delete('category');
     }
+    nextParams.set('page', '1');
     setSearchParams(nextParams);
   };
 
@@ -72,10 +179,9 @@ export default function ProductsScreen() {
     } else {
       nextParams.delete('q');
     }
+    nextParams.set('page', '1');
     setSearchParams(nextParams);
   };
-
-
 
   const setFilterParam = (key, value) => {
     const nextParams = new URLSearchParams(searchParams);
@@ -84,11 +190,12 @@ export default function ProductsScreen() {
     } else {
       nextParams.delete(key);
     }
+    nextParams.set('page', '1');
     setSearchParams(nextParams);
   };
 
   const resetFilters = () => {
-    setSearchParams({});
+    setSearchParams({ page: '1' });
   };
 
   const categoryOptions = [
@@ -171,37 +278,7 @@ export default function ProductsScreen() {
     : [];
   const matchingCategorySlugs = matchingCategories.map((cat) => cat.slug);
 
-  const filteredProducts = (products || []).filter(p => {
-    const productCategory = p.category; // Assuming p.category is an object populated from backend, or we map it if it's an ID
-    const matchesSearch = normalizedSearch
-      ? [
-          p.title,
-          productCategory?.name,
-          productCategory?.slug,
-        ]
-          .filter(Boolean)
-          .some((value) => value.toLowerCase().includes(normalizedSearch)) ||
-        matchingCategorySlugs.includes(productCategory?.slug)
-      : true;
-    const matchesCategory = category ? productCategory?.slug === category || productCategory?._id === category : true;
-    const matchesMinPrice = minPrice ? p.price >= Number(minPrice) : true;
-    const matchesMaxPrice = maxPrice ? p.price <= Number(maxPrice) : true;
-    const matchesRating = minRating ? p.averageRating >= Number(minRating) : true;
-    
-    // We can add logic to extract these from specifications later if needed
-    const matchesMinMoq = true; 
-    const matchesMaxMoq = true;
-    const matchesTradeTerm = true;
-    const matchesRegion = true;
-    const matchesStock = true;
-
-    return matchesSearch && matchesCategory && matchesMinPrice && matchesMaxPrice && matchesMinMoq && matchesMaxMoq && matchesRating && matchesTradeTerm && matchesRegion && matchesStock;
-  }).sort((a, b) => {
-    if (sortBy === 'price-asc') return a.price - b.price;
-    if (sortBy === 'price-desc') return b.price - a.price;
-    if (sortBy === 'rating-desc') return b.averageRating - a.averageRating;
-    return 0;
-  });
+  const filteredProducts = products || [];
 
   const hasSearch = Boolean(normalizedSearch);
   const hasActiveFilters = Boolean(query || category || minPrice || maxPrice || minMoq || maxMoq || minRating || tradeTerm || region || stockStatus || sortBy !== 'relevance');
@@ -442,69 +519,87 @@ export default function ProductsScreen() {
               </Reveal>
             </>
           ) : (
-            <StaggerGroup key={searchParams.toString()} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-brand-md">
-              {filteredProducts.map((p) => (
-                <StaggerItem key={p._id || p.id} className="h-full"><TiltCard variant="default" className="flex flex-col h-full p-brand-md border border-border-default/50 hover:border-accent-gold/45 group">
-                  <div className="relative aspect-video rounded-xl overflow-hidden bg-background-primary mb-brand-md border border-border-default/40">
-                    <img
-                      src={p.images && p.images.length > 0 ? p.images[0].url : p.image}
+            <>
+              <StaggerGroup key={searchParams.toString()} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-brand-md">
+                {filteredProducts.map((p) => (
+                  <StaggerItem key={p._id || p.id} className="h-full"><TiltCard variant="default" className="flex flex-col h-full p-brand-md border border-border-default/50 hover:border-accent-gold/45 group">
+                    <CardImageSlider
+                      images={p.images}
+                      defaultImage={p.image}
                       alt={p.title || p.name}
-                      onError={(e) => {
-                        e.currentTarget.onerror = null;
-                        e.currentTarget.src = fallbackImage;
-                      }}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      hasThreeD={!!p.threeDModel?.url}
                     />
-                    <div className="absolute top-2 left-2 px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-background-surface/85 text-text-primary border border-border-default/30 backdrop-blur-xs uppercase tracking-wider">
-                      3D Model
-                    </div>
-                  </div>
 
-                    <div className="flex-1 flex flex-col justify-between gap-brand-sm">
-                    <div>
-                      <h4 className="text-sm font-bold text-text-primary line-clamp-2 group-hover:text-accent-gold transition-colors font-display">
-                        {p.title || p.name}
-                      </h4>
-                      <p className="text-xs text-text-secondary mt-1">
-                        Category: <span className="font-semibold text-text-primary">{p.category?.name || 'Uncategorized'}</span>
-                      </p>
-                      <div className="mt-3 flex flex-wrap gap-1.5">
+                      <div className="flex-1 flex flex-col justify-between gap-brand-sm">
+                      <div>
+                        <h4 className="text-sm font-bold text-text-primary line-clamp-2 group-hover:text-accent-gold transition-colors font-display">
+                          {p.title || p.name}
+                        </h4>
+                        <p className="text-xs text-text-secondary mt-1">
+                          Category: <span className="font-semibold text-text-primary">{p.category?.name || 'Uncategorized'}</span>
+                        </p>
+                        <div className="mt-3 flex flex-wrap gap-1.5">
+                          {/* OLD (commented out - do not delete)
+                          <span className="rounded-md bg-background-primary/80 border border-border-default/45 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-text-secondary">
+                              {p.stock > 0 ? 'Ready Stock' : 'Out of Stock'}
+                          </span>
+                          */}
+                          {/* NEW */}
+                          <span className={`rounded-md border px-2 py-1 text-[10px] font-bold uppercase tracking-wide ${
+                             (p.stock === 0 || p.availabilityStatus === 'Out Of Stock')
+                               ? 'bg-rose-500/10 border-rose-500/20 text-rose-600 dark:text-rose-455'
+                               : p.availabilityStatus === 'Pre-Order'
+                               ? 'bg-amber-500/10 border-amber-500/20 text-amber-600 dark:text-amber-400'
+                               : p.availabilityStatus === 'Archived'
+                               ? 'bg-slate-500/10 border-slate-500/20 text-slate-600 dark:text-slate-400'
+                               : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400'
+                           }`}>
+                               {(p.stock === 0 || p.availabilityStatus === 'Out Of Stock')
+                                 ? 'Out of Stock'
+                                 : p.availabilityStatus === 'Pre-Order'
+                                 ? 'Pre-Order'
+                                 : p.availabilityStatus === 'Archived'
+                                 ? 'Archived'
+                                 : 'In Stock'}
+                           </span>
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="flex items-center justify-between gap-3 text-sm font-extrabold text-accent-gold mb-brand-sm">
+                          <span>${p.price?.toFixed(2)} / 25 units</span>
+                          <span className="text-xs text-accent-gold-hover">{(p.averageRating || p.rating || 0).toFixed(1)} ★</span>
+                        </div>
+
                         {/* OLD (commented out - do not delete)
-                        <span className="rounded-md bg-background-primary/80 border border-border-default/45 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-text-secondary">
-                            {p.stock > 0 ? 'Ready Stock' : 'Out of Stock'}
-                        </span>
+                        <Link to={isPortal ? `/user/products/${p._id || p.id}` : `/products/${p._id || p.id}`}>
+                          <Button variant="outline" className="w-full justify-between" size="md" icon={FiArrowRight} iconPosition="right">
+                            View details
+                          </Button>
+                        </Link>
                         */}
                         {/* NEW */}
-                        <span className="rounded-md bg-background-primary/80 border border-border-default/45 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-text-secondary">
-                            {p.stock > 0 ? 'In Stock' : 'Out of Stock'}
-                        </span>
+                        <Link to={isPortal ? `/user/products/${p._id || p.id}` : `/products/${p._id || p.id}`}>
+                          <Button variant="outline" className="w-full justify-between" size="md" icon={FiArrowRight} iconPosition="right">
+                            Shop Product
+                          </Button>
+                        </Link>
                       </div>
                     </div>
-
-                    <div>
-                      <div className="flex items-center justify-between gap-3 text-sm font-extrabold text-accent-gold mb-brand-sm">
-                        <span>${p.price?.toFixed(2)} / 25 units</span>
-                        <span className="text-xs text-accent-gold-hover">{(p.averageRating || p.rating || 0).toFixed(1)} ★</span>
-                      </div>
-
-                      {/* OLD (commented out - do not delete)
-                      <Link to={isPortal ? `/user/products/${p._id || p.id}` : `/products/${p._id || p.id}`}>
-                        <Button variant="outline" className="w-full justify-between" size="md" icon={FiArrowRight} iconPosition="right">
-                          View details
-                        </Button>
-                      </Link>
-                      */}
-                      {/* NEW */}
-                      <Link to={isPortal ? `/user/products/${p._id || p.id}` : `/products/${p._id || p.id}`}>
-                        <Button variant="outline" className="w-full justify-between" size="md" icon={FiArrowRight} iconPosition="right">
-                          Shop Product
-                        </Button>
-                      </Link>
-                    </div>
-                  </div>
-                </TiltCard></StaggerItem>
-              ))}
-            </StaggerGroup>
+                  </TiltCard></StaggerItem>
+                ))}
+              </StaggerGroup>
+              <Pagination
+                currentPage={pagination?.page || 1}
+                totalPages={pagination?.pages || 1}
+                onPageChange={(p) => {
+                  const nextParams = new URLSearchParams(searchParams);
+                  nextParams.set('page', p.toString());
+                  setSearchParams(nextParams);
+                }}
+                className="mt-6"
+              />
+            </>
           )}
         </div>
       </div>

@@ -9,6 +9,7 @@ import Dropdown from '../../commonComponents/dropdowns/Dropdown';
 import { fetchProducts, adminCreateProduct, adminDeleteProduct, adminUpdateProduct } from '../../redux/slices/productSlice';
 import { fetchCategories } from '../../redux/slices/categorySlice';
 import apiClient from '../../services/apiClient';
+import Pagination from '../../commonComponents/pagination/Pagination';
 
 export default function AdminProductsScreen() {
   const dispatch = useDispatch();
@@ -36,6 +37,7 @@ export default function AdminProductsScreen() {
   const [recyclable, setRecyclable] = useState(true);
   const [printingOption, setPrintingOption] = useState('Plain');
   const [burstingFactor, setBurstingFactor] = useState('');
+  const [stock, setStock] = useState('100');
   
   // Media uploads state
   const [images, setImages] = useState([]);
@@ -45,11 +47,17 @@ export default function AdminProductsScreen() {
   const [isDraggingImages, setIsDraggingImages] = useState(false);
   const [isDraggingModel, setIsDraggingModel] = useState(false);
 
-  const { products } = useSelector((state) => state.products);
+  const [page, setPage] = useState(1);
+  const limit = 10;
+
+  const { products, pagination } = useSelector((state) => state.products);
   const { categoriesList } = useSelector((state) => state.categories);
 
   useEffect(() => {
-    dispatch(fetchProducts('?limit=50'));
+    dispatch(fetchProducts(`?page=${page}&limit=${limit}`));
+  }, [dispatch, page]);
+
+  useEffect(() => {
     dispatch(fetchCategories());
   }, [dispatch]);
 
@@ -86,6 +94,7 @@ export default function AdminProductsScreen() {
     setBurstingFactor('');
     setImages([]);
     setThreeDModel({ url: '', public_id: '' });
+    setStock('100');
     setEditingProduct(null);
   };
 
@@ -118,6 +127,7 @@ export default function AdminProductsScreen() {
     setBurstingFactor(prod.burstingFactor || '');
     setImages(prod.images || []);
     setThreeDModel(prod.threeDModel || { url: '', public_id: '' });
+    setStock(prod.stock !== undefined ? prod.stock.toString() : '0');
 
     setIsEditModalOpen(true);
   };
@@ -235,7 +245,8 @@ export default function AdminProductsScreen() {
       printingOption,
       burstingFactor,
       images,
-      threeDModel
+      threeDModel,
+      stock: parseInt(stock, 10) || 0
     };
 
     dispatch(adminCreateProduct(payload))
@@ -245,6 +256,7 @@ export default function AdminProductsScreen() {
         setIsModalOpen(false);
         resetForm();
         alert('Product published successfully!');
+        dispatch(fetchProducts(`?page=${page}&limit=${limit}`));
       })
       .catch((err) => {
         setIsLoading(false);
@@ -287,7 +299,8 @@ export default function AdminProductsScreen() {
       printingOption,
       burstingFactor,
       images,
-      threeDModel
+      threeDModel,
+      stock: parseInt(stock, 10) || 0
     };
 
     dispatch(adminUpdateProduct(payload))
@@ -297,6 +310,7 @@ export default function AdminProductsScreen() {
         setIsEditModalOpen(false);
         resetForm();
         alert('Product updated successfully!');
+        dispatch(fetchProducts(`?page=${page}&limit=${limit}`));
       })
       .catch((err) => {
         setIsLoading(false);
@@ -309,7 +323,10 @@ export default function AdminProductsScreen() {
       if (id && !id.startsWith('prod-')) {
         dispatch(adminDeleteProduct(id))
           .unwrap()
-          .then(() => alert('Product deleted successfully!'))
+          .then(() => {
+            alert('Product deleted successfully!');
+            dispatch(fetchProducts(`?page=${page}&limit=${limit}`));
+          })
           .catch((err) => alert(err || 'Failed to delete product'));
       } else {
         alert('Mock product deleted successfully (simulated)!');
@@ -442,7 +459,7 @@ export default function AdminProductsScreen() {
         />
         </div>
 
-        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <Input
           label="Price for 25 Units ($)"
           placeholder="e.g. 4.00"
@@ -460,6 +477,24 @@ export default function AdminProductsScreen() {
           type="number"
           value={moq}
           onChange={(e) => setMoq(e.target.value)}
+          required
+        />
+
+        <Input
+          label="Stock Quantity"
+          placeholder="e.g. 100"
+          type="number"
+          value={stock}
+          onChange={(e) => {
+            const val = e.target.value;
+            setStock(val);
+            const num = parseInt(val, 10);
+            if (num === 0) {
+              setAvailabilityStatus('Out Of Stock');
+            } else if (num > 0 && availabilityStatus === 'Out Of Stock') {
+              setAvailabilityStatus('In Stock');
+            }
+          }}
           required
         />
         </div>
@@ -565,7 +600,15 @@ export default function AdminProductsScreen() {
         <Dropdown
           label="Availability Status"
           value={availabilityStatus}
-          onChange={(e) => setAvailabilityStatus(e.target.value)}
+          onChange={(e) => {
+            const val = e.target.value;
+            setAvailabilityStatus(val);
+            if (val === 'Out Of Stock') {
+              setStock('0');
+            } else if (val === 'In Stock' && (parseInt(stock, 10) === 0 || !stock)) {
+              setStock('100');
+            }
+          }}
           options={[
             { label: 'In Stock', value: 'In Stock' },
             { label: 'Out Of Stock', value: 'Out Of Stock' },
@@ -744,6 +787,13 @@ export default function AdminProductsScreen() {
         data={activeProducts}
         emptyMessage="No product items currently inside the database."
         className="text-slate-700 dark:text-slate-350"
+      />
+
+      <Pagination
+        currentPage={pagination?.page || 1}
+        totalPages={pagination?.pages || 1}
+        onPageChange={(p) => setPage(p)}
+        className="mt-4"
       />
 
       {/* Add Product Modal */}

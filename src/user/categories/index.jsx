@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { FiBox, FiArrowRight, FiGrid } from 'react-icons/fi';
@@ -7,17 +7,22 @@ import { SkeletonCard } from '../../commonComponents/loaders/Skeleton';
 import { Reveal } from '../../commonComponents/animations/ScrollReveal';
 import EmptyState from '../../commonComponents/layouts/EmptyState';
 import ErrorState from '../../commonComponents/layouts/ErrorState';
-import { fetchCategories } from '../../redux/slices/categorySlice';
+import { fetchPaginatedCategories } from '../../redux/slices/categorySlice';
+import Pagination from '../../commonComponents/pagination/Pagination';
 
 export default function CategoriesScreen() {
   const location = useLocation();
   const dispatch = useDispatch();
   const isPortal = location.pathname.startsWith('/user');
-  const { categoriesList, loading, error } = useSelector((state) => state.categories);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const page = parseInt(searchParams.get('page') || '1', 10);
+  const limit = 6;
+
+  const { categories, pagination, loading, error } = useSelector((state) => state.categories);
 
   useEffect(() => {
-    dispatch(fetchCategories());
-  }, [dispatch]);
+    dispatch(fetchPaginatedCategories(`?page=${page}&limit=${limit}`));
+  }, [dispatch, page]);
 
   return (
     <div className="flex flex-col gap-12 py-4">
@@ -36,22 +41,22 @@ export default function CategoriesScreen() {
 
       {/* Categories Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {loading && categoriesList.length === 0 ? (
+        {loading && categories.length === 0 ? (
           Array.from({ length: 6 }, (_, index) => <SkeletonCard key={index} />)
-        ) : error && categoriesList.length === 0 ? (
+        ) : error && categories.length === 0 ? (
           <ErrorState
             title="Categories Could Not Load"
             description={error}
-            onRetry={() => dispatch(fetchCategories())}
+            onRetry={() => dispatch(fetchPaginatedCategories(`?page=${page}&limit=${limit}`))}
             className="col-span-full"
           />
-        ) : categoriesList.length === 0 ? (
+        ) : categories.length === 0 ? (
           <EmptyState
             title="No Categories Available"
             description="Active product categories will appear here after they are added."
             className="col-span-full"
           />
-        ) : categoriesList.map((cat) => {
+        ) : categories.map((cat) => {
           const Icon = FiBox; // Placeholder icon since icon names aren't in DB usually
           const fallbackImage = 'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&w=400&q=80';
           return (
@@ -64,7 +69,7 @@ export default function CategoriesScreen() {
               
               <div className="flex flex-col gap-5 relative z-10">
                 {/* Category Image Header */}
-                <div className="relative h-44 w-full rounded-2xl overflow-hidden bg-background-primary border border-border-default/30">
+                <div className="relative h-44 w-full rounded-2xl overflow-hidden bg-white dark:bg-slate-950 border border-border-default/30 flex items-center justify-center p-4">
                   <img
                     src={cat.image || fallbackImage}
                     alt={cat.name}
@@ -72,7 +77,7 @@ export default function CategoriesScreen() {
                       e.currentTarget.onerror = null;
                       e.currentTarget.src = fallbackImage;
                     }}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-500"
                   />
                   <div className="absolute top-3 left-3 h-10 w-10 rounded-xl bg-black-accent/80 backdrop-blur-xs text-accent-gold flex items-center justify-center border border-accent-gold/15">
                     <Icon className="h-5 w-5" />
@@ -106,6 +111,16 @@ export default function CategoriesScreen() {
           );
         })}
       </div>
+
+      <Pagination
+        currentPage={pagination?.page || 1}
+        totalPages={pagination?.pages || 1}
+        onPageChange={(p) => {
+          const nextParams = new URLSearchParams(searchParams);
+          nextParams.set('page', p.toString());
+          setSearchParams(nextParams);
+        }}
+      />
 
       {/* Catalog Overview Banner */}
       <Reveal className="bg-black-accent rounded-3xl p-8 border border-border-default/20 relative overflow-hidden">

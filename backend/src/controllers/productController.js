@@ -1,4 +1,6 @@
 const Product = require('../models/Product');
+const Category = require('../models/Category');
+const mongoose = require('mongoose');
 const ErrorResponse = require('../utils/errorResponse');
 const sendResponse = require('../utils/responseFormatter');
 
@@ -15,7 +17,7 @@ exports.getProducts = async (req, res, next) => {
     const reqQuery = { ...req.query };
 
     // Fields to exclude from filtering
-    const removeFields = ['select', 'sort', 'page', 'limit', 'search'];
+    const removeFields = ['select', 'sort', 'page', 'limit', 'search', 'minPrice', 'maxPrice', 'rating'];
     removeFields.forEach(param => delete reqQuery[param]);
 
     // Create query string
@@ -27,9 +29,52 @@ exports.getProducts = async (req, res, next) => {
     // Parse back
     let finalQuery = JSON.parse(queryStr);
     
-    // Search functionality
+    // Resolve Category slug or ID
+    if (finalQuery.category) {
+      if (!mongoose.Types.ObjectId.isValid(finalQuery.category)) {
+        const categoryObj = await Category.findOne({ slug: finalQuery.category });
+        if (categoryObj) {
+          finalQuery.category = categoryObj._id;
+        } else {
+          finalQuery.category = new mongoose.Types.ObjectId();
+        }
+      }
+    }
+
+    // Search functionality (matching product title or matching categories)
     if (req.query.search) {
-      finalQuery.title = { $regex: req.query.search, $options: 'i' };
+      const searchRegex = { $regex: req.query.search, $options: 'i' };
+      
+      const matchingCategories = await Category.find({
+        $or: [
+          { name: searchRegex },
+          { slug: searchRegex },
+          { description: searchRegex }
+        ]
+      }).select('_id');
+      
+      const categoryIds = matchingCategories.map(cat => cat._id);
+
+      finalQuery.$or = [
+        { title: searchRegex },
+        { category: { $in: categoryIds } }
+      ];
+    }
+
+    // Price filters
+    if (req.query.minPrice || req.query.maxPrice) {
+      finalQuery.price = {};
+      if (req.query.minPrice) {
+        finalQuery.price.$gte = Number(req.query.minPrice);
+      }
+      if (req.query.maxPrice) {
+        finalQuery.price.$lte = Number(req.query.maxPrice);
+      }
+    }
+
+    // Rating filter (averageRating >= rating)
+    if (req.query.rating) {
+      finalQuery.averageRating = { $gte: Number(req.query.rating) };
     }
 
     // Only active published products for public
@@ -49,12 +94,21 @@ exports.getProducts = async (req, res, next) => {
     }
 
     // Sort
+    let sortBy = '-createdAt';
     if (req.query.sort) {
-      const sortBy = req.query.sort.split(',').join(' ');
-      query = query.sort(sortBy);
-    } else {
-      query = query.sort('-createdAt');
+      if (req.query.sort === 'price-asc') {
+        sortBy = 'price';
+      } else if (req.query.sort === 'price-desc') {
+        sortBy = '-price';
+      } else if (req.query.sort === 'rating-desc') {
+        sortBy = '-averageRating';
+      } else if (req.query.sort === 'moq-asc') {
+        sortBy = 'specifications.value';
+      } else {
+        sortBy = req.query.sort.split(',').join(' ');
+      }
     }
+    query = query.sort(sortBy);
 
     // Pagination
     const page = parseInt(req.query.page, 10) || 1;
@@ -121,6 +175,16 @@ exports.createProduct = async (req, res, next) => {
       req.body.vendor = req.user.id;
     }
 
+    // Auto-derive availabilityStatus from stock on creation
+    const stockOnCreate = Number(req.body.stock);
+    if (!isNaN(stockOnCreate)) {
+      if (stockOnCreate === 0) {
+        req.body.availabilityStatus = 'Out Of Stock';
+      } else if (stockOnCreate > 0 && (!req.body.availabilityStatus || req.body.availabilityStatus === 'Out Of Stock')) {
+        req.body.availabilityStatus = 'In Stock';
+      }
+    }
+
     const product = await Product.create(req.body);
     sendResponse(res, 201, 'Product created successfully', product);
   } catch (error) {
@@ -157,6 +221,20 @@ exports.updateProduct = async (req, res, next) => {
       });
       if (existingSku) {
         return next(new ErrorResponse('This SKU is already assigned to another product', 400));
+      }
+    }
+
+    // Always auto-derive availabilityStatus from stock if stock is being updated
+    if (req.body.stock !== undefined) {
+      const stockNum = Number(req.body.stock);
+      if (stockNum === 0) {
+        req.body.availabilityStatus = 'Out Of Stock';
+      } else if (stockNum > 0) {
+        // Only override to In Stock if it was Out Of Stock — respect Pre-Order/Archived
+        const currentStatus = req.body.availabilityStatus || product.availabilityStatus;
+        if (!currentStatus || currentStatus === 'Out Of Stock') {
+          req.body.availabilityStatus = 'In Stock';
+        }
       }
     }
 

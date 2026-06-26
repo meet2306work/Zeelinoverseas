@@ -10,7 +10,7 @@ export default function Card({
 }) {
   const shouldReduceMotion = useReducedMotion();
   const isInteractive = Boolean(onClick);
-  const baseClasses = 'rounded-2xl p-5 bg-background-surface border border-border-default/60 transition-[border-color,box-shadow,background-color] duration-brand-base text-text-primary';
+  const baseClasses = 'rounded-2xl p-5 bg-background-surface border border-border-default/60 transition-[border-color,box-shadow,background-color] duration-brand-base text-text-primary transform-gpu will-change-transform [backface-visibility:hidden]';
   
   const variants = {
     default: 'shadow-premium hover:border-accent-gold/40 hover:shadow-card-hover',
@@ -26,7 +26,7 @@ export default function Card({
   return (
     <motion.div
       onClick={onClick}
-      whileHover={hover && variant !== 'borderless' && !shouldReduceMotion ? { y: -6, scale: 1.01 } : undefined}
+      whileHover={hover && variant !== 'borderless' && !shouldReduceMotion ? { y: -6 } : undefined}
       whileTap={isInteractive && !shouldReduceMotion ? { scale: 0.99 } : undefined}
       transition={motionTransitions.interface}
       className={`${baseClasses} ${variants[variant]} ${hoverClasses} ${className}`}

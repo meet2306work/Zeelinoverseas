@@ -13,6 +13,8 @@ import LoginRedirectModal from '../../commonComponents/modals/LoginRedirectModal
 import { motion, AnimatePresence } from 'framer-motion';
 import useTiltEffect from '../../hooks/useTiltEffect';
 
+const fallbackImage = 'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?auto=format&fit=crop&w=400&q=80';
+
 function TiltCard({ children, ...props }) {
   const { tiltProps, style } = useTiltEffect(6);
   return (
@@ -23,6 +25,80 @@ function TiltCard({ children, ...props }) {
     </motion.div>
   );
 }
+
+const CardImageSlider = ({ images, defaultImage, alt, badgeLabel }) => {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+  const timerRef = useRef(null);
+
+  const productImages = images && images.length > 0 
+    ? images.map(img => img.url).filter(Boolean) 
+    : [defaultImage].filter(Boolean);
+
+  useEffect(() => {
+    if (isHovered && productImages.length > 1) {
+      timerRef.current = setInterval(() => {
+        setActiveIndex((prev) => (prev + 1) % productImages.length);
+      }, 1500);
+    } else {
+      setActiveIndex(0);
+      if (timerRef.current) clearInterval(timerRef.current);
+    }
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [isHovered, productImages.length]);
+
+  return (
+    <div
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className="relative aspect-video rounded-xl overflow-hidden bg-white dark:bg-slate-955 mb-brand-md border border-border-default/40 w-full flex items-center justify-center p-2"
+    >
+      <div className="w-full h-full flex items-center justify-center">
+        <AnimatePresence mode="wait">
+          <motion.img
+            key={activeIndex}
+            src={productImages[activeIndex] || fallbackImage}
+            alt={alt}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            onError={(e) => {
+              e.currentTarget.onerror = null;
+              e.currentTarget.src = fallbackImage;
+            }}
+            className="max-h-full max-w-full object-contain animate-fade-in-up"
+          />
+        </AnimatePresence>
+      </div>
+
+      {/* Dots overlay for multiple images */}
+      {productImages.length > 1 && (
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 z-20 bg-black/30 px-2.5 py-1 rounded-full backdrop-blur-xs">
+          {productImages.map((_, idx) => (
+            <div
+              key={idx}
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                idx === activeIndex
+                  ? 'w-3.5 bg-accent-gold'
+                  : 'w-1.5 bg-white/60'
+              }`}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Badge Overlay */}
+      {badgeLabel && (
+        <div className="absolute top-2 left-2 px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-background-surface/85 text-text-primary border border-border-default/30 backdrop-blur-xs uppercase tracking-wider z-10 font-sans">
+          {badgeLabel}
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default function HomeScreen() {
   const location = useLocation();
@@ -54,8 +130,6 @@ export default function HomeScreen() {
   ];
 
   const topProducts = (products || []).slice(0, 3);
-
-  const fallbackImage = 'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?auto=format&fit=crop&w=400&q=80';
   const catalogSuggestions = [
     ...topProducts.map((product) => product.name || product.title),
     ...(categoriesList || []).flatMap((cat) => [cat.name, cat.slug, cat.desc]),
@@ -315,12 +389,12 @@ export default function HomeScreen() {
                     to={isPortal ? `/user/products/${product.id}` : `/products/${product.id}`}
                     className="group grid grid-cols-[82px_1fr] gap-3 rounded-2xl border border-border-default/50 bg-background-surface p-3 transition hover:border-accent-gold/45 hover:shadow-md"
                   >
-                    <div className="aspect-square overflow-hidden rounded-xl bg-background-primary">
+                    <div className="aspect-square overflow-hidden rounded-xl bg-white dark:bg-slate-955 flex items-center justify-center p-1.5 border border-border-default/30">
                       <img
-                        src={product.images?.[0] || product.image}
+                        src={product.images?.[0]?.url || product.image}
                         alt={product.name}
                         onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = fallbackImage; }}
-                        className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                        className="max-h-full max-w-full object-contain transition duration-300 group-hover:scale-105"
                       />
                     </div>
                     <div className="min-w-0">
@@ -342,7 +416,13 @@ export default function HomeScreen() {
                       {/* NEW */}
                       <div className="mt-3 flex flex-wrap gap-2 text-[11px] font-semibold text-text-secondary">
                         <span className="rounded-lg bg-background-primary/85 px-2 py-1">MOQ {product.moq}</span>
-                        <span className="rounded-lg bg-background-primary/85 px-2 py-1">In Stock</span>
+                        <span className={`rounded-lg px-2 py-1 ${
+                          (product.stock === 0 || product.availabilityStatus === 'Out Of Stock')
+                            ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400'
+                            : 'bg-background-primary/85 text-text-secondary'
+                        }`}>
+                          {(product.stock === 0 || product.availabilityStatus === 'Out Of Stock') ? 'Out of Stock' : 'In Stock'}
+                        </span>
                         <span className="rounded-lg bg-background-primary/85 px-2 py-1">Wholesale Rates</span>
                       </div>
                     </div>
@@ -415,8 +495,8 @@ export default function HomeScreen() {
                   className="group block h-full"
                 >
                   <TiltCard variant="glass" className="flex h-full flex-col overflow-hidden border-border-default/50 p-0 hover:border-accent-gold/45">
-                    <div className="relative aspect-video w-full overflow-hidden bg-background-primary border-b border-border-default/40">
-                      <img src={cat.image} alt={cat.name} onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = fallbackImage; }} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                    <div className="relative aspect-video w-full overflow-hidden bg-white dark:bg-slate-955 border-b border-border-default/40 flex items-center justify-center p-3">
+                      <img src={cat.image} alt={cat.name} onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = fallbackImage; }} className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300" />
                     </div>
                     <div className="p-brand-md text-center flex flex-col items-center flex-1 justify-center">
                       <h3 className="text-sm font-bold text-text-primary group-hover:text-accent-gold transition-colors font-display">{cat.name}</h3>
@@ -468,27 +548,34 @@ export default function HomeScreen() {
           {topProducts.map((p) => (
             <StaggerItem key={p.id} className="h-full"><TiltCard variant="default" className="flex flex-col justify-between h-full p-brand-md border border-border-default/50 hover:border-accent-gold/45 group">
               <div>
-                <div className="relative aspect-video rounded-xl overflow-hidden bg-background-primary mb-brand-md border border-border-default/40">
-                  <img
-                    src={p.images?.[0] || p.image}
-                    alt={p.name}
-                    onError={(e) => {
-                      e.currentTarget.onerror = null;
-                      e.currentTarget.src = fallbackImage;
-                    }}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute top-2 left-2 px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-background-surface/85 text-text-primary border border-border-default/30 backdrop-blur-xs uppercase tracking-wider">
-                    Top Seller
-                  </div>
-                </div>
+                <CardImageSlider
+                  images={p.images}
+                  defaultImage={p.image}
+                  alt={p.name}
+                  badgeLabel="Top Seller"
+                />
 
                 <h4 className="text-sm font-bold text-text-primary line-clamp-2 group-hover:text-accent-gold transition-colors font-display mb-1">
                   {p.name}
                 </h4>
-                <p className="text-xs text-text-secondary">
-                  MOQ: <span className="font-semibold text-text-primary">{p.moq}</span>
-                </p>
+                <div className="flex items-center justify-between gap-2 mt-1.5">
+                  <p className="text-xs text-text-secondary">
+                    MOQ: <span className="font-semibold text-text-primary">{p.moq}</span>
+                  </p>
+                  <span className={`rounded-md border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide ${
+                    (p.stock === 0 || p.availabilityStatus === 'Out Of Stock')
+                      ? 'bg-rose-500/10 border-rose-500/20 text-rose-600 dark:text-rose-455'
+                      : p.availabilityStatus === 'Pre-Order'
+                      ? 'bg-amber-500/10 border-amber-500/20 text-amber-600 dark:text-amber-400'
+                      : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400'
+                  }`}>
+                    {(p.stock === 0 || p.availabilityStatus === 'Out Of Stock')
+                      ? 'Out of Stock'
+                      : p.availabilityStatus === 'Pre-Order'
+                      ? 'Pre-Order'
+                      : 'In Stock'}
+                  </span>
+                </div>
               </div>
 
               <div className="mt-4">

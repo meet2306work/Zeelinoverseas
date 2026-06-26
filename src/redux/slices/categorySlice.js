@@ -17,6 +17,22 @@ export const fetchCategories = createAsyncThunk(
   }
 );
 
+export const fetchPaginatedCategories = createAsyncThunk(
+  'categories/fetchPaginatedCategories',
+  async (queryParams = '', { rejectWithValue }) => {
+    try {
+      const response = await apiClient.get(`/categories${queryParams}`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message
+      );
+    }
+  }
+);
+
 export const createCategory = createAsyncThunk(
   'categories/createCategory',
   async (categoryData, { rejectWithValue }) => {
@@ -67,6 +83,8 @@ export const deleteCategory = createAsyncThunk(
 
 const initialState = {
   categoriesList: [],
+  categories: [],
+  pagination: {},
   loading: false,
   error: null,
 };
@@ -86,6 +104,19 @@ const categorySlice = createSlice({
         state.categoriesList = Array.isArray(action.payload) ? action.payload : [];
       })
       .addCase(fetchCategories.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(fetchPaginatedCategories.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchPaginatedCategories.fulfilled, (state, action) => {
+        state.loading = false;
+        state.categories = action.payload.data || [];
+        state.pagination = action.payload.pagination || {};
+      })
+      .addCase(fetchPaginatedCategories.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
