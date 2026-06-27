@@ -36,6 +36,8 @@ const userSchema = new mongoose.Schema({
   phone: {
     type: String,
     required: [true, 'Phone number is required'],
+    unique: true,
+    trim: true,
   },
   password: {
     type: String,
@@ -116,8 +118,6 @@ const userSchema = new mongoose.Schema({
   toJSON: { virtuals: true },
   toObject: { virtuals: true }
 });
-
-userSchema.index({ phone: 1 });
 
 // Virtual for full name
 userSchema.virtual('fullName').get(function () {

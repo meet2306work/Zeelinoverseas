@@ -1,4 +1,5 @@
 const Rfq = require('../models/Rfq');
+const mongoose = require('mongoose');
 const ErrorResponse = require('../utils/errorResponse');
 const sendResponse = require('../utils/responseFormatter');
 
@@ -51,8 +52,21 @@ exports.createRfq = async (req, res, next) => {
 // @access  Private/Admin
 exports.getRfqs = async (req, res, next) => {
   try {
-    const rfqs = await Rfq.find().sort('-createdAt');
-    sendResponse(res, 200, 'RFQs fetched successfully', rfqs);
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = Math.min(parseInt(req.query.limit, 10) || 20, 100);
+    const skip = (page - 1) * limit;
+
+    const [total, rfqs] = await Promise.all([
+      Rfq.countDocuments({}),
+      Rfq.find().sort('-createdAt').skip(skip).limit(limit)
+    ]);
+
+    sendResponse(res, 200, 'RFQs fetched successfully', rfqs, {
+      page,
+      limit,
+      total,
+      pages: Math.ceil(total / limit)
+    });
   } catch (error) {
     next(error);
   }
@@ -63,8 +77,22 @@ exports.getRfqs = async (req, res, next) => {
 // @access  Private
 exports.getMyRfqs = async (req, res, next) => {
   try {
-    const rfqs = await Rfq.find({ user: req.user.id }).sort('-createdAt');
-    sendResponse(res, 200, 'My RFQs fetched successfully', rfqs);
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = Math.min(parseInt(req.query.limit, 10) || 20, 100);
+    const skip = (page - 1) * limit;
+    const filter = { user: req.user.id };
+
+    const [total, rfqs] = await Promise.all([
+      Rfq.countDocuments(filter),
+      Rfq.find(filter).sort('-createdAt').skip(skip).limit(limit)
+    ]);
+
+    sendResponse(res, 200, 'My RFQs fetched successfully', rfqs, {
+      page,
+      limit,
+      total,
+      pages: Math.ceil(total / limit)
+    });
   } catch (error) {
     next(error);
   }
@@ -75,6 +103,10 @@ exports.getMyRfqs = async (req, res, next) => {
 // @access  Private/Admin
 exports.updateRfqStatus = async (req, res, next) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return next(new ErrorResponse('Invalid RFQ id', 400));
+    }
+
     let rfq = await Rfq.findById(req.params.id);
 
     if (!rfq) {

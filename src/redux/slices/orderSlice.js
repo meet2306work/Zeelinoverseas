@@ -20,10 +20,10 @@ export const createOrder = createAsyncThunk(
 
 export const fetchMyOrders = createAsyncThunk(
   'orders/fetchMyOrders',
-  async (_, { rejectWithValue }) => {
+  async (queryParams = '', { rejectWithValue }) => {
     try {
-      const response = await apiClient.get('/orders/myorders');
-      return response.data.data; // Array of user orders
+      const response = await apiClient.get(`/orders/myorders${queryParams}`);
+      return response.data;
     } catch (error) {
       return rejectWithValue(
         error.response && error.response.data.message
@@ -36,10 +36,10 @@ export const fetchMyOrders = createAsyncThunk(
 
 export const fetchAllOrders = createAsyncThunk(
   'orders/fetchAllOrders',
-  async (_, { rejectWithValue }) => {
+  async (queryParams = '', { rejectWithValue }) => {
     try {
-      const response = await apiClient.get('/orders');
-      return response.data.data; // Array of all orders (Admin)
+      const response = await apiClient.get(`/orders${queryParams}`);
+      return response.data;
     } catch (error) {
       return rejectWithValue(
         error.response && error.response.data.message
@@ -56,22 +56,6 @@ export const fetchOrderById = createAsyncThunk(
     try {
       const response = await apiClient.get(`/orders/${orderId}`);
       return response.data.data; // Specific order details
-    } catch (error) {
-      return rejectWithValue(
-        error.response && error.response.data.message
-          ? error.response.data.message
-          : error.message
-      );
-    }
-  }
-);
-
-export const payOrder = createAsyncThunk(
-  'orders/payOrder',
-  async ({ orderId, paymentResult }, { rejectWithValue }) => {
-    try {
-      const response = await apiClient.put(`/orders/${orderId}/pay`, paymentResult);
-      return response.data.data; // Updated paid order object
     } catch (error) {
       return rejectWithValue(
         error.response && error.response.data.message
@@ -102,6 +86,7 @@ const initialState = {
   ordersList: [],
   currentOrder: null,
   trackingMilestones: [],
+  pagination: {},
   isLoading: false,
   error: null,
 };
@@ -140,7 +125,8 @@ const orderSlice = createSlice({
       })
       .addCase(fetchMyOrders.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.ordersList = action.payload;
+        state.ordersList = action.payload.data || [];
+        state.pagination = action.payload.pagination || {};
       })
       .addCase(fetchMyOrders.rejected, (state, action) => {
         state.isLoading = false;
@@ -153,7 +139,8 @@ const orderSlice = createSlice({
       })
       .addCase(fetchAllOrders.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.ordersList = action.payload;
+        state.ordersList = action.payload.data || [];
+        state.pagination = action.payload.pagination || {};
       })
       .addCase(fetchAllOrders.rejected, (state, action) => {
         state.isLoading = false;
@@ -169,23 +156,6 @@ const orderSlice = createSlice({
         state.currentOrder = action.payload;
       })
       .addCase(fetchOrderById.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload;
-      })
-      // Pay Order
-      .addCase(payOrder.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
-      .addCase(payOrder.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.currentOrder = action.payload;
-        const index = state.ordersList.findIndex(o => o._id === action.payload._id);
-        if (index !== -1) {
-          state.ordersList[index] = action.payload;
-        }
-      })
-      .addCase(payOrder.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })
@@ -214,3 +184,4 @@ export const selectAllOrders = (state) => state.orders.ordersList;
 export const selectCurrentOrder = (state) => state.orders.currentOrder;
 export const selectOrdersLoading = (state) => state.orders.isLoading;
 export const selectOrdersError = (state) => state.orders.error;
+export const selectOrdersPagination = (state) => state.orders.pagination;

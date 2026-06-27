@@ -8,21 +8,32 @@ const generateOTP = require('../utils/generateOTP');
 // Hash an OTP before storage so plaintext is never saved to DB
 const hashOtp = (otp) => crypto.createHash('sha256').update(otp).digest('hex');
 
+const getCookieOptions = () => {
+  const sameSite = process.env.COOKIE_SAMESITE || (process.env.NODE_ENV === 'production' ? 'none' : 'lax');
+  const options = {
+    expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production' || sameSite === 'none',
+    sameSite
+  };
+
+  if (process.env.COOKIE_DOMAIN) {
+    options.domain = process.env.COOKIE_DOMAIN;
+  }
+
+  return options;
+};
+
 // Get token from model, create cookie and send response
 const sendTokenResponse = (user, statusCode, res, message) => {
   const token = user.getSignedJwtToken();
+  const safeUser = user.toObject ? user.toObject() : { ...user };
+  delete safeUser.password;
 
-  const options = {
-    expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict'
-  };
-
-  res.status(statusCode).cookie('token', token, options).json({
+  res.status(statusCode).cookie('token', token, getCookieOptions()).json({
     success: true,
     message,
-    data: { user, token },
+    data: { user: safeUser },
     pagination: null,
     errors: null,
     statusCode
@@ -34,7 +45,7 @@ const sendTokenResponse = (user, statusCode, res, message) => {
 // @access  Public
 exports.register = async (req, res, next) => {
   try {
-    const { firstName, lastName, email, phone, password, role } = req.body;
+    const { firstName, lastName, email, phone, password } = req.body;
 
     // Check duplicate email
     const emailExists = await User.findOne({ email });
@@ -59,7 +70,7 @@ exports.register = async (req, res, next) => {
       email,
       phone,
       password,
-      role: role || 'user',
+      role: 'user',
       otp: hashOtp(otp),
       otpExpire
     });
@@ -125,11 +136,13 @@ exports.login = async (req, res, next) => {
 // @access  Private
 exports.logout = async (req, res, next) => {
   try {
+    const cookieOptions = getCookieOptions();
     res.cookie('token', 'none', {
       expires: new Date(Date.now() + 10 * 1000),
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict'
+      secure: cookieOptions.secure,
+      sameSite: cookieOptions.sameSite,
+      ...(cookieOptions.domain ? { domain: cookieOptions.domain } : {})
     });
 
     sendResponse(res, 200, 'Logged out successfully');
@@ -144,6 +157,10 @@ exports.logout = async (req, res, next) => {
 exports.getMe = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id);
+    if (!user) {
+      return next(new ErrorResponse('The user belonging to this session no longer exists.', 401));
+    }
+
     sendResponse(res, 200, 'User profile fetched successfully', user);
   } catch (error) {
     next(error);
@@ -242,15 +259,16 @@ exports.verifyEmail = async (req, res, next) => {
 exports.resendOtp = async (req, res, next) => {
   try {
     const { email } = req.body;
+    const genericMessage = 'If the account exists and is not verified, a new OTP has been sent.';
 
     const user = await User.findOne({ email });
 
     if (!user) {
-      return next(new ErrorResponse('User not found with this email', 404));
+      return sendResponse(res, 200, genericMessage);
     }
 
     if (user.isEmailVerified) {
-      return next(new ErrorResponse('Email already verified', 400));
+      return sendResponse(res, 200, genericMessage);
     }
 
     // Generate new OTP
@@ -274,7 +292,7 @@ exports.resendOtp = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      message: 'A new OTP has been sent.'
+      message: genericMessage
     });
   } catch (error) {
     next(error);

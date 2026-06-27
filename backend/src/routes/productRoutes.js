@@ -7,7 +7,7 @@ const {
   deleteProduct
 } = require('../controllers/productController');
 
-const { protect, authorize } = require('../middlewares/auth');
+const { protect, optionalProtect, authorize } = require('../middlewares/auth');
 
 // Include other resource routers
 const reviewRouter = require('./reviewRoutes');
@@ -18,7 +18,7 @@ const router = express.Router();
 router.use('/:productId/reviews', reviewRouter);
 
 router.route('/')
-  .get(getProducts)
+  .get(optionalProtect, getProducts)
   .post(protect, authorize('admin', 'vendor'), createProduct);
 
 router.route('/:id')

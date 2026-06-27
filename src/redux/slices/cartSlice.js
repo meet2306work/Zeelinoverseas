@@ -6,11 +6,11 @@ const loadCartState = () => {
   try {
     const serializedCart = localStorage.getItem('zeelin_cart');
     if (serializedCart === null) {
-      return { items: [], totalQuantity: 0, totalPrice: 0 };
+      return { items: [], totalQuantity: 0, totalPrice: 0, error: null };
     }
-    return JSON.parse(serializedCart);
+    return { error: null, ...JSON.parse(serializedCart) };
   } catch {
-    return { items: [], totalQuantity: 0, totalPrice: 0 };
+    return { items: [], totalQuantity: 0, totalPrice: 0, error: null };
   }
 };
 
@@ -45,7 +45,8 @@ const cartSlice = createSlice({
         newItem.availabilityStatus === 'Out Of Stock' ||
         newItem.availabilityStatus === 'Archived'
       ) {
-        return; // silently skip — UI should show its own error toast
+        state.error = 'This product is not available for checkout.';
+        return;
       }
 
       const existingItem = state.items.find(item => item.id === newItem.id);
@@ -71,6 +72,7 @@ const cartSlice = createSlice({
       }
 
       recalcTotals(state);
+      state.error = null;
       saveCartState(state);
     },
 
@@ -82,6 +84,7 @@ const cartSlice = createSlice({
       if (item) {
         item.qty = safeQty;
         recalcTotals(state);
+        state.error = null;
         saveCartState(state);
       }
     },
@@ -89,6 +92,7 @@ const cartSlice = createSlice({
     removeFromCart: (state, action) => {
       state.items = state.items.filter(item => item.id !== action.payload);
       recalcTotals(state);
+      state.error = null;
       saveCartState(state);
     },
 
@@ -100,7 +104,10 @@ const cartSlice = createSlice({
       state.items = state.items.filter(item => {
         const latest = priceMap[item.id];
         if (!latest) return true; // keep if product not found (will be validated at checkout)
-        if (latest.availabilityStatus === 'Archived') return false; // drop archived
+        if (['Out Of Stock', 'Archived'].includes(latest.availabilityStatus)) {
+          state.error = 'Some unavailable products were removed from your cart.';
+          return false;
+        }
         item.price = latest.price;
         item.availabilityStatus = latest.availabilityStatus;
         return true;
@@ -113,7 +120,11 @@ const cartSlice = createSlice({
       state.items = [];
       state.totalQuantity = 0;
       state.totalPrice = 0;
+      state.error = null;
       saveCartState(state);
+    },
+    clearCartError: (state) => {
+      state.error = null;
     },
   },
 
@@ -123,6 +134,7 @@ const cartSlice = createSlice({
       state.items = [];
       state.totalQuantity = 0;
       state.totalPrice = 0;
+      state.error = null;
       saveCartState(state);
     });
   },
@@ -134,6 +146,7 @@ export const {
   removeFromCart,
   updateCartPrices,
   clearCart,
+  clearCartError,
 } = cartSlice.actions;
 
 export default cartSlice.reducer;

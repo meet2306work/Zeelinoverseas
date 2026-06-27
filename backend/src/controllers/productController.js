@@ -6,6 +6,46 @@ const ErrorResponse = require('../utils/errorResponse');
 const sendResponse = require('../utils/responseFormatter');
 
 const normalizeSku = (value) => typeof value === 'string' ? value.trim().toUpperCase() : value;
+const escapeRegex = (value) => String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const allowedProductFields = [
+  'title',
+  'description',
+  'shortDescription',
+  'price',
+  'discountPrice',
+  'category',
+  'subCategory',
+  'images',
+  'stock',
+  'sku',
+  'ply',
+  'dimension',
+  'sizeUnit',
+  'gsm',
+  'color',
+  'bundle',
+  'unit',
+  'gstRate',
+  'availabilityStatus',
+  'thickness',
+  'recyclable',
+  'printingOption',
+  'burstingFactor',
+  'threeDModel',
+  'specifications',
+  'isFeatured',
+  'status'
+];
+
+const pickProductFields = (body) => {
+  const picked = {};
+  allowedProductFields.forEach((field) => {
+    if (Object.prototype.hasOwnProperty.call(body, field)) {
+      picked[field] = body[field];
+    }
+  });
+  return picked;
+};
 
 /**
  * Recursively strip any object key that starts with '$' from user input.
@@ -58,7 +98,7 @@ exports.getProducts = async (req, res, next) => {
 
     // Search functionality (matching product title or matching categories)
     if (req.query.search) {
-      const searchRegex = { $regex: req.query.search, $options: 'i' };
+      const searchRegex = { $regex: escapeRegex(req.query.search), $options: 'i' };
       
       const matchingCategories = await Category.find({
         $or: [
@@ -127,7 +167,7 @@ exports.getProducts = async (req, res, next) => {
 
     // Pagination
     const page = parseInt(req.query.page, 10) || 1;
-    const limit = parseInt(req.query.limit, 10) || 10;
+    const limit = Math.min(parseInt(req.query.limit, 10) || 10, 100);
     const startIndex = (page - 1) * limit;
     query = query.skip(startIndex).limit(limit);
 
@@ -155,6 +195,10 @@ exports.getProducts = async (req, res, next) => {
 // @access  Public
 exports.getProduct = async (req, res, next) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return next(new ErrorResponse('Invalid product id', 400));
+    }
+
     const reviewPage = parseInt(req.query.reviewPage, 10) || 1;
     const reviewLimit = Math.min(parseInt(req.query.reviewLimit, 10) || 10, 50);
     const reviewSkip = (reviewPage - 1) * reviewLimit;
@@ -195,33 +239,34 @@ exports.getProduct = async (req, res, next) => {
 // @access  Private/Admin/Vendor
 exports.createProduct = async (req, res, next) => {
   try {
-    req.body.sku = normalizeSku(req.body.sku);
+    const productData = pickProductFields(req.body);
+    productData.sku = normalizeSku(productData.sku);
 
-    if (!req.body.sku) {
+    if (!productData.sku) {
       return next(new ErrorResponse('Product SKU is required', 400));
     }
 
-    const existingSku = await Product.exists({ sku: req.body.sku });
+    const existingSku = await Product.exists({ sku: productData.sku });
     if (existingSku) {
       return next(new ErrorResponse('This SKU is already assigned to another product', 400));
     }
 
-    // Add vendor logic if role is vendor
     if (req.user.role === 'vendor') {
-      req.body.vendor = req.user.id;
+      productData.vendor = req.user.id;
+      delete productData.isFeatured;
+      delete productData.status;
     }
 
-    // Auto-derive availabilityStatus from stock on creation
-    const stockOnCreate = Number(req.body.stock);
+    const stockOnCreate = Number(productData.stock);
     if (!isNaN(stockOnCreate)) {
       if (stockOnCreate === 0) {
-        req.body.availabilityStatus = 'Out Of Stock';
-      } else if (stockOnCreate > 0 && (!req.body.availabilityStatus || req.body.availabilityStatus === 'Out Of Stock')) {
-        req.body.availabilityStatus = 'In Stock';
+        productData.availabilityStatus = 'Out Of Stock';
+      } else if (stockOnCreate > 0 && (!productData.availabilityStatus || productData.availabilityStatus === 'Out Of Stock')) {
+        productData.availabilityStatus = 'In Stock';
       }
     }
 
-    const product = await Product.create(req.body);
+    const product = await Product.create(productData);
     sendResponse(res, 201, 'Product created successfully', product);
   } catch (error) {
     next(error);
@@ -233,26 +278,36 @@ exports.createProduct = async (req, res, next) => {
 // @access  Private/Admin/Vendor
 exports.updateProduct = async (req, res, next) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return next(new ErrorResponse('Invalid product id', 400));
+    }
+
     let product = await Product.findById(req.params.id);
 
     if (!product) {
       return next(new ErrorResponse(`Product not found with id of ${req.params.id}`, 404));
     }
 
-    // Make sure user is product vendor or admin
-    if (product.vendor && product.vendor.toString() !== req.user.id && req.user.role !== 'admin') {
-      return next(new ErrorResponse(`User not authorized to update this product`, 401));
+    if (req.user.role !== 'admin' && (!product.vendor || product.vendor.toString() !== req.user.id)) {
+      return next(new ErrorResponse('User not authorized to update this product', 403));
     }
 
-    if (Object.prototype.hasOwnProperty.call(req.body, 'sku')) {
-      req.body.sku = normalizeSku(req.body.sku);
+    const productData = pickProductFields(req.body);
 
-      if (!req.body.sku) {
+    if (req.user.role === 'vendor') {
+      delete productData.isFeatured;
+      delete productData.status;
+    }
+
+    if (Object.prototype.hasOwnProperty.call(productData, 'sku')) {
+      productData.sku = normalizeSku(productData.sku);
+
+      if (!productData.sku) {
         return next(new ErrorResponse('Product SKU is required', 400));
       }
 
       const existingSku = await Product.exists({
-        sku: req.body.sku,
+        sku: productData.sku,
         _id: { $ne: req.params.id }
       });
       if (existingSku) {
@@ -261,20 +316,19 @@ exports.updateProduct = async (req, res, next) => {
     }
 
     // Always auto-derive availabilityStatus from stock if stock is being updated
-    if (req.body.stock !== undefined) {
-      const stockNum = Number(req.body.stock);
+    if (productData.stock !== undefined) {
+      const stockNum = Number(productData.stock);
       if (stockNum === 0) {
-        req.body.availabilityStatus = 'Out Of Stock';
+        productData.availabilityStatus = 'Out Of Stock';
       } else if (stockNum > 0) {
-        // Only override to In Stock if it was Out Of Stock — respect Pre-Order/Archived
-        const currentStatus = req.body.availabilityStatus || product.availabilityStatus;
+        const currentStatus = productData.availabilityStatus || product.availabilityStatus;
         if (!currentStatus || currentStatus === 'Out Of Stock') {
-          req.body.availabilityStatus = 'In Stock';
+          productData.availabilityStatus = 'In Stock';
         }
       }
     }
 
-    product = await Product.findByIdAndUpdate(req.params.id, req.body, {
+    product = await Product.findByIdAndUpdate(req.params.id, productData, {
       new: true,
       runValidators: true
     });
@@ -290,14 +344,18 @@ exports.updateProduct = async (req, res, next) => {
 // @access  Private/Admin/Vendor
 exports.deleteProduct = async (req, res, next) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return next(new ErrorResponse('Invalid product id', 400));
+    }
+
     const product = await Product.findById(req.params.id);
 
     if (!product) {
       return next(new ErrorResponse(`Product not found with id of ${req.params.id}`, 404));
     }
 
-    if (product.vendor && product.vendor.toString() !== req.user.id && req.user.role !== 'admin') {
-      return next(new ErrorResponse(`User not authorized to delete this product`, 401));
+    if (req.user.role !== 'admin' && (!product.vendor || product.vendor.toString() !== req.user.id)) {
+      return next(new ErrorResponse('User not authorized to delete this product', 403));
     }
 
     await product.deleteOne();

@@ -17,7 +17,7 @@ const mapBackendRfq = (r) => {
     category: r.productDetails || 'Industrial Sourcing',
     port: r.shippingDestination || 'Rotterdam',
     qty: typeof r.quantity === 'number' ? `${r.quantity.toLocaleString()} Units` : r.quantity || '0 Units',
-    targetBudget: r.targetPrice ? `$${r.targetPrice.toLocaleString()}` : 'Contact Desk',
+    targetBudget: r.targetPrice !== null && r.targetPrice !== undefined ? `$${r.targetPrice.toLocaleString()}` : 'Contact Desk',
     status: displayStatus,
     leadTime: r.requirements ? r.requirements.slice(0, 35) : '21 Days Delivery ETA',
     approvedQuote: r.status === 'Quoted' || r.status === 'Accepted' ? `$${(r.targetPrice || 5000).toLocaleString()}` : '',
@@ -28,10 +28,10 @@ const mapBackendRfq = (r) => {
 // Async Thunks
 export const fetchMyRfqs = createAsyncThunk(
   'rfq/fetchMyRfqs',
-  async (_, { rejectWithValue }) => {
+  async (queryParams = '', { rejectWithValue }) => {
     try {
-      const response = await apiClient.get('/rfq/myrfqs');
-      return response.data.data; // Array of RFQ objects
+      const response = await apiClient.get(`/rfq/myrfqs${queryParams}`);
+      return response.data;
     } catch (error) {
       return rejectWithValue(
         error.response && error.response.data.message
@@ -44,10 +44,10 @@ export const fetchMyRfqs = createAsyncThunk(
 
 export const fetchAllRfqs = createAsyncThunk(
   'rfq/fetchAllRfqs',
-  async (_, { rejectWithValue }) => {
+  async (queryParams = '', { rejectWithValue }) => {
     try {
-      const response = await apiClient.get('/rfq');
-      return response.data.data;
+      const response = await apiClient.get(`/rfq${queryParams}`);
+      return response.data;
     } catch (error) {
       return rejectWithValue(
         error.response && error.response.data.message
@@ -112,6 +112,7 @@ export const updateRfqQuote = createAsyncThunk(
 const initialState = {
   rfqsList: [],
   selectedRfq: null,
+  pagination: {},
   isLoading: false,
   error: null,
 };
@@ -136,7 +137,8 @@ const rfqSlice = createSlice({
       })
       .addCase(fetchMyRfqs.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.rfqsList = action.payload.map(mapBackendRfq);
+        state.rfqsList = (action.payload.data || []).map(mapBackendRfq);
+        state.pagination = action.payload.pagination || {};
       })
       .addCase(fetchMyRfqs.rejected, (state, action) => {
         state.isLoading = false;
@@ -149,7 +151,8 @@ const rfqSlice = createSlice({
       })
       .addCase(fetchAllRfqs.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.rfqsList = action.payload.map(mapBackendRfq);
+        state.rfqsList = (action.payload.data || []).map(mapBackendRfq);
+        state.pagination = action.payload.pagination || {};
       })
       .addCase(fetchAllRfqs.rejected, (state, action) => {
         state.isLoading = false;
@@ -196,3 +199,4 @@ export const selectAllRfqs = (state) => state.rfq.rfqsList;
 export const selectActiveRfq = (state) => state.rfq.selectedRfq;
 export const selectRfqLoading = (state) => state.rfq.isLoading;
 export const selectRfqError = (state) => state.rfq.error;
+export const selectRfqPagination = (state) => state.rfq.pagination;

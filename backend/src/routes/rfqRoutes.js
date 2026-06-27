@@ -6,16 +6,7 @@ const {
   getMyRfqs,
   updateRfqStatus
 } = require('../controllers/rfqController');
-const { protect, authorize } = require('../middlewares/auth');
-
-// Try to extract user if token is present, but don't fail if not
-const optionalProtect = (req, res, next) => {
-  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-    protect(req, res, next);
-  } else {
-    next();
-  }
-};
+const { protect, optionalProtect, authorize } = require('../middlewares/auth');
 
 router.route('/')
   .post(optionalProtect, createRfq)

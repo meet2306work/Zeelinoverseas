@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { FiCreditCard, FiDollarSign, FiGlobe, FiFileText, FiShield } from 'react-icons/fi';
 import Card from '../../commonComponents/cards/Card';
 import Button from '../../commonComponents/buttons/Button';
@@ -27,7 +27,6 @@ const normalizePaymentMethod = (paymentMethod) => {
 };
 
 export default function PaymentScreen() {
-  const navigate = useNavigate();
   const location = useLocation();
 
   // Retrieve order from route state, or use a default mock for visualization if none
@@ -40,27 +39,12 @@ export default function PaymentScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [wireReceipt, setWireReceipt] = useState(null);
   const [transactionId, setTransactionId] = useState('');
+  const [paymentError, setPaymentError] = useState('Online payment is not configured yet. Your order is created but payment must be verified by the Zeelin billing team.');
 
   const handleProcessPayment = (e) => {
     e.preventDefault();
-    setIsLoading(true);
-
-    setTimeout(() => {
-      setIsLoading(false);
-      const mappedOrder = {
-        id: order._id,
-        date: order.createdAt
-          ? new Date(order.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-          : new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-        status: method === 'wire' ? 'Payment Verification Pending' : 'Awaiting Gateway Verification',
-        total: order.totalPrice,
-        itemsCount: order.orderItems?.reduce((acc, curr) => acc + curr.qty, 0) || 1,
-        shippingAddress: `${order.shippingAddress.street || '142 Marine Trade Way'}, ${order.shippingAddress.city || 'Rotterdam'}, ${order.shippingAddress.country || 'NL'}`,
-        paymentMethod: order.paymentMethod,
-        transactionId,
-      };
-      navigate('/user/order-success', { state: { order: mappedOrder } });
-    }, 1000);
+    setIsLoading(false);
+    setPaymentError('Online payment is not configured yet. Your order is created but payment must be verified by the Zeelin billing team.');
   };
 
   const methodsList = [
@@ -135,7 +119,7 @@ export default function PaymentScreen() {
               </span>
             </div>
             <div className="flex justify-between items-center text-xs text-slate-500 mb-4 pb-4 border-b border-slate-200/40 dark:border-slate-800/40">
-              <span>Customs VAT/Duties (5%):</span>
+              <span>GST / Tax:</span>
               <span className="font-semibold text-slate-700 dark:text-slate-300">
                 ${order.taxPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}
               </span>
@@ -151,34 +135,28 @@ export default function PaymentScreen() {
             <form onSubmit={handleProcessPayment} className="flex flex-col gap-4">
               {method === 'stripe' && (
                 <div className="flex flex-col gap-3">
-                  <Input label="Cardholder Name" placeholder="e.g. John Doe" required />
-                  <Input label="Card Number" placeholder="•••• •••• •••• ••••" maxLength={19} required />
-                  <div className="grid grid-cols-2 gap-4">
-                    <Input label="Expiration Date" placeholder="MM/YY" maxLength={5} required />
-                    <Input label="CVC" placeholder="•••" maxLength={4} required />
+                  <div className="bg-amber-50 dark:bg-amber-950/20 p-4 rounded-xl border border-amber-200/80 dark:border-amber-800/50 text-xs text-amber-800 dark:text-amber-200">
+                    Card payments are not enabled yet. This screen will not collect card details until the backend payment gateway is configured.
                   </div>
                 </div>
               )}
 
               {method === 'paypal' && (
                 <div className="bg-slate-50 dark:bg-slate-900/45 p-4 rounded-xl border border-slate-200/40 dark:border-slate-800/40 text-center text-xs text-slate-500">
-                  Clicking "Pay Now" will redirect you to PayPal checkout portal to sign in and complete the transaction.
+                  PayPal checkout is not configured yet. Please contact the billing team for manual payment instructions.
                 </div>
               )}
 
               {method === 'lc' && (
                 <div className="bg-slate-50 dark:bg-slate-900/45 p-4 rounded-xl border border-slate-200/40 dark:border-slate-800/40 text-center text-xs text-slate-500">
-                  Letter of Credit bank authorization flow will prompt for secure verification.
+                  Letter of Credit payment is handled offline by the billing team. Online authorization is not enabled yet.
                 </div>
               )}
 
               {method === 'wire' && (
                 <div className="flex flex-col gap-4 text-xs text-slate-500">
-                  <div className="bg-slate-50 dark:bg-slate-900/45 p-4 rounded-xl border border-slate-200/40 dark:border-slate-800/40 flex flex-col gap-2">
-                    <span className="font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider text-[10px]">Bank Wire Account Details</span>
-                    <div>Bank: Chase Manhattan Bank N.A.</div>
-                    <div>Account: 9812-401-209-1</div>
-                    <div>Routing / SWIFT Code: CHASEUS33XXX</div>
+                  <div className="bg-amber-50 dark:bg-amber-950/20 p-4 rounded-xl border border-amber-200/80 dark:border-amber-800/50 text-amber-800 dark:text-amber-200">
+                    Wire transfer receipts are not uploaded from this screen yet. Contact billing to receive verified bank details and submit proof of payment.
                   </div>
 
                   <Input
@@ -200,14 +178,21 @@ export default function PaymentScreen() {
                 </div>
               )}
 
+              {paymentError && (
+                <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs font-medium text-amber-800 dark:border-amber-800/50 dark:bg-amber-950/20 dark:text-amber-200">
+                  {paymentError}
+                </div>
+              )}
+
               <Button
                 type="submit"
                 variant="primary"
                 size="lg"
                 className="w-full mt-2"
                 isLoading={isLoading}
+                disabled
               >
-                {method === 'wire' ? 'Submit Receipt Logs' : `Pay $${order.totalPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })} Now`}
+                Payment Integration Unavailable
               </Button>
             </form>
           </Card>

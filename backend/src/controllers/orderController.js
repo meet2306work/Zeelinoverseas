@@ -1,14 +1,31 @@
 const Order = require('../models/Order');
 const Product = require('../models/Product');
+const mongoose = require('mongoose');
 const ErrorResponse = require('../utils/errorResponse');
 const sendResponse = require('../utils/responseFormatter');
+
+const deductStockForOrder = async (order, session) => {
+  for (const item of order.orderItems) {
+    const result = await Product.findOneAndUpdate(
+      {
+        _id: item.product,
+        stock: { $gte: item.qty },
+        availabilityStatus: { $nin: ['Out Of Stock', 'Archived'] }
+      },
+      { $inc: { stock: -item.qty } },
+      { session, new: true }
+    );
+
+    if (!result) {
+      throw new ErrorResponse(`Insufficient stock for "${item.name}". Please review the order before marking it paid.`, 409);
+    }
+  }
+};
 
 // @desc    Create new order
 // @route   POST /v1/orders
 // @access  Private
 exports.addOrderItems = async (req, res, next) => {
-  const appliedStockUpdates = [];
-
   try {
     const { orderItems, shippingAddress, paymentMethod } = req.body;
 
@@ -57,21 +74,6 @@ exports.addOrderItems = async (req, res, next) => {
     const shippingPrice = itemsPrice > 1000 ? 0 : 100; // free shipping over ₹1000
     const totalPrice = parseFloat((itemsPrice + taxPrice + shippingPrice).toFixed(2));
 
-    // Bug #6: Atomically decrement stock for each ordered item
-    for (const item of verifiedItems) {
-      const result = await Product.findOneAndUpdate(
-        { _id: item.product, stock: { $gte: item.qty } }, // stock check is atomic
-        { $inc: { stock: -item.qty } }
-      );
-      if (!result) {
-        await Promise.all(appliedStockUpdates.map(update =>
-          Product.findByIdAndUpdate(update.product, { $inc: { stock: update.qty } })
-        ));
-        return next(new ErrorResponse(`Stock ran out for "${item.name}" during checkout. Please refresh your cart.`, 409));
-      }
-      appliedStockUpdates.push(item);
-    }
-
     const order = new Order({
       orderItems: verifiedItems,
       user: req.user.id,
@@ -86,11 +88,6 @@ exports.addOrderItems = async (req, res, next) => {
     const createdOrder = await order.save();
     sendResponse(res, 201, 'Order created successfully', createdOrder);
   } catch (error) {
-    if (appliedStockUpdates.length > 0) {
-      await Promise.all(appliedStockUpdates.map(update =>
-        Product.findByIdAndUpdate(update.product, { $inc: { stock: update.qty } })
-      ));
-    }
     next(error);
   }
 };
@@ -100,6 +97,10 @@ exports.addOrderItems = async (req, res, next) => {
 // @access  Private
 exports.getOrderById = async (req, res, next) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return next(new ErrorResponse('Invalid order id', 400));
+    }
+
     const order = await Order.findById(req.params.id).populate(
       'user',
       'firstName lastName email'
@@ -124,36 +125,51 @@ exports.getOrderById = async (req, res, next) => {
 // @route   PUT /v1/orders/:id/pay
 // @access  Private
 exports.updateOrderToPaid = async (req, res, next) => {
+  const session = await mongoose.startSession();
+
   try {
-    const order = await Order.findById(req.params.id);
-
-    if (!order) {
-      return next(new ErrorResponse('Order not found', 404));
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return next(new ErrorResponse('Invalid order id', 400));
     }
 
-    // Ownership check — only the order owner or admin may mark as paid
-    if (order.user.toString() !== req.user.id && req.user.role !== 'admin') {
-      return next(new ErrorResponse('Not authorized to update this order', 403));
+    const { provider, transactionId, payerEmail } = req.body;
+
+    if (!provider || !transactionId) {
+      return next(new ErrorResponse('Payment provider and transaction id are required', 400));
     }
 
-    // Guard against missing payer object from payment gateway
-    if (!req.body.payer || !req.body.payer.email_address) {
-      return next(new ErrorResponse('Invalid payment result: payer information is missing', 400));
-    }
+    let updatedOrder;
+    await session.withTransaction(async () => {
+      const order = await Order.findById(req.params.id).session(session);
 
-    order.isPaid = true;
-    order.paidAt = Date.now();
-    order.paymentResult = {
-      id: req.body.id,
-      status: req.body.status,
-      update_time: req.body.update_time,
-      email_address: req.body.payer.email_address,
-    };
+      if (!order) {
+        throw new ErrorResponse('Order not found', 404);
+      }
 
-    const updatedOrder = await order.save();
+      if (order.isPaid) {
+        updatedOrder = order;
+        return;
+      }
+
+      await deductStockForOrder(order, session);
+
+      order.isPaid = true;
+      order.paidAt = Date.now();
+      order.paymentResult = {
+        id: transactionId,
+        status: 'VERIFIED',
+        update_time: new Date().toISOString(),
+        email_address: payerEmail || ''
+      };
+
+      updatedOrder = await order.save({ session });
+    });
+
     sendResponse(res, 200, 'Order paid successfully', updatedOrder);
   } catch (error) {
     next(error);
+  } finally {
+    session.endSession();
   }
 };
 
@@ -162,6 +178,10 @@ exports.updateOrderToPaid = async (req, res, next) => {
 // @access  Private/Admin/Vendor
 exports.updateOrderToDelivered = async (req, res, next) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return next(new ErrorResponse('Invalid order id', 400));
+    }
+
     const order = await Order.findById(req.params.id);
 
     if (!order) {
@@ -238,6 +258,10 @@ exports.getOrders = async (req, res, next) => {
 // @access  Private/Admin
 exports.updateOrder = async (req, res, next) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return next(new ErrorResponse('Invalid order id', 400));
+    }
+
     const order = await Order.findById(req.params.id);
     if (!order) {
       return next(new ErrorResponse('Order not found', 404));

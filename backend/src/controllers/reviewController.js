@@ -1,5 +1,6 @@
 const Review = require('../models/Review');
 const Order = require('../models/Order');
+const mongoose = require('mongoose');
 const ErrorResponse = require('../utils/errorResponse');
 const sendResponse = require('../utils/responseFormatter');
 
@@ -10,14 +11,28 @@ const sendResponse = require('../utils/responseFormatter');
 exports.getReviews = async (req, res, next) => {
   try {
     if (req.params.productId) {
-      // Product-specific reviews — no pagination needed (usually small set)
-      const reviews = await Review.find({ product: req.params.productId })
+      const page = parseInt(req.query.page, 10) || 1;
+      const limit = Math.min(parseInt(req.query.limit, 10) || 10, 50);
+      const skip = (page - 1) * limit;
+      const filter = { product: req.params.productId };
+
+      const [total, reviews] = await Promise.all([
+        Review.countDocuments(filter),
+        Review.find(filter)
         .populate('user', 'firstName lastName avatar')
-        .sort('-createdAt');
-      return sendResponse(res, 200, 'Reviews fetched successfully', reviews);
+          .sort('-createdAt')
+          .skip(skip)
+          .limit(limit)
+      ]);
+
+      return sendResponse(res, 200, 'Reviews fetched successfully', reviews, {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit)
+      });
     }
 
-    // Admin: all reviews — paginated (Bug #20)
     const page = parseInt(req.query.page, 10) || 1;
     const limit = Math.min(parseInt(req.query.limit, 10) || 20, 100);
     const skip = (page - 1) * limit;
@@ -44,6 +59,9 @@ exports.getReviews = async (req, res, next) => {
 exports.addReview = async (req, res, next) => {
   try {
     const productId = req.params.productId;
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      return next(new ErrorResponse('Invalid product id', 400));
+    }
 
     // Bug #22: Verify the user has actually purchased this product
     const hasPurchased = await Order.findOne({
@@ -77,6 +95,10 @@ exports.addReview = async (req, res, next) => {
 // @access  Private
 exports.updateReview = async (req, res, next) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return next(new ErrorResponse('Invalid review id', 400));
+    }
+
     let review = await Review.findById(req.params.id);
 
     if (!review) {
@@ -107,6 +129,10 @@ exports.updateReview = async (req, res, next) => {
 // @access  Private
 exports.deleteReview = async (req, res, next) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return next(new ErrorResponse('Invalid review id', 400));
+    }
+
     const review = await Review.findById(req.params.id);
 
     if (!review) {

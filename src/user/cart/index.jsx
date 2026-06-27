@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { FiTrash2, FiShoppingCart, FiMinus, FiPlus, FiArrowRight, FiInfo } from 'react-icons/fi';
-import { addToCart, updateItemQty, updateCartPrices, removeFromCart, clearCart } from '../../redux/slices/cartSlice';
+import { addToCart, updateItemQty, updateCartPrices, removeFromCart, clearCart, clearCartError } from '../../redux/slices/cartSlice';
 import Card from '../../commonComponents/cards/Card';
 import Button from '../../commonComponents/buttons/Button';
 import { Reveal } from '../../commonComponents/animations/ScrollReveal';
@@ -12,7 +12,7 @@ import productService from '../../services/productService';
 
 export default function CartScreen() {
   const dispatch = useDispatch();
-  const { items, totalPrice, totalQuantity } = useSelector((state) => state.cart);
+  const { items, totalPrice, totalQuantity, error } = useSelector((state) => state.cart);
   const shouldReduceMotion = useReducedMotion();
   const cartProductIdsKey = useMemo(() => items.map(item => item.id).join('|'), [items]);
 
@@ -69,9 +69,8 @@ export default function CartScreen() {
     dispatch(clearCart());
   };
 
-  // Estimate shipment freight logistics rates
-  const shippingCost = totalPrice > 0 ? (totalPrice > 10000 ? 450 : 250) : 0;
-  const taxCost = Math.round(totalPrice * 0.05); // 5% trade tax estimate
+  const shippingCost = totalPrice > 0 ? (totalPrice > 1000 ? 0 : 100) : 0;
+  const taxCost = Number((totalPrice * 0.18).toFixed(2));
   const grandTotal = totalPrice + shippingCost + taxCost;
 
   return (
@@ -118,6 +117,16 @@ export default function CartScreen() {
         </Card></Reveal>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {error && (
+            <div className="lg:col-span-12 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs font-medium text-amber-800 dark:border-amber-800/50 dark:bg-amber-950/20 dark:text-amber-200">
+              <div className="flex items-center justify-between gap-4">
+                <span>{error}</span>
+                <button type="button" className="font-bold uppercase tracking-wider" onClick={() => dispatch(clearCartError())}>
+                  Dismiss
+                </button>
+              </div>
+            </div>
+          )}
           
           {/* Left Side: Items list */}
           <div className="lg:col-span-8 flex flex-col gap-4">

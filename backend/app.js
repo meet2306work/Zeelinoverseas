@@ -28,7 +28,9 @@ const allowedOrigins = [
   "https://zeelinoverseas.com",
   "https://store.zeelinoverseas.com",
   "http://localhost:5173",
-];
+  ...(process.env.FRONTEND_URLS ? process.env.FRONTEND_URLS.split(",").map(origin => origin.trim()) : []),
+  ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
+].filter(Boolean);
 
 app.use(
   cors({

@@ -47,10 +47,11 @@ export default function CheckoutScreen() {
   // Payment Selection State
   const [paymentMethod, setPaymentMethod] = useState('card'); // 'card' | 'paypal' | 'wire' | 'lc'
   const [isLoading, setIsLoading] = useState(false);
+  const [checkoutError, setCheckoutError] = useState('');
 
   // Math totals
-  const shippingCost = totalPrice > 0 ? (totalPrice > 10000 ? 450 : 250) : 0;
-  const taxCost = Math.round(totalPrice * 0.05);
+  const shippingCost = totalPrice > 0 ? (totalPrice > 1000 ? 0 : 100) : 0;
+  const taxCost = Number((totalPrice * 0.18).toFixed(2));
   const grandTotal = totalPrice + shippingCost + taxCost;
 
   const handlePlaceOrder = (e) => {
@@ -58,6 +59,7 @@ export default function CheckoutScreen() {
     if (items.length === 0) return;
     
     setIsLoading(true);
+    setCheckoutError('');
     const orderData = {
       orderItems: items.map(item => ({
         product: item.id,
@@ -89,7 +91,7 @@ export default function CheckoutScreen() {
       })
       .catch((err) => {
         setIsLoading(false);
-        alert(err || 'Failed to place order');
+        setCheckoutError(err || 'Failed to place order');
       });
   };
 
@@ -115,6 +117,11 @@ export default function CheckoutScreen() {
       </ol>
 
       <form onSubmit={handlePlaceOrder} className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {checkoutError && (
+          <div className="lg:col-span-12 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs font-medium text-red-700 dark:border-red-900/60 dark:bg-red-950/20 dark:text-red-200">
+            {checkoutError}
+          </div>
+        )}
         
         {/* Left Columns: Forms */}
         <div className="lg:col-span-8 flex flex-col gap-6">
@@ -239,7 +246,7 @@ export default function CheckoutScreen() {
                 <span className="font-bold text-slate-800 dark:text-white">${shippingCost > 0 ? `$${shippingCost}` : 'Free'}</span>
               </div>
               <div className="flex justify-between">
-                <span>Customs Duties (5%)</span>
+                <span>GST / Tax (18%)</span>
                 <span className="font-bold text-slate-800 dark:text-white">${taxCost.toLocaleString()}</span>
               </div>
               <div className="flex justify-between text-sm font-extrabold text-slate-900 dark:text-white pt-2 border-t border-dashed border-slate-200 dark:border-slate-800">
