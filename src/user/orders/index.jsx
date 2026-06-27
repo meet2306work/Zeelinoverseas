@@ -27,7 +27,7 @@ export default function OrdersScreen() {
 
   // Fallback default list to showcase in prototype if redux has none
   const fallbackOrdersList = [
-    { id: 'ZO-2026-981242', date: 'Jun 02, 2026', total: 8850, itemsCount: 2, status: 'In Transit', paymentMethod: 'L/C' },
+    { id: 'ZO-2026-981242', date: 'Jun 02, 2026', total: 8850, itemsCount: 2, status: 'In Transit', paymentMethod: 'P.O.' },
     { id: 'ZO-2026-972140', date: 'May 28, 2026', total: 680, itemsCount: 1, status: 'Delivered', paymentMethod: 'CARD' },
   ];
 
@@ -174,8 +174,8 @@ export default function OrdersScreen() {
       id: 'ZO-2026-X8341',
       date: new Date().toLocaleDateString(),
       total: 4500,
-      shippingAddress: 'Customs Warehouse, Rotterdam, NL',
-      paymentMethod: 'LETTER OF CREDIT (L/C)'
+      shippingAddress: '123 Packaging Blvd, Rotterdam, NL',
+      paymentMethod: 'Purchase Order (P.O.)'
     };
 
     return (
@@ -189,7 +189,7 @@ export default function OrdersScreen() {
             Payment & Order Confirmed
           </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400 mb-6 max-w-sm mx-auto leading-relaxed">
-            Your transaction has been authorized successfully. Intermodal dispatch coordinates are now locking.
+            Your transaction has been authorized successfully. Your order is being processed for courier dispatch.
           </p>
 
           <div className="bg-slate-50 dark:bg-slate-900/50 rounded-2xl p-5 border border-slate-200/50 dark:border-slate-800/50 flex flex-col gap-3 text-left text-xs mb-8">

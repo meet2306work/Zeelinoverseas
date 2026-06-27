@@ -220,14 +220,14 @@ export default function CartScreen() {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="flex items-center gap-1">
-                    Est. Shipping & Handling <FiInfo className="h-3.5 w-3.5 text-slate-400" title="Based on port logistics carrier variables." />
+                    Est. Shipping & Handling <FiInfo className="h-3.5 w-3.5 text-slate-400" title="Based on delivery address & courier rates." />
                   </span>
                   <span className="font-bold text-slate-900 dark:text-white">
                     {shippingCost > 0 ? `$${shippingCost}` : 'Calculated next'}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Customs VAT/Duties (5%)</span>
+                  <span>Est. Taxes & Processing (5%)</span>
                   <span className="font-bold text-slate-900 dark:text-white">${taxCost.toLocaleString()}</span>
                 </div>
                 

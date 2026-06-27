@@ -14,36 +14,36 @@ export default function ServicesScreen() {
   const isPortal = location.pathname.startsWith('/user');
   const services = [
     {
-      id: 'freight',
-      title: 'Global Freight Forwarding',
-      description: 'Multi-modal shipping lines spanning ocean, air, and overland networks. Offering full-container load (FCL) and less-than-container load (LCL) consolidation with real-time IoT cargo monitoring.',
-      icon: FiTruck,
-      badge: 'Ocean & Air',
-      features: ['Real-time container tracking', 'Port-to-port consolidation', 'Intermodal inland supply chains'],
-    },
-    {
-      id: 'customs',
-      title: 'Customs Brokerage & Clearance',
-      description: 'Certified customs documentation filing, HS Code classification audits, and compliance clearing. We handle port-of-entry custom declarations and tariff optimizations seamlessly.',
-      icon: FiShield,
-      badge: 'Compliance',
-      features: ['Automated HS Code lookup', 'Import/Export permit filing', 'Duty and tariff optimization'],
-    },
-    {
-      id: 'sourcing',
-      title: 'B2B Sourcing & Quality Auditing',
-      description: 'Direct-to-factory production monitoring, batch inspection, and strict quality control auditing. All goods are verified via SGS, Intertek, or custom test guidelines before shipping.',
-      icon: FiSearch,
-      badge: 'Inspection',
-      features: ['SGS certification audits', 'Factory compliance checks', 'Pre-shipment batch testing'],
-    },
-    {
-      id: 'rfq-contracts',
-      title: 'Structured RFQ & Trade Contracts',
-      description: 'Streamlined trade negotiation workflows. Request bulk pricing, custom tooling adjustments, and flexible commercial payment schedules integrated with our digital CRM.',
+      id: 'custom-packaging',
+      title: 'Custom Packaging & Design',
+      description: 'Tailored dimensions, custom board grade selection, and premium color printing optimization. Design custom box layouts aligned with your brand dimensions.',
       icon: FiLayers,
-      badge: 'Trade Financing',
-      features: ['Multi-item RFQ builder', 'Digital contract drafting', 'Milestone-based escrows'],
+      badge: 'Design & Tooling',
+      features: ['Multi-ply material options', 'Custom brand printing layout', 'Durable structural prototypes'],
+    },
+    {
+      id: 'express-delivery',
+      title: 'Doorstep Courier Delivery',
+      description: 'Reliable parcel delivery and bulk logistics networks. Partnered with leading couriers (FedEx, DHL, UPS) to provide fast door-to-door transit with live status updates.',
+      icon: FiTruck,
+      badge: 'Fast Shipping',
+      features: ['Real-time courier tracking', 'Standard & Express options', 'Safe bulk pallet logistics'],
+    },
+    {
+      id: 'volume-discounts',
+      title: 'Wholesale & Volume Discounts',
+      description: 'Scale your operations seamlessly. Order custom batches starting from minor minimum order quantities (MOQ) up to high-volume manufacturing runs at optimized pricing.',
+      icon: FiSearch,
+      badge: 'Bulk Sourcing',
+      features: ['Tier-based discount brackets', 'Flexible production scaling', 'Quality batch inspection'],
+    },
+    {
+      id: 'online-payment',
+      title: 'Frictionless RFQ & Transactions',
+      description: 'Request custom pricing proposals within 24 hours. Place purchase orders, execute secure bank wire transfers, and track order fulfillment directly inside the portal.',
+      icon: FiShield,
+      badge: 'Secure Billing',
+      features: ['Automated RFQ builder', 'Pre-approved P.O. terms', 'Transparent invoice generation'],
     },
   ];
 
@@ -55,10 +55,10 @@ export default function ServicesScreen() {
           Enterprise Solutions
         </span>
         <h1 className="text-display-md font-extrabold text-slate-900 dark:text-white tracking-tight mt-1 mb-2">
-          Global Logistics & Trade Services
+          Premium Packaging &amp; Shipping Services
         </h1>
         <p className="text-body-md text-slate-500 dark:text-slate-400 max-w-2xl">
-          End-to-end maritime transportation, strict customs auditing, and certified trade sourcing designed to guarantee seamless supply chain execution.
+          End-to-end custom design packaging, wholesale batch production, and door-to-door courier tracking designed to guarantee seamless business fulfillment.
         </p>
       </section>
 
@@ -125,10 +125,10 @@ export default function ServicesScreen() {
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-accent/10 rounded-full blur-3xl pointer-events-none -translate-x-1/2 translate-y-1/2" />
         
         <h2 className="text-xl font-bold text-white tracking-tight relative z-10">
-          Need a Custom Supply Chain Solution?
+          Need Custom Branded Packaging Boxes?
         </h2>
         <p className="text-xs text-slate-400 max-w-lg leading-relaxed relative z-10">
-          Submit a custom RFQ detailing your trade specification, volume targets, and target port. Our logistics desks will compile a quote within 24 hours.
+          Submit a custom RFQ detailing your packaging measurements, quantities, and delivery location. Our sales team will compile a custom quote within 24 hours.
         </p>
         <Link 
           to={isPortal ? "/user/rfq" : "/rfq"} 

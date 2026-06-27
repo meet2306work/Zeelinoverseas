@@ -170,7 +170,7 @@ export default function SettingsScreen() {
               <label className="flex items-center justify-between p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/40 cursor-pointer">
                 <div>
                   <span className="text-xs font-bold text-slate-850 dark:text-white block">SMS Notifications</span>
-                  <span className="text-[10px] text-slate-400">Real-time alerts for customs release waypoints.</span>
+                  <span className="text-[10px] text-slate-400">Real-time alerts for carrier dispatch and delivery updates.</span>
                 </div>
                 <input
                   type="checkbox"

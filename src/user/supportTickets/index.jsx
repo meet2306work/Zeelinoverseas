@@ -113,7 +113,7 @@ export default function SupportTicketsScreen() {
             Support Desk
           </h1>
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            Submit inquiry queries to our maritime freight brokers or custom logistics agents.
+            Submit inquiry queries to our customer support representatives or packaging specialists.
           </p>
         </div>
 

@@ -7,15 +7,15 @@ export default function NotificationsScreen() {
   const [notifications, setNotifications] = useState([
     {
       id: 'notif-1',
-      title: 'Logistics Update: Mumbai Port Dispatch',
-      desc: 'Container ZLU-984210-9 has successfully cleared export customs checks and loaded on vessel M.V. Oceanus Trader.',
+      title: 'Order Dispatched: FedEx Transit',
+      desc: 'Your package (Tracking ID: FDX9842109) has successfully cleared processing checks and is in transit via FedEx Express.',
       date: 'June 09, 2026',
       icon: FiTruck,
       isNew: true
     },
     {
       id: 'notif-2',
-      title: 'RFQ Quote Ready: Agricultural Grains',
+      title: 'RFQ Quote Ready: Custom Packaging Boxes',
       desc: 'Sales Desk generated pricing proposal for RFQ-2026-003. Open detail drawer to verify proposal bid.',
       date: 'June 03, 2026',
       icon: FiFileText,
@@ -24,7 +24,7 @@ export default function NotificationsScreen() {
     {
       id: 'notif-3',
       title: 'Trade Account Activated',
-      desc: 'SGS corporate audits verified. You have been upgraded to Level 1 Gold Importer.',
+      desc: 'Corporate trade account verified. You have been upgraded to Level 1 Gold Buyer.',
       date: 'June 02, 2026',
       icon: FiCheckCircle,
       isNew: false
@@ -48,7 +48,7 @@ export default function NotificationsScreen() {
             Notifications Center
           </h1>
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            Monitor real-time shipments alerts, trade quote notifications, and billing transactions status.
+            Monitor real-time order alerts, trade quote notifications, and billing transactions status.
           </p>
         </div>
 
@@ -71,8 +71,8 @@ export default function NotificationsScreen() {
             <h3 className="text-base font-bold text-slate-900 dark:text-white mb-1">
               No New Notifications
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm">
-              You are completely caught up! We will alert you when cargo milestone status updates occur.
+            <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto leading-relaxed">
+              You are completely caught up! We will alert you when order status updates occur.
             </p>
           </div>
         </Card>

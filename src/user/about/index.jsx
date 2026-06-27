@@ -3,21 +3,21 @@ import Card from '../../commonComponents/cards/Card';
 
 export default function AboutScreen() {
   const stats = [
-    { label: 'Cleared Cargo (Tons)', value: '4.8M+', icon: FiAnchor },
+    { label: 'Products Shipped', value: '4.8M+', icon: FiBox },
     { label: 'Global Trade Partners', value: '1,200+', icon: FiUsers },
     { label: 'Active Countries', value: '54+', icon: FiGlobe },
-    { label: 'Customs Agents', value: '85+', icon: FiBriefcase },
+    { label: 'Support Experts', value: '85+', icon: FiBriefcase },
   ];
 
   const values = [
     {
-      title: 'Global Connectivity',
-      desc: 'Seamlessly routing sea freight, air cargo, and intermodal inland supply chains across borders.',
+      title: 'Global Delivery',
+      desc: 'Offering local parcel delivery, express air shipping, and bulk logistics to warehouses worldwide.',
       icon: FiGlobe,
     },
     {
-      title: 'Regulated Compliance',
-      desc: 'Ensuring absolute regulatory clearance with full ISO standards, certified HS Codes, and custom broker clearances.',
+      title: 'Durable Quality',
+      desc: 'Ensuring absolute quality standards with durable materials, certified food-grade packaging, and eco-friendly options.',
       icon: FiShield,
     },
     {
@@ -35,7 +35,7 @@ export default function AboutScreen() {
           About Zeelinoverseas
         </h1>
         <p className="text-body-md text-text-secondary max-w-2xl">
-          Leading B2B import-export logistics and enterprise e-commerce systems. Mapped to bridge intermodal shipping pipelines with customized digital contract processing.
+          Leading B2B and consumer e-commerce systems for premium custom packaging. Dedicated to bridging manufacturing directly with your retail doorstep or warehouse fulfillment.
         </p>
       </section>
 
@@ -73,7 +73,7 @@ export default function AboutScreen() {
             Streamlining Global Commerce with Intelligent Workflows
           </h2>
           <p className="text-body-md text-text-secondary leading-relaxed">
-            Zeelinoverseas drives end-to-end import and export operations. From custom manufacturing tooling specs and raw material sourcing to sea-port shipping manifests, our network ensures verified, on-time contract fulfillment.
+            Zeelinoverseas drives end-to-end packaging manufacturing and delivery operations. From custom specification tooling and design verification to fast courier delivery, our network ensures verified, on-time order fulfillment.
           </p>
         </div>
         <div className="relative aspect-video rounded-2xl overflow-hidden bg-black-accent border border-border-default/20 flex items-center justify-center p-6 text-center">
@@ -81,9 +81,9 @@ export default function AboutScreen() {
           <div className="absolute inset-0 bg-gradient-to-t from-black-accent via-black-accent/80 to-black-accent/40" />
           <div className="relative flex flex-col gap-2 z-10">
             <FiShield className="h-10 w-10 text-accent-gold mx-auto" />
-            <h4 className="text-sm font-bold text-white uppercase tracking-wider">SGS Audit Verified</h4>
+            <h4 className="text-sm font-bold text-white uppercase tracking-wider">Quality Verified</h4>
             <p className="text-[11px] text-slate-300 max-w-xs leading-relaxed font-medium">
-              Consistently audited trade practices ensuring full compliance with international maritime logistics security guidelines.
+              Consistently audited manufacturing practices ensuring full compliance with international eco-friendly and quality packaging standards.
             </p>
           </div>
         </div>

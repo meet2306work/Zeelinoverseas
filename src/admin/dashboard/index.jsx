@@ -94,7 +94,7 @@ export default function AdminDashboardScreen() {
     },
     { 
       key: 'route', 
-      label: 'Route',
+      label: 'Carrier',
       render: (val) => <span className="font-semibold text-text-secondary">{val}</span>
     },
     {
@@ -105,14 +105,14 @@ export default function AdminDashboardScreen() {
           'In Transit': 'bg-sky-50 text-sky-700 border-sky-200/60 dark:bg-sky-500/10 dark:text-sky-450 dark:border-sky-500/25',
           'Delivered': 'bg-emerald-50 text-emerald-700 border-emerald-200/60 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/25',
           'Pending': 'bg-amber-50 text-amber-700 border-amber-200/60 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/25',
-          'Customs Hold': 'bg-rose-50 text-rose-700 border-rose-200/60 dark:bg-rose-500/10 dark:text-rose-450 dark:border-rose-500/25',
+          'Out for Delivery': 'bg-indigo-50 text-indigo-700 border-indigo-200/60 dark:bg-indigo-500/10 dark:text-indigo-400 dark:border-indigo-500/25',
           'Cancelled': 'bg-slate-100 text-slate-600 border-slate-200/60 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700',
         };
         const icons = {
           'In Transit': FiTruck,
           'Delivered': FiCheck,
           'Pending': FiClock,
-          'Customs Hold': FiAlertTriangle,
+          'Out for Delivery': FiTruck,
           'Cancelled': FiX,
         };
         const Icon = icons[val];

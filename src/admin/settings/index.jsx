@@ -20,7 +20,7 @@ export default function AdminSettingsScreen() {
   const [companyName, setCompanyName] = useState('Zeelinoverseas Ltd');
   const [supportEmail, setSupportEmail] = useState('operations@zeelin.com');
   const [apiKey, setApiKey] = useState('sk_live_51Msz32Lksp7981Lwk2');
-  const [portApi, setPortApi] = useState('https://api.maritimelogistics.org/v1');
+  const [portApi, setPortApi] = useState('https://api.couriertracking.org/v1');
   const [notifyRfq, setNotifyRfq] = useState(true);
   const [notifyOrder, setNotifyOrder] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -298,9 +298,9 @@ export default function AdminSettingsScreen() {
               {/* ── API Config ── */}
               {activeTab === 'api' && (
                 <div className="flex flex-col gap-5">
-                  <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider mb-2">Ocean Freight APIs Setup</h3>
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider mb-2">Courier &amp; Delivery APIs Setup</h3>
                   <Input
-                    label="Maritime Logistics API Host URL"
+                    label="Courier Tracking API Host URL"
                     type="url"
                     value={portApi}
                     onChange={(e) => setPortApi(e.target.value)}

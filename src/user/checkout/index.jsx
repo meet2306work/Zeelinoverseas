@@ -188,7 +188,7 @@ export default function CheckoutScreen() {
                 <p className="text-[11px] text-slate-500">Stripe and Razorpay gateway gateways supported.</p>
               </motion.button>
 
-              {/* LC Option */}
+              {/* Purchase Order Option */}
               <motion.button
                 type="button"
                 onClick={() => setPaymentMethod('lc')}
@@ -202,10 +202,10 @@ export default function CheckoutScreen() {
                 `}
               >
                 <div className="flex justify-between items-center">
-                  <span className="text-xs font-bold text-slate-850 dark:text-white">Letter of Credit (L/C)</span>
+                  <span className="text-xs font-bold text-slate-850 dark:text-white">Purchase Order (P.O.)</span>
                   <FiFileText className="h-4.5 w-4.5 text-slate-400" />
                 </div>
-                <p className="text-[11px] text-slate-500">Standard inter-bank documentation verification required.</p>
+                <p className="text-[11px] text-slate-500">Invoice will be generated for pre-approved corporate payment terms.</p>
               </motion.button>
             </div>
           </Card></Reveal>
@@ -242,7 +242,7 @@ export default function CheckoutScreen() {
                 <span className="font-bold text-slate-800 dark:text-white">${totalPrice.toLocaleString()}</span>
               </div>
               <div className="flex justify-between">
-                <span>Est. Logistics Duty</span>
+                <span>Est. Shipping & Handling</span>
                 <span className="font-bold text-slate-800 dark:text-white">${shippingCost > 0 ? `$${shippingCost}` : 'Free'}</span>
               </div>
               <div className="flex justify-between">

@@ -50,7 +50,7 @@ export default function PaymentScreen() {
   const methodsList = [
     { id: 'stripe', name: 'Credit / Debit Cards', desc: 'Secure payment powered by Stripe', icon: FiCreditCard },
     { id: 'paypal', name: 'PayPal Express', desc: 'Pay via credit card or PayPal wallet', icon: FiGlobe },
-    { id: 'lc', name: 'Letter of Credit (L/C)', desc: 'Inter-bank verification system', icon: FiFileText },
+    { id: 'lc', name: 'Purchase Order (P.O.)', desc: 'Invoice terms for corporate accounts', icon: FiFileText },
     { id: 'wire', name: 'Bank Wire Transfer', desc: 'For transactions above $10k', icon: FiDollarSign },
   ];
 
