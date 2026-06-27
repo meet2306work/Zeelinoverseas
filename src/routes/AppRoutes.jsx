@@ -1,5 +1,5 @@
 import React, { lazy, Suspense } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Loader from '../commonComponents/loaders/Loader';
 
 // Layouts
@@ -69,7 +69,7 @@ const AuthEmailVerificationScreen = lazy(() => import('../auth/emailVerification
 
 export default function AppRoutes() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Suspense fallback={<Loader type="page" />}>
         <Routes>
           {/* Public Routes */}
@@ -155,6 +155,6 @@ export default function AppRoutes() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
