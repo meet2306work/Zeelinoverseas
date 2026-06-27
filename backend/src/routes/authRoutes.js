@@ -15,6 +15,7 @@ const {
   registerValidation,
   loginValidation,
   forgotPasswordValidation,
+  resetPasswordValidation,
   verifyEmailValidation,
   resendOtpValidation
 } = require('../validators/authValidator');
@@ -50,10 +51,10 @@ const resendMaxLimiter = rateLimit({
 
 router.post('/register', registerValidation, register);
 router.post('/login', loginValidation, login);
-router.get('/logout', logout);
+router.post('/logout', protect, logout); // POST prevents CSRF-based forced logout
 router.get('/me', protect, getMe);
 router.post('/forgot-password', forgotPasswordValidation, forgotPassword);
-router.put('/reset-password/:token', resetPassword);
+router.put('/reset-password/:token', resetPasswordValidation, resetPassword); // validator was missing (bug #17)
 router.post('/verify-email', verifyEmailValidation, verifyEmail);
 router.post('/resend-otp', resendOtpValidation, resendLimiter, resendMaxLimiter, resendOtp);
 

@@ -75,6 +75,16 @@ exports.updateOrderToPaid = async (req, res, next) => {
       return next(new ErrorResponse('Order not found', 404));
     }
 
+    // Ownership check: only the order owner (or admin) may mark as paid (bug #3)
+    if (order.user.toString() !== req.user.id && req.user.role !== 'admin') {
+      return next(new ErrorResponse('Not authorized to update this order', 403));
+    }
+
+    // Guard against missing payer object from payment gateway (bug #20)
+    if (!req.body.payer || !req.body.payer.email_address) {
+      return next(new ErrorResponse('Invalid payment result: payer information is missing', 400));
+    }
+
     order.isPaid = true;
     order.paidAt = Date.now();
     order.paymentResult = {

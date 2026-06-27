@@ -5,6 +5,9 @@ const sendEmail = require('../services/emailService');
 const crypto = require('crypto');
 const generateOTP = require('../utils/generateOTP');
 
+// Hash an OTP before storage so plaintext is never saved to DB
+const hashOtp = (otp) => crypto.createHash('sha256').update(otp).digest('hex');
+
 // Get token from model, create cookie and send response
 const sendTokenResponse = (user, statusCode, res, message) => {
   const token = user.getSignedJwtToken();
@@ -12,7 +15,8 @@ const sendTokenResponse = (user, statusCode, res, message) => {
   const options = {
     expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production'
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict'
   };
 
   res.status(statusCode).cookie('token', token, options).json({
@@ -44,11 +48,11 @@ exports.register = async (req, res, next) => {
       return next(new ErrorResponse('Phone number is already registered', 400));
     }
 
-    // Generate OTP
+    // Generate OTP and hash it before storing
     const otp = generateOTP();
     const otpExpire = Date.now() + 10 * 60 * 1000; // 10 minutes
 
-    // Create user
+    // Create user — store hashed OTP, never plaintext
     const user = await User.create({
       firstName,
       lastName,
@@ -56,7 +60,7 @@ exports.register = async (req, res, next) => {
       phone,
       password,
       role: role || 'user',
-      otp,
+      otp: hashOtp(otp),
       otpExpire
     });
 
@@ -116,11 +120,16 @@ exports.login = async (req, res, next) => {
 // @desc    Log user out / clear cookie
 // @route   GET /v1/auth/logout
 // @access  Private
+// @desc    Log user out / clear cookie
+// @route   POST /v1/auth/logout  (POST prevents CSRF-based forced logout)
+// @access  Private
 exports.logout = async (req, res, next) => {
   try {
     res.cookie('token', 'none', {
       expires: new Date(Date.now() + 10 * 1000),
-      httpOnly: true
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict'
     });
 
     sendResponse(res, 200, 'Logged out successfully');
@@ -147,30 +156,33 @@ exports.getMe = async (req, res, next) => {
 exports.forgotPassword = async (req, res, next) => {
   try {
     const user = await User.findOne({ email: req.body.email });
+
+    // Always return the same response to prevent user enumeration (bug #9)
+    const genericMessage = 'If an account with that email exists, a reset link has been sent.';
+
     if (!user) {
-      return next(new ErrorResponse('There is no user with that email', 404));
+      // Return 200 with generic message — do NOT expose whether email exists
+      return sendResponse(res, 200, genericMessage);
     }
 
-    // Generate token (simple random hex for now, could be a 6 digit OTP)
-    const resetToken = crypto.randomBytes(20).toString('hex');
+    // Generate token
+    const resetToken = crypto.randomBytes(32).toString('hex');
     user.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
     user.resetPasswordExpire = Date.now() + 10 * 60 * 1000; // 10 mins
 
     await user.save({ validateBeforeSave: false });
 
-    // Create reset url
+    // Create reset url — do NOT log this URL (token is sensitive)
     const resetUrl = `${process.env.FRONTEND_URL}/auth/reset-password?token=${resetToken}`;
-
-    const message = `You are receiving this email because you (or someone else) has requested the reset of a password. Please make a PUT request to: \n\n ${resetUrl}`;
 
     try {
       await sendEmail({
         email: user.email,
-        subject: 'Password reset token',
-        message
+        subject: 'Password Reset Request — Zeelin Overseas',
+        message: `You requested a password reset. Visit this link to set a new password (expires in 10 minutes): ${resetUrl}`
       });
 
-      sendResponse(res, 200, 'Email sent');
+      sendResponse(res, 200, genericMessage);
     } catch (err) {
       user.resetPasswordToken = undefined;
       user.resetPasswordExpire = undefined;
@@ -199,18 +211,15 @@ exports.verifyEmail = async (req, res, next) => {
       return next(new ErrorResponse('Email already verified', 400));
     }
 
-    if (!user.otp || user.otp !== otp) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid OTP.'
-      });
+    // Check expiry first (avoids timing-leak ordering)
+    if (!user.otpExpire || user.otpExpire < Date.now()) {
+      return res.status(400).json({ success: false, message: 'OTP has expired.' });
     }
 
-    if (user.otpExpire < Date.now()) {
-      return res.status(400).json({
-        success: false,
-        message: 'OTP has expired.'
-      });
+    // Compare hashed OTP using constant-time comparison (bug #11)
+    const hashedInput = crypto.createHash('sha256').update(otp).digest('hex');
+    if (!user.otp || !crypto.timingSafeEqual(Buffer.from(user.otp), Buffer.from(hashedInput))) {
+      return res.status(400).json({ success: false, message: 'Invalid OTP.' });
     }
 
     user.isEmailVerified = true;
@@ -248,7 +257,8 @@ exports.resendOtp = async (req, res, next) => {
     const otp = generateOTP();
     const otpExpire = Date.now() + 10 * 60 * 1000; // 10 minutes
 
-    user.otp = otp;
+    // Store hashed OTP — never store plaintext (bug #11)
+    user.otp = hashOtp(otp);
     user.otpExpire = otpExpire;
     await user.save();
 
@@ -285,16 +295,17 @@ exports.resetPassword = async (req, res, next) => {
     });
 
     if (!user) {
-      return next(new ErrorResponse('Invalid token', 400));
+      return next(new ErrorResponse('Invalid or expired reset token', 400));
     }
 
-    // Set new password
+    // Set new password and clear reset fields
     user.password = req.body.password;
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;
     await user.save();
 
-    sendTokenResponse(user, 200, res, 'Password reset successful');
+    // Do NOT auto-login after reset (bug #10) — force user to log in with new password
+    sendResponse(res, 200, 'Password reset successful. Please log in with your new password.');
   } catch (error) {
     next(error);
   }

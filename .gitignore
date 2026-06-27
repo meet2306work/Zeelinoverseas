@@ -28,3 +28,7 @@ dist-ssr
 .env.local
 .env.*.local
 
+# Backend environment files (CRITICAL: never commit production secrets)
+backend/.env
+backend/.env.production
+backend/.env.local

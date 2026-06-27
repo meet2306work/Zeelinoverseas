@@ -22,6 +22,16 @@ exports.getProfile = async (req, res, next) => {
 // @access  Private
 exports.updateProfile = async (req, res, next) => {
   try {
+    // Validate avatar URL before accepting it (bug #6)
+    // Only accept null/empty or a valid Cloudinary URL
+    if (req.body.avatar && req.body.avatar !== null) {
+      const avatarUrl = req.body.avatar;
+      const isValidCloudinaryUrl = /^https:\/\/res\.cloudinary\.com\/[^/]+\/.+/.test(avatarUrl);
+      if (!isValidCloudinaryUrl) {
+        return next(new ErrorResponse('Invalid avatar URL: only Cloudinary URLs are accepted', 400));
+      }
+    }
+
     const fieldsToUpdate = {
       firstName: req.body.firstName,
       lastName: req.body.lastName,
@@ -199,6 +209,22 @@ exports.updateUserAdmin = async (req, res, next) => {
 
     if (!user) {
       return next(new ErrorResponse('User not found', 404));
+    }
+
+    // Prevent an admin from modifying their own role/status via this endpoint (bug #4)
+    if (req.params.id === req.user.id) {
+      return next(new ErrorResponse('You cannot modify your own account via admin controls', 400));
+    }
+
+    // Whitelist allowed role values
+    const allowedRoles = ['user', 'vendor', 'admin'];
+    if (role && !allowedRoles.includes(role)) {
+      return next(new ErrorResponse(`Invalid role: ${role}`, 400));
+    }
+
+    const allowedStatuses = ['active', 'inactive', 'suspended'];
+    if (status && !allowedStatuses.includes(status)) {
+      return next(new ErrorResponse(`Invalid status: ${status}`, 400));
     }
 
     if (role) user.role = role;

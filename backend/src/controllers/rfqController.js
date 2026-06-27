@@ -7,11 +7,39 @@ const sendResponse = require('../utils/responseFormatter');
 // @access  Public (or Private if logged in)
 exports.createRfq = async (req, res, next) => {
   try {
+    // Whitelist fields — never pass req.body directly to Rfq.create() (bug #5)
+    const {
+      contactName,
+      email,
+      phone,
+      companyName,
+      productDetails,
+      quantity,
+      targetPrice,
+      shippingDestination,
+      requirements,
+      attachments
+    } = req.body;
+
+    const rfqData = {
+      contactName,
+      email,
+      phone,
+      companyName,
+      productDetails,
+      quantity,
+      targetPrice,
+      shippingDestination,
+      requirements,
+      attachments
+    };
+
+    // Only attach authenticated user if token was present
     if (req.user) {
-      req.body.user = req.user.id;
+      rfqData.user = req.user.id;
     }
-    
-    const rfq = await Rfq.create(req.body);
+
+    const rfq = await Rfq.create(rfqData);
     sendResponse(res, 201, 'RFQ created successfully', rfq);
   } catch (error) {
     next(error);

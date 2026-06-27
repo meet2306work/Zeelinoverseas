@@ -6,6 +6,20 @@ const sendResponse = require('../utils/responseFormatter');
 
 const normalizeSku = (value) => typeof value === 'string' ? value.trim().toUpperCase() : value;
 
+/**
+ * Recursively strip any object key that starts with '$' from user input.
+ * This prevents NoSQL operator injection (e.g. ?price[$where]=...) (bug #8)
+ */
+const sanitizeQuery = (obj) => {
+  if (typeof obj !== 'object' || obj === null) return obj;
+  const clean = {};
+  for (const key of Object.keys(obj)) {
+    if (key.startsWith('$')) continue; // Drop injected operators
+    clean[key] = sanitizeQuery(obj[key]);
+  }
+  return clean;
+};
+
 // @desc    Get all products (with filters, pagination, sorting)
 // @route   GET /v1/products
 // @access  Public
@@ -13,8 +27,8 @@ exports.getProducts = async (req, res, next) => {
   try {
     let query;
 
-    // Copy req.query
-    const reqQuery = { ...req.query };
+    // Copy req.query and sanitize to prevent NoSQL injection
+    const reqQuery = sanitizeQuery({ ...req.query });
 
     // Fields to exclude from filtering
     const removeFields = ['select', 'sort', 'page', 'limit', 'search', 'minPrice', 'maxPrice', 'rating'];
@@ -23,7 +37,7 @@ exports.getProducts = async (req, res, next) => {
     // Create query string
     let queryStr = JSON.stringify(reqQuery);
     
-    // Create operators ($gt, $gte, etc)
+    // Create operators ($gt, $gte, etc) — safe because reqQuery is already sanitized
     queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
 
     // Parse back

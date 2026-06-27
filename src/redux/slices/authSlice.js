@@ -135,7 +135,7 @@ export const logoutUser = createAsyncThunk(
   'auth/logoutUser',
   async (_, { rejectWithValue }) => {
     try {
-      await apiClient.get('/auth/logout');
+      await apiClient.post('/auth/logout'); // POST prevents CSRF-based forced logout
       localStorage.removeItem('auth_token');
       return true;
     } catch (error) {
