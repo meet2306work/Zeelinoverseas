@@ -71,8 +71,8 @@ reviewSchema.post('save', function () {
   this.constructor.getAverageRating(this.product);
 });
 
-// Call getAverageRating before remove
-reviewSchema.pre('deleteOne', { document: true, query: false }, function () {
+// Bug #21: Must be post('deleteOne') so average is calculated AFTER deletion
+reviewSchema.post('deleteOne', { document: true, query: false }, function () {
   this.constructor.getAverageRating(this.product);
 });
 

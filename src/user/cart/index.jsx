@@ -1,17 +1,53 @@
+import { useEffect, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { FiTrash2, FiShoppingCart, FiMinus, FiPlus, FiArrowRight, FiInfo } from 'react-icons/fi';
-import { addToCart, removeFromCart, clearCart } from '../../redux/slices/cartSlice';
+import { addToCart, updateItemQty, updateCartPrices, removeFromCart, clearCart } from '../../redux/slices/cartSlice';
 import Card from '../../commonComponents/cards/Card';
 import Button from '../../commonComponents/buttons/Button';
 import { Reveal } from '../../commonComponents/animations/ScrollReveal';
 import { motionTransitions } from '../../config/motion';
+import productService from '../../services/productService';
 
 export default function CartScreen() {
   const dispatch = useDispatch();
   const { items, totalPrice, totalQuantity } = useSelector((state) => state.cart);
   const shouldReduceMotion = useReducedMotion();
+  const cartProductIdsKey = useMemo(() => items.map(item => item.id).join('|'), [items]);
+
+  useEffect(() => {
+    let isActive = true;
+
+    const cartProductIds = cartProductIdsKey ? cartProductIdsKey.split('|') : [];
+
+    if (cartProductIds.length === 0) {
+      return () => {
+        isActive = false;
+      };
+    }
+
+    Promise.allSettled(cartProductIds.map(id => productService.getProductById(id)))
+      .then((results) => {
+        if (!isActive) return;
+
+        const latestProducts = results
+          .filter(result => result.status === 'fulfilled')
+          .map(result => result.value.data)
+          .filter(Boolean)
+          .map(product => ({
+            id: product._id,
+            price: product.price,
+            availabilityStatus: product.availabilityStatus,
+          }));
+
+        dispatch(updateCartPrices(latestProducts));
+      });
+
+    return () => {
+      isActive = false;
+    };
+  }, [cartProductIdsKey, dispatch]);
 
   const handleIncrement = (item) => {
     dispatch(addToCart({ id: item.id, name: item.name, price: item.price, qty: 1 }));
@@ -19,7 +55,7 @@ export default function CartScreen() {
 
   const handleDecrement = (item) => {
     if (item.qty > 1) {
-      dispatch(addToCart({ id: item.id, name: item.name, price: item.price, qty: -1 }));
+      dispatch(updateItemQty({ id: item.id, qty: item.qty - 1 }));
     } else {
       dispatch(removeFromCart(item.id));
     }

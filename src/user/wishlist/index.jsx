@@ -25,7 +25,14 @@ export default function WishlistScreen() {
   };
 
   const handleMoveToCart = (item) => {
-    dispatch(addToCart({ id: item.id, name: item.name, price: item.price, qty: 1, image: item.image }));
+    dispatch(addToCart({
+      id: item.id,
+      name: item.name,
+      price: item.price,
+      qty: 1,
+      image: item.image,
+      availabilityStatus: item.availabilityStatus,
+    }));
     dispatch(removeProductFromWishlist(item.id));
     navigate('/user/cart');
   };

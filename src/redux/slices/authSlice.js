@@ -7,7 +7,6 @@ export const loginUser = createAsyncThunk(
   async (credentials, { rejectWithValue }) => {
     try {
       const response = await apiClient.post('/auth/login', credentials);
-      localStorage.setItem('auth_token', response.data.data.token);
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -39,7 +38,7 @@ export const fetchCurrentUser = createAsyncThunk(
   'auth/fetchCurrentUser',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await apiClient.get('/auth/me');
+      const response = await apiClient.get('/auth/me', { suppressAuthRedirect: true });
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -147,10 +146,12 @@ export const logoutUser = createAsyncThunk(
 
 const initialState = {
   user: null,
-  token: localStorage.getItem('auth_token') || null,
-  isAuthenticated: !!localStorage.getItem('auth_token'),
+  token: null,
+  isAuthenticated: false,
   role: null, // 'user' | 'admin' | 'vendor'
   loading: false,
+  authChecking: true,
+  authChecked: false,
   error: null,
 };
 
@@ -161,15 +162,19 @@ const authSlice = createSlice({
     setCredentials: (state, action) => {
       const { user, token, role } = action.payload;
       state.user = user;
-      state.token = token;
+      state.token = token || null;
       state.isAuthenticated = true;
       state.role = role;
+      state.authChecked = true;
+      state.authChecking = false;
     },
     logout: (state) => {
       state.user = null;
       state.token = null;
       state.isAuthenticated = false;
       state.role = null;
+      state.authChecked = true;
+      state.authChecking = false;
       localStorage.removeItem('auth_token');
     },
     clearError: (state) => {
@@ -187,8 +192,10 @@ const authSlice = createSlice({
         state.loading = false;
         state.isAuthenticated = true;
         state.user = action.payload.data.user;
-        state.token = action.payload.data.token;
+        state.token = null;
         state.role = action.payload.data.user.role;
+        state.authChecked = true;
+        state.authChecking = false;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
@@ -212,16 +219,19 @@ const authSlice = createSlice({
       })
       // Fetch Current User Cases
       .addCase(fetchCurrentUser.pending, (state) => {
-        state.loading = true;
+        state.authChecking = true;
       })
       .addCase(fetchCurrentUser.fulfilled, (state, action) => {
-        state.loading = false;
+        state.authChecking = false;
+        state.authChecked = true;
         state.isAuthenticated = true;
         state.user = action.payload.data;
         state.role = action.payload.data.role;
+        state.token = null;
       })
-      .addCase(fetchCurrentUser.rejected, (state, action) => {
-        state.loading = false;
+      .addCase(fetchCurrentUser.rejected, (state) => {
+        state.authChecking = false;
+        state.authChecked = true;
         state.isAuthenticated = false;
         state.user = null;
         state.token = null;
@@ -262,6 +272,16 @@ const authSlice = createSlice({
         state.user = null;
         state.token = null;
         state.role = null;
+        state.authChecked = true;
+        state.authChecking = false;
+      })
+      .addCase(logoutUser.rejected, (state) => {
+        state.isAuthenticated = false;
+        state.user = null;
+        state.token = null;
+        state.role = null;
+        state.authChecked = true;
+        state.authChecking = false;
       });
   },
 });
@@ -271,3 +291,4 @@ export default authSlice.reducer;
 export const selectCurrentUser = (state) => state.auth.user;
 export const selectIsAuthenticated = (state) => state.auth.isAuthenticated;
 export const selectUserRole = (state) => state.auth.role;
+export const selectAuthChecking = (state) => state.auth.authChecking;

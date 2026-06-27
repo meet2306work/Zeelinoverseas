@@ -10,7 +10,8 @@ import Breadcrumb from '../commonComponents/breadcrumbs/Breadcrumb';
 import Dropdown from '../commonComponents/dropdowns/Dropdown';
 import PageContainer from '../commonComponents/layouts/PageContainer';
 import PageTransition from '../commonComponents/layouts/PageTransition';
-import { logout, selectIsAuthenticated, selectUserRole, selectCurrentUser } from '../redux/slices/authSlice';
+import Loader from '../commonComponents/loaders/Loader';
+import { logoutUser, selectAuthChecking, selectIsAuthenticated, selectUserRole, selectCurrentUser } from '../redux/slices/authSlice';
 import ConfirmationDialog from '../commonComponents/modals/ConfirmationDialog';
 
 export default function AdminLayout() {
@@ -22,7 +23,7 @@ export default function AdminLayout() {
   const dispatch = useDispatch();
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const role = useSelector(selectUserRole);
-  const loading = useSelector((state) => state.auth.loading);
+  const authChecking = useSelector(selectAuthChecking);
   const currentUser = useSelector(selectCurrentUser);
 
   const fullName = currentUser ? `${currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim() || 'Admin User' : 'Admin User';
@@ -31,14 +32,14 @@ export default function AdminLayout() {
     : (currentUser?.firstName ? currentUser.firstName[0].toUpperCase() : 'AD');
 
   useEffect(() => {
-    const token = localStorage.getItem('auth_token');
-    if (loading || (token && !role)) {
+    if (authChecking) {
       return;
     }
+
     if (!isAuthenticated || role !== 'admin') {
       navigate('/auth/login');
     }
-  }, [isAuthenticated, role, loading, navigate]);
+  }, [authChecking, isAuthenticated, role, navigate]);
 
   const sidebarLinks = [
     { label: 'Dashboard', path: '/admin/dashboard', icon: FiGrid },
@@ -84,7 +85,7 @@ export default function AdminLayout() {
   });
 
   const handleLogout = () => {
-    dispatch(logout());
+    dispatch(logoutUser());
     navigate('/auth/login');
   };
 
@@ -92,6 +93,10 @@ export default function AdminLayout() {
     { label: 'Public Website', onClick: () => navigate('/'), icon: FiBriefcase },
     { label: 'Sign Out', onClick: () => setIsLogoutDialogOpen(true), icon: FiLogOut },
   ];
+
+  if (authChecking) {
+    return <Loader type="page" />;
+  }
 
   return (
     <div className="min-h-screen flex bg-background-primary text-text-primary font-sans transition-colors duration-300">

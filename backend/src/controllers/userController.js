@@ -122,7 +122,7 @@ exports.getWishlist = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id).populate({
       path: 'wishlist',
-      select: 'title price images moq specifications description averageRating ratingsCount'
+      select: 'title price images moq specifications description averageRating ratingsCount availabilityStatus stock status'
     });
     if (!user) {
       return next(new ErrorResponse('User not found', 404));
@@ -142,24 +142,21 @@ exports.addToWishlist = async (req, res, next) => {
     if (!productId) {
       return next(new ErrorResponse('Product ID is required', 400));
     }
-    const user = await User.findById(req.user.id);
+
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { $addToSet: { wishlist: productId } },
+      { new: true }
+    ).populate({
+      path: 'wishlist',
+      select: 'title price images moq specifications description averageRating ratingsCount availabilityStatus stock status'
+    });
+
     if (!user) {
       return next(new ErrorResponse('User not found', 404));
     }
-    if (user.wishlist.includes(productId)) {
-      const populatedUser = await User.findById(req.user.id).populate({
-        path: 'wishlist',
-        select: 'title price images moq specifications description averageRating ratingsCount'
-      });
-      return sendResponse(res, 200, 'Product already in wishlist', populatedUser.wishlist);
-    }
-    user.wishlist.push(productId);
-    await user.save();
-    const populatedUser = await User.findById(req.user.id).populate({
-      path: 'wishlist',
-      select: 'title price images moq specifications description averageRating ratingsCount'
-    });
-    sendResponse(res, 200, 'Product added to wishlist', populatedUser.wishlist);
+
+    sendResponse(res, 200, 'Product added to wishlist', user.wishlist);
   } catch (error) {
     next(error);
   }
@@ -171,17 +168,21 @@ exports.addToWishlist = async (req, res, next) => {
 exports.removeFromWishlist = async (req, res, next) => {
   try {
     const { productId } = req.params;
-    const user = await User.findById(req.user.id);
+
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { $pull: { wishlist: productId } },
+      { new: true }
+    ).populate({
+      path: 'wishlist',
+      select: 'title price images moq specifications description averageRating ratingsCount availabilityStatus stock status'
+    });
+
     if (!user) {
       return next(new ErrorResponse('User not found', 404));
     }
-    user.wishlist = user.wishlist.filter(id => id.toString() !== productId);
-    await user.save();
-    const populatedUser = await User.findById(req.user.id).populate({
-      path: 'wishlist',
-      select: 'title price images moq specifications description averageRating ratingsCount'
-    });
-    sendResponse(res, 200, 'Product removed from wishlist', populatedUser.wishlist);
+
+    sendResponse(res, 200, 'Product removed from wishlist', user.wishlist);
   } catch (error) {
     next(error);
   }

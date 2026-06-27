@@ -6,7 +6,8 @@ import Breadcrumb from '../commonComponents/breadcrumbs/Breadcrumb';
 import Dropdown from '../commonComponents/dropdowns/Dropdown';
 import PageContainer from '../commonComponents/layouts/PageContainer';
 import PageTransition from '../commonComponents/layouts/PageTransition';
-import { logout, selectIsAuthenticated, selectUserRole, selectCurrentUser } from '../redux/slices/authSlice';
+import Loader from '../commonComponents/loaders/Loader';
+import { logoutUser, selectAuthChecking, selectIsAuthenticated, selectUserRole, selectCurrentUser } from '../redux/slices/authSlice';
 import ConfirmationDialog from '../commonComponents/modals/ConfirmationDialog';
 import WhatsAppFloatingButton from '../commonComponents/buttons/WhatsAppFloatingButton';
 
@@ -20,6 +21,7 @@ export default function UserLayout() {
   const dispatch = useDispatch();
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const role = useSelector(selectUserRole);
+  const authChecking = useSelector(selectAuthChecking);
   const currentUser = useSelector(selectCurrentUser);
   const { totalQuantity } = useSelector((state) => state.cart);
   const { categoriesList } = useSelector((state) => state.categories);
@@ -30,10 +32,14 @@ export default function UserLayout() {
     : (currentUser?.firstName ? currentUser.firstName[0].toUpperCase() : 'U');
 
   useEffect(() => {
+    if (authChecking) {
+      return;
+    }
+
     if (!isAuthenticated || role !== 'user') {
       navigate('/auth/login');
     }
-  }, [isAuthenticated, role, navigate]);
+  }, [authChecking, isAuthenticated, role, navigate]);
 
   const sidebarLinks = [
     { label: 'Dashboard', path: '/user/home', icon: FiHome },
@@ -90,7 +96,7 @@ export default function UserLayout() {
   }
 
   const handleLogout = () => {
-    dispatch(logout());
+    dispatch(logoutUser());
     navigate('/auth/login');
   };
 
@@ -99,6 +105,10 @@ export default function UserLayout() {
     { label: 'Settings', onClick: () => navigate('/user/settings'), icon: FiSettings },
     { label: 'Sign Out', onClick: () => setIsLogoutDialogOpen(true), icon: FiLogOut },
   ];
+
+  if (authChecking) {
+    return <Loader type="page" />;
+  }
 
   return (
     <div className="min-h-screen flex bg-background-primary font-sans text-text-primary">

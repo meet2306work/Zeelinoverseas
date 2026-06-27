@@ -1,5 +1,6 @@
 const Product = require('../models/Product');
 const Category = require('../models/Category');
+const Review = require('../models/Review');
 const mongoose = require('mongoose');
 const ErrorResponse = require('../utils/errorResponse');
 const sendResponse = require('../utils/responseFormatter');
@@ -128,13 +129,12 @@ exports.getProducts = async (req, res, next) => {
     const page = parseInt(req.query.page, 10) || 1;
     const limit = parseInt(req.query.limit, 10) || 10;
     const startIndex = (page - 1) * limit;
-    const endIndex = page * limit;
-    const total = await Product.countDocuments(finalQuery);
-
     query = query.skip(startIndex).limit(limit);
 
-    // Executing query
-    const products = await query;
+    const [total, products] = await Promise.all([
+      Product.countDocuments(finalQuery),
+      query
+    ]);
 
     // Pagination result
     const pagination = {
@@ -155,14 +155,36 @@ exports.getProducts = async (req, res, next) => {
 // @access  Public
 exports.getProduct = async (req, res, next) => {
   try {
+    const reviewPage = parseInt(req.query.reviewPage, 10) || 1;
+    const reviewLimit = Math.min(parseInt(req.query.reviewLimit, 10) || 10, 50);
+    const reviewSkip = (reviewPage - 1) * reviewLimit;
+
     const product = await Product.findById(req.params.id)
-      .populate('category subCategory')
-      .populate('reviews');
+      .populate('category subCategory');
 
     if (!product) {
       return next(new ErrorResponse(`Product not found with id of ${req.params.id}`, 404));
     }
-    sendResponse(res, 200, 'Product fetched successfully', product);
+
+    const [reviewsTotal, reviews] = await Promise.all([
+      Review.countDocuments({ product: product._id }),
+      Review.find({ product: product._id })
+        .populate('user', 'firstName lastName avatar')
+        .sort('-createdAt')
+        .skip(reviewSkip)
+        .limit(reviewLimit)
+    ]);
+
+    sendResponse(res, 200, 'Product fetched successfully', {
+      ...product.toObject(),
+      reviews,
+      reviewsPagination: {
+        page: reviewPage,
+        limit: reviewLimit,
+        total: reviewsTotal,
+        pages: Math.ceil(reviewsTotal / reviewLimit)
+      }
+    });
   } catch (error) {
     next(error);
   }

@@ -6,7 +6,7 @@ import Button from '../commonComponents/buttons/Button';
 import Breadcrumb from '../commonComponents/breadcrumbs/Breadcrumb';
 import PageContainer from '../commonComponents/layouts/PageContainer';
 import PageTransition from '../commonComponents/layouts/PageTransition';
-import { logout, selectIsAuthenticated, selectUserRole } from '../redux/slices/authSlice';
+import { logoutUser, selectIsAuthenticated, selectUserRole } from '../redux/slices/authSlice';
 import WhatsAppFloatingButton from '../commonComponents/buttons/WhatsAppFloatingButton';
 import LoginRedirectModal from '../commonComponents/modals/LoginRedirectModal';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
@@ -134,7 +134,7 @@ export default function PublicLayout() {
                     </Button>
                   </Link>
                 )}
-                <Button variant="outline" size="sm" onClick={() => dispatch(logout())}>
+                <Button variant="outline" size="sm" onClick={() => dispatch(logoutUser())}>
                   Sign Out
                 </Button>
               </>
@@ -207,7 +207,7 @@ export default function PublicLayout() {
                     </Button>
                   </Link>
                 )}
-                <Button variant="outline" className="w-full" onClick={() => { setIsMobileMenuOpen(false); dispatch(logout()); }}>
+                <Button variant="outline" className="w-full" onClick={() => { setIsMobileMenuOpen(false); dispatch(logoutUser()); }}>
                   Sign Out
                 </Button>
               </>

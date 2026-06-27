@@ -1,106 +1,66 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { FiCreditCard, FiDollarSign, FiGlobe, FiFileText, FiCheckCircle, FiShield } from 'react-icons/fi';
+import { FiCreditCard, FiDollarSign, FiGlobe, FiFileText, FiShield } from 'react-icons/fi';
 import Card from '../../commonComponents/cards/Card';
 import Button from '../../commonComponents/buttons/Button';
 import Input from '../../commonComponents/inputs/Input';
 import FileUpload from '../../commonComponents/fileUploads/FileUpload';
-import { payOrder } from '../../redux/slices/orderSlice';
+
+const fallbackOrder = {
+  _id: 'ZO-MOCK-PAYMENT',
+  itemsPrice: 8400,
+  shippingPrice: 250,
+  taxPrice: 420,
+  totalPrice: 9070,
+  paymentMethod: 'CARD',
+  orderItems: [{ qty: 2 }],
+  shippingAddress: { street: '142 Marine Trade Way', city: 'Rotterdam', country: 'Netherlands' }
+};
+
+const normalizePaymentMethod = (paymentMethod) => {
+  const method = paymentMethod ? paymentMethod.toLowerCase() : 'stripe';
+  if (method === 'card' || method === 'stripe') return 'stripe';
+  if (method === 'lc') return 'lc';
+  if (method === 'wire') return 'wire';
+  if (method === 'paypal') return 'paypal';
+  return 'stripe';
+};
 
 export default function PaymentScreen() {
   const navigate = useNavigate();
   const location = useLocation();
-  const dispatch = useDispatch();
 
   // Retrieve order from route state, or use a default mock for visualization if none
-  const order = location.state?.order || {
-    _id: 'ZO-MOCK-' + Math.floor(100000 + Math.random() * 900000),
-    itemsPrice: 8400,
-    shippingPrice: 250,
-    taxPrice: 420,
-    totalPrice: 9070,
-    paymentMethod: 'CARD',
-    orderItems: [{ qty: 2 }],
-    shippingAddress: { street: '142 Marine Trade Way', city: 'Rotterdam', country: 'Netherlands' }
-  };
-
-  const { user } = useSelector((state) => state.auth);
+  const order = location.state?.order || fallbackOrder;
 
   const [method, setMethod] = useState(
-    order.paymentMethod ? order.paymentMethod.toLowerCase() : 'stripe'
+    () => normalizePaymentMethod(order.paymentMethod)
   );
   
   const [isLoading, setIsLoading] = useState(false);
   const [wireReceipt, setWireReceipt] = useState(null);
   const [transactionId, setTransactionId] = useState('');
 
-  // Handle case where method from order doesn't map directly to the list
-  useEffect(() => {
-    if (order.paymentMethod) {
-      const pm = order.paymentMethod.toLowerCase();
-      if (pm === 'card' || pm === 'stripe') {
-        setMethod('stripe');
-      } else if (pm === 'lc') {
-        setMethod('lc');
-      } else if (pm === 'wire') {
-        setMethod('wire');
-      } else if (pm === 'paypal') {
-        setMethod('paypal');
-      }
-    }
-  }, [order.paymentMethod]);
-
   const handleProcessPayment = (e) => {
     e.preventDefault();
     setIsLoading(true);
 
-    const paymentDetails = {
-      id: transactionId || 'pay_' + Math.floor(1000000 + Math.random() * 9000000),
-      status: 'COMPLETED',
-      update_time: new Date().toISOString(),
-      payer: {
-        email_address: user?.email || 'trade-desk@zeelinoverseas.com'
-      }
-    };
-
-    // If it's a real order created in the database, update it to PAID
-    if (order._id && !order._id.startsWith('ZO-MOCK-')) {
-      dispatch(payOrder({ orderId: order._id, paymentResult: paymentDetails }))
-        .unwrap()
-        .then((updatedOrder) => {
-          setIsLoading(false);
-          const mappedOrder = {
-            id: updatedOrder._id,
-            date: new Date(updatedOrder.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-            status: updatedOrder.orderStatus || 'Pending',
-            total: updatedOrder.totalPrice,
-            itemsCount: updatedOrder.orderItems?.reduce((acc, curr) => acc + curr.qty, 0) || 0,
-            shippingAddress: `${updatedOrder.shippingAddress.street}, ${updatedOrder.shippingAddress.city}, ${updatedOrder.shippingAddress.country}`,
-            paymentMethod: updatedOrder.paymentMethod,
-          };
-          navigate('/user/order-success', { state: { order: mappedOrder } });
-        })
-        .catch((err) => {
-          setIsLoading(false);
-          alert(err || 'Payment verification failed');
-        });
-    } else {
-      // Prototype simulated transaction gateway loading
-      setTimeout(() => {
-        setIsLoading(false);
-        const mappedOrder = {
-          id: order._id,
-          date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-          status: 'In Transit',
-          total: order.totalPrice,
-          itemsCount: order.orderItems?.reduce((acc, curr) => acc + curr.qty, 0) || 1,
-          shippingAddress: `${order.shippingAddress.street || '142 Marine Trade Way'}, ${order.shippingAddress.city || 'Rotterdam'}, ${order.shippingAddress.country || 'NL'}`,
-          paymentMethod: order.paymentMethod,
-        };
-        navigate('/user/order-success', { state: { order: mappedOrder } });
-      }, 1500);
-    }
+    setTimeout(() => {
+      setIsLoading(false);
+      const mappedOrder = {
+        id: order._id,
+        date: order.createdAt
+          ? new Date(order.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+          : new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        status: method === 'wire' ? 'Payment Verification Pending' : 'Awaiting Gateway Verification',
+        total: order.totalPrice,
+        itemsCount: order.orderItems?.reduce((acc, curr) => acc + curr.qty, 0) || 1,
+        shippingAddress: `${order.shippingAddress.street || '142 Marine Trade Way'}, ${order.shippingAddress.city || 'Rotterdam'}, ${order.shippingAddress.country || 'NL'}`,
+        paymentMethod: order.paymentMethod,
+        transactionId,
+      };
+      navigate('/user/order-success', { state: { order: mappedOrder } });
+    }, 1000);
   };
 
   const methodsList = [

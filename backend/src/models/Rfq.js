@@ -57,4 +57,7 @@ const rfqSchema = new mongoose.Schema({
   timestamps: true
 });
 
+rfqSchema.index({ user: 1, createdAt: -1 });
+rfqSchema.index({ status: 1, createdAt: -1 });
+
 module.exports = mongoose.model('Rfq', rfqSchema);

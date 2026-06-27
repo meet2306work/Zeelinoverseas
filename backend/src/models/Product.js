@@ -184,4 +184,7 @@ productSchema.pre('save', function (next) {
   next();
 });
 
+productSchema.index({ status: 1, category: 1, createdAt: -1 });
+productSchema.index({ availabilityStatus: 1, stock: 1 });
+
 module.exports = mongoose.model('Product', productSchema);

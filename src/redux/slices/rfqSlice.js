@@ -4,7 +4,7 @@ import apiClient from '../../services/apiClient';
 // Helper to map backend RFQ model to frontend properties
 const mapBackendRfq = (r) => {
   let displayStatus = 'Pending Quote';
-  if (r.status === 'Reviewed') displayStatus = 'Pending Review';
+  if (r.status === 'Reviewed') displayStatus = 'Under Review';   // Bug #25 fix: was 'Pending Review' — semantically backwards
   else if (r.status === 'Quoted') displayStatus = 'Quote Submitted';
   else if (r.status === 'Accepted') displayStatus = 'Approved';
   else if (r.status === 'Rejected') displayStatus = 'Rejected';

@@ -15,6 +15,9 @@ const mapWishlistItem = (p) => ({
   specifications: p.specifications || [],
   description: p.description || '',
   averageRating: p.averageRating || 0,
+  availabilityStatus: p.availabilityStatus || 'In Stock',
+  stock: p.stock ?? 0,
+  status: p.status || 'published',
 });
 
 // Async Thunks

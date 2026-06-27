@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
-import { FiShield, FiArrowRight, FiMail } from 'react-icons/fi';
+import { FiShield, FiArrowRight } from 'react-icons/fi';
 import { notify } from '../../commonComponents/toasts/notify';
 import Input from '../../commonComponents/inputs/Input';
 import Button from '../../commonComponents/buttons/Button';
@@ -61,7 +61,7 @@ export default function AuthOtpVerificationScreen() {
     try {
       await dispatch(verifyEmailOtp({ email, otp })).unwrap();
       notify.success('Email verified successfully.');
-      navigate('/auth/verify-email');
+      navigate('/auth/login');
     } catch (err) {
       notify.error(err || 'Failed to verify OTP');
       setLocalError(err || 'Failed to verify OTP');

@@ -135,7 +135,8 @@ export default function ProductDetailsScreen() {
         name: product.name,
         price: selectedTier.totalPrice,
         qty: 1,
-        image: productImages[0] || product.image
+        image: productImages[0] || product.image,
+        availabilityStatus: product.availabilityStatus,
       }));
       setIsAdded(true);
       setTimeout(() => {

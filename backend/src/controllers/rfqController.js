@@ -82,7 +82,10 @@ exports.updateRfqStatus = async (req, res, next) => {
     }
 
     rfq.status = req.body.status || rfq.status;
-    rfq.targetPrice = req.body.targetPrice || rfq.targetPrice;
+    // Bug #24: Use hasOwnProperty so targetPrice: 0 is accepted (0 is falsy, || skips it)
+    if (Object.prototype.hasOwnProperty.call(req.body, 'targetPrice') && req.body.targetPrice !== null) {
+      rfq.targetPrice = req.body.targetPrice;
+    }
     
     await rfq.save();
 

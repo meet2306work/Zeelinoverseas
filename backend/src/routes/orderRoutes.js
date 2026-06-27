@@ -21,7 +21,7 @@ router.route('/:id')
   .get(protect, getOrderById)
   .put(protect, authorize('admin'), updateOrder);
 
-router.route('/:id/pay').put(protect, updateOrderToPaid);
+router.route('/:id/pay').put(protect, authorize('admin'), updateOrderToPaid);
 
 router.route('/:id/deliver').put(protect, authorize('admin', 'vendor'), updateOrderToDelivered);
 

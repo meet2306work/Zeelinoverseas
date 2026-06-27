@@ -117,6 +117,8 @@ const userSchema = new mongoose.Schema({
   toObject: { virtuals: true }
 });
 
+userSchema.index({ phone: 1 });
+
 // Virtual for full name
 userSchema.virtual('fullName').get(function () {
   return `${this.firstName} ${this.lastName}`;

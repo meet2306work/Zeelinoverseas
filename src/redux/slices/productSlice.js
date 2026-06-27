@@ -53,7 +53,7 @@ export const createProductReview = createAsyncThunk(
   'products/createProductReview',
   async ({ productId, rating, comment, title }, { rejectWithValue }) => {
     try {
-      const response = await apiClient.post(`/products/${productId}/reviews`, { rating, comment, title });
+      const response = await apiClient.post(`/products/${productId}/reviews`, { rating, text: comment, title });
       return response.data.data;
     } catch (error) {
       return rejectWithValue(
@@ -169,7 +169,7 @@ const productSlice = createSlice({
         state.loading = false;
         state.reviews = action.payload;
       })
-      .addCase(fetchProductReviews.rejected, (state, action) => {
+      .addCase(fetchProductReviews.rejected, (state) => {
         state.loading = false;
       })
       // Create Review

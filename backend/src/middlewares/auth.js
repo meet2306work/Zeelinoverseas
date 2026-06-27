@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken');
 const ErrorResponse = require('../utils/errorResponse');
-const User = require('../models/User');
 
 // Protect routes
 exports.protect = async (req, res, next) => {
@@ -17,20 +16,14 @@ exports.protect = async (req, res, next) => {
   }
 
   try {
-    // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = await User.findById(decoded.id);
-    
-    if (!req.user) {
-      return next(new ErrorResponse('The user belonging to this token does no longer exist.', 401));
-    }
-
-    if(req.user.status !== 'active') {
-      return next(new ErrorResponse('Your account is currently inactive or suspended.', 403));
-    }
+    req.user = {
+      id: decoded.id,
+      role: decoded.role
+    };
 
     next();
-  } catch (err) {
+  } catch {
     return next(new ErrorResponse('Not authorized to access this route', 401));
   }
 };
