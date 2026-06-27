@@ -19,6 +19,51 @@ export default function OrderTrackingScreen() {
   const rfq = rfqsList.find((item) => item.trackingId === id || item.id === id);
   const dbOrder = ordersList.find((item) => item._id === id);
 
+  const fallbackOrdersList = [
+    { 
+      id: 'ZO-2026-981242', 
+      date: 'Jun 02, 2026', 
+      total: 8850, 
+      itemsCount: 2, 
+      status: 'In Transit', 
+      paymentMethod: 'P.O.',
+      carrier: 'FedEx Express',
+      trackingNo: 'FDX9842109',
+      departure: 'Fulfillment Center (Asia-Pacific)',
+      destination: 'Rotterdam, Netherlands',
+      eta: 'July 14, 2026',
+      milestones: [
+        { label: 'Order Confirmed', date: 'June 02, 2026', desc: 'Order has been placed and payment is verified.', done: true },
+        { label: 'Packed & Ready', date: 'June 05, 2026', desc: 'Items have been packed and labeled at our warehouse.', done: true },
+        { label: 'Handed to Courier Partner', date: 'June 08, 2026', desc: 'Package picked up by courier and sorting at local dispatch hub.', done: true },
+        { label: 'Dispatched (In Transit)', date: 'June 09, 2026', desc: 'Handed over to FedEx Express. Package in transit to destination.', done: true, active: true },
+        { label: 'Out for Delivery', date: 'Pending ETA', desc: 'Package arrived at local delivery hub.', done: false },
+        { label: 'Delivered', date: 'Pending ETA', desc: 'Package delivered to the destination address.', done: false },
+      ]
+    },
+    { 
+      id: 'ZO-2026-972140', 
+      date: 'May 28, 2026', 
+      total: 680, 
+      itemsCount: 1, 
+      status: 'Delivered', 
+      paymentMethod: 'CARD',
+      carrier: 'DHL Express',
+      trackingNo: 'DHL987123',
+      departure: 'Fulfillment Center (Europe)',
+      destination: 'Paris, France',
+      eta: 'May 31, 2026',
+      milestones: [
+        { label: 'Order Confirmed', date: 'May 28, 2026', desc: 'Order has been placed and payment is verified.', done: true },
+        { label: 'Packed & Ready', date: 'May 29, 2026', desc: 'Items have been packed and labeled at our warehouse.', done: true },
+        { label: 'Handed to Courier Partner', date: 'May 30, 2026', desc: 'Package picked up by courier and sorting at local dispatch hub.', done: true },
+        { label: 'Dispatched (In Transit)', date: 'May 30, 2026', desc: 'Handed over to DHL Express. Package in transit to destination.', done: true },
+        { label: 'Out for Delivery', date: 'May 31, 2026', desc: 'Package arrived at local delivery hub.', done: true },
+        { label: 'Delivered', date: 'May 31, 2026', desc: 'Package delivered to the destination address.', done: true, active: true },
+      ]
+    },
+  ];
+
   const getDbOrderMilestones = (order) => {
     const isShipped = ['Shipped', 'Out for Delivery', 'Delivered'].includes(order.orderStatus);
     const isOut = ['Out for Delivery', 'Delivered'].includes(order.orderStatus);
@@ -62,6 +107,8 @@ export default function OrderTrackingScreen() {
     ];
   };
 
+  const matchedFallback = fallbackOrdersList.find((item) => item.id === id);
+
   const shipment = rfq ? {
     orderId: rfq.trackingId || rfq.id,
     vesselName: 'RFQ Sourcing Desk',
@@ -82,10 +129,19 @@ export default function OrderTrackingScreen() {
     vesselName: dbOrder.shippingLine || 'Standard Courier',
     containerId: dbOrder.trackingNo || 'Pending Sourcing',
     departure: 'Fulfillment Center',
-    destination: `${dbOrder.shippingAddress.city}, ${dbOrder.shippingAddress.country}`,
+    destination: dbOrder.shippingAddress ? `${dbOrder.shippingAddress.city}, ${dbOrder.shippingAddress.country}` : 'N/A',
     eta: dbOrder.isDelivered ? 'Delivered' : '5-7 Business Days',
     status: dbOrder.orderStatus,
     milestones: getDbOrderMilestones(dbOrder)
+  } : matchedFallback ? {
+    orderId: matchedFallback.id,
+    vesselName: matchedFallback.carrier,
+    containerId: matchedFallback.trackingNo,
+    departure: matchedFallback.departure,
+    destination: matchedFallback.destination,
+    eta: matchedFallback.eta,
+    status: matchedFallback.status,
+    milestones: matchedFallback.milestones
   } : {
     orderId: id || 'ZO-2026-9812',
     vesselName: 'FedEx Express',
