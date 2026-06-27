@@ -64,7 +64,6 @@ export default function RfqScreen() {
     setIsLoading(true);
 
     const selectedCategory = (categoriesList || []).find((cat) => cat.slug === category);
-    const selectedPort = portOptions.find((option) => option.value === port);
     const parsedQty = parseInt(qty.replace(/\D/g, '')) || 100;
     const parsedPrice = parseInt(targetPrice.replace(/\D/g, '')) || 5000;
 
@@ -76,7 +75,7 @@ export default function RfqScreen() {
       productDetails: selectedCategory?.name || category || 'Custom Sourcing',
       quantity: parsedQty,
       targetPrice: parsedPrice,
-      shippingDestination: selectedPort?.label || port,
+      shippingDestination: port,
       requirements: specs,
     };
 
@@ -93,23 +92,6 @@ export default function RfqScreen() {
   };
 
   const categoryOptions = (categoriesList || []).map((c) => ({ label: c.name, value: c.slug }));
-
-  // OLD (commented out - do not delete)
-  // const portOptions = [
-  //   { label: 'Port of Rotterdam (Netherlands)', value: 'NLRTM' },
-  //   { label: 'Port of Singapore (Singapore)', value: 'SGSGP' },
-  //   { label: 'Port of Houston (United States)', value: 'USHOU' },
-  //   { label: 'Port of Shanghai (China)', value: 'CNSHA' },
-  //   { label: 'Port of Mumbai / JNPT (India)', value: 'INBOM' },
-  // ];
-  // NEW
-  const portOptions = [
-    { label: 'Europe (Rotterdam Depot)', value: 'NLRTM' },
-    { label: 'Asia-Pacific Hub (Singapore)', value: 'SGSGP' },
-    { label: 'North America (Houston Facility)', value: 'USHOU' },
-    { label: 'East Asia Center (Shanghai)', value: 'CNSHA' },
-    { label: 'South Asia Depot (Mumbai)', value: 'INBOM' },
-  ];
 
   /* ── Success state ── */
   if (success) {
@@ -255,21 +237,12 @@ export default function RfqScreen() {
                     options={categoryOptions}
                     required
                   />
-                  {/* OLD (commented out - do not delete)
-                  <Dropdown
-                    label="Destination Port *"
+                  <Input
+                    label="Shipping Destination (City, Country) *"
+                    placeholder="e.g. New York, United States"
                     value={port}
                     onChange={(e) => setPort(e.target.value)}
-                    options={portOptions}
-                    required
-                  />
-                  */}
-                  {/* NEW */}
-                  <Dropdown
-                    label="Shipping Region / Destination Depot *"
-                    value={port}
-                    onChange={(e) => setPort(e.target.value)}
-                    options={portOptions}
+                    icon={FiGlobe}
                     required
                   />
                 </div>

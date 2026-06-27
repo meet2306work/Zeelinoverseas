@@ -1,4 +1,4 @@
-import { FiTrendingUp, FiAnchor, FiBriefcase, FiShield, FiGlobe, FiUsers } from 'react-icons/fi';
+import { FiTrendingUp, FiBox, FiBriefcase, FiShield, FiGlobe, FiUsers } from 'react-icons/fi';
 import Card from '../../commonComponents/cards/Card';
 
 export default function AboutScreen() {

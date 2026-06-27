@@ -78,13 +78,13 @@ export default function AdminDashboardScreen() {
   const recentShipments = dbShipments.length > 0 ? dbShipments : [
     { id: 'SHP-2024-00134', customer: 'Acme Apparel Co', route: 'Express Delivery', status: 'In Transit', eta: 'Nov 28' },
     { id: 'SHP-2024-00133', customer: 'TechBridge Inc', route: 'Standard Ground', status: 'Pending', eta: 'Dec 4' },
-    { id: 'SHP-2024-00132', customer: 'Boutique Packaging Corp', route: 'Air Freight', status: 'Delivered', eta: 'Nov 22' },
+    { id: 'SHP-2024-00132', customer: 'Boutique Packaging Corp', route: 'DHL Express', status: 'Delivered', eta: 'Nov 22' },
   ];
 
   const columns = [
     { 
       key: 'id', 
-      label: 'Shipment ID',
+      label: 'Order ID',
       render: (val) => <span className="font-mono font-bold text-text-secondary">{val}</span>
     },
     { 

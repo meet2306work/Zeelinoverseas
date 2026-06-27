@@ -272,7 +272,7 @@ export default function ProfileScreen() {
                 icon={FiShield}
               />
               <Input
-                label="Preferred Destination Port"
+                label="Preferred Shipping Destination"
                 name="prefPort"
                 value={profile.prefPort}
                 onChange={handleChange}

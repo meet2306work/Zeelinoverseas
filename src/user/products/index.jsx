@@ -232,9 +232,9 @@ export default function ProductsScreen() {
   // NEW
   const tradeTermOptions = [
     { label: 'All Shipping Options', value: '' },
-    { label: 'Standard Shipping (FOB)', value: 'FOB' },
-    { label: 'Freight Delivery (CIF)', value: 'CIF' },
-    { label: 'Ex-Factory Pickup (EXW)', value: 'EXW' },
+    { label: 'Standard Courier Delivery', value: 'FOB' },
+    { label: 'Express Courier Delivery', value: 'CIF' },
+    { label: 'Warehouse Self-Pickup', value: 'EXW' },
   ];
   // OLD (commented out - do not delete)
   // const regionOptions = [

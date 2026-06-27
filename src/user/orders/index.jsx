@@ -118,7 +118,7 @@ export default function OrdersScreen() {
     },
     {
       key: 'port',
-      label: 'Destination Port',
+      label: 'Shipping Destination',
       render: (val) => <span className="text-slate-600 dark:text-slate-400 font-medium">{val}</span>
     },
     {
