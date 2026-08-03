@@ -1,6 +1,8 @@
 import { categories as seedCategories, products as seedProducts, demoUserBase } from './data';
 
 const STORAGE_KEY = 'zeelin_mock_db_v1';
+const ADMIN_EMAIL = 'admin@zeelinoverseas.com';
+const ADMIN_PASSWORD = 'Admin@2026';
 
 function seedState() {
   return {
@@ -118,8 +120,9 @@ export const store = {
     return db.user;
   },
 
-  login({ email }) {
-    db.user = { ...demoUserBase, email: email || demoUserBase.email };
+  login({ email, password }) {
+    const isAdmin = email === ADMIN_EMAIL && password === ADMIN_PASSWORD;
+    db.user = { ...demoUserBase, email: email || demoUserBase.email, role: isAdmin ? 'admin' : 'user' };
     persist();
     return db.user;
   },
