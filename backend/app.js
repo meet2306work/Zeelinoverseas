@@ -6,6 +6,7 @@ const compression = require("compression");
 const cookieParser = require("cookie-parser");
 const rateLimit = require("express-rate-limit");
 const path = require("path");
+const connectDB = require("./src/database/connection");
 
 require("dotenv").config();
 
@@ -85,6 +86,19 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 // ============================
 
 app.use(cookieParser());
+
+// ============================
+// Database (lazy-connect, cached across warm serverless invocations)
+// ============================
+
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
 
 // ============================
 // Logger
