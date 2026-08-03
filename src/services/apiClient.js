@@ -1,5 +1,9 @@
 import axios from 'axios';
+import mockAdapter from '../mockApi/adapter';
 
+// No backend is deployed yet — requests are served by the in-browser mock
+// API (src/mockApi) instead of hitting the network. Remove the `adapter`
+// line below once a real backend is connected.
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'https://zeelinoverseas.onrender.com/v1',
   timeout: 60000,
@@ -7,6 +11,7 @@ const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  adapter: mockAdapter,
 });
 
 apiClient.interceptors.request.use(
