@@ -4,6 +4,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { FiMapPin, FiCreditCard, FiCheckCircle, FiShield, FiFileText } from 'react-icons/fi';
 import { createOrder } from '../../redux/slices/orderSlice';
+import { useCurrency, formatPriceNoDecimals } from '../../utils/currency';
 import { clearCart } from '../../redux/slices/cartSlice';
 import Card from '../../commonComponents/cards/Card';
 import Input from '../../commonComponents/inputs/Input';
@@ -12,6 +13,7 @@ import { Reveal } from '../../commonComponents/animations/ScrollReveal';
 import { motionSprings } from '../../config/motion';
 
 export default function CheckoutScreen() {
+  const currency = useCurrency();
   const shouldReduceMotion = useReducedMotion();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -226,9 +228,9 @@ export default function CheckoutScreen() {
                   <div key={item.id} className="flex justify-between items-center text-xs gap-3">
                     <div className="min-w-0">
                       <p className="font-bold text-slate-800 dark:text-white truncate">{item.name}</p>
-                      <p className="text-[11px] text-slate-500 mt-0.5">Qty: {item.qty} × ${item.price.toLocaleString()}</p>
+                      <p className="text-[11px] text-slate-500 mt-0.5">Qty: {item.qty} × {formatPriceNoDecimals(item.price)}</p>
                     </div>
-                    <span className="font-bold text-slate-900 dark:text-white">${(item.price * item.qty).toLocaleString()}</span>
+                    <span className="font-bold text-slate-900 dark:text-white">{formatPriceNoDecimals(item.price * item.qty)}</span>
                   </div>
                 ))}
               </div>
@@ -239,19 +241,19 @@ export default function CheckoutScreen() {
             <div className="flex flex-col gap-2.5 text-xs font-medium text-slate-655 dark:text-slate-400">
               <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span className="font-bold text-slate-800 dark:text-white">${totalPrice.toLocaleString()}</span>
+                <span className="font-bold text-slate-800 dark:text-white">{formatPriceNoDecimals(totalPrice)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Est. Shipping & Handling</span>
-                <span className="font-bold text-slate-800 dark:text-white">${shippingCost > 0 ? `$${shippingCost}` : 'Free'}</span>
+                <span className="font-bold text-slate-800 dark:text-white">{shippingCost > 0 ? formatPriceNoDecimals(shippingCost) : 'Free'}</span>
               </div>
               <div className="flex justify-between">
                 <span>GST / Tax (18%)</span>
-                <span className="font-bold text-slate-800 dark:text-white">${taxCost.toLocaleString()}</span>
+                <span className="font-bold text-slate-800 dark:text-white">{formatPriceNoDecimals(taxCost)}</span>
               </div>
               <div className="flex justify-between text-sm font-extrabold text-slate-900 dark:text-white pt-2 border-t border-dashed border-slate-200 dark:border-slate-800">
                 <span>Total Due</span>
-                <span className="text-secondary dark:text-accent font-display text-base">${grandTotal.toLocaleString()}</span>
+                <span className="text-secondary dark:text-accent font-display text-base">{formatPriceNoDecimals(grandTotal)}</span>
               </div>
             </div>
 

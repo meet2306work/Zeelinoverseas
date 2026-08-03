@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { FiTrash2, FiShoppingCart, FiMinus, FiPlus, FiArrowRight, FiInfo } from 'react-icons/fi';
 import { addToCart, updateItemQty, updateCartPrices, removeFromCart, clearCart, clearCartError } from '../../redux/slices/cartSlice';
+import { useCurrency, formatPriceNoDecimals } from '../../utils/currency';
 import Card from '../../commonComponents/cards/Card';
 import Button from '../../commonComponents/buttons/Button';
 import { Reveal } from '../../commonComponents/animations/ScrollReveal';
@@ -11,6 +12,7 @@ import { motionTransitions } from '../../config/motion';
 import productService from '../../services/productService';
 
 export default function CartScreen() {
+  const currency = useCurrency();
   const dispatch = useDispatch();
   const { items, totalPrice, totalQuantity, error } = useSelector((state) => state.cart);
   const shouldReduceMotion = useReducedMotion();
@@ -164,7 +166,7 @@ export default function CartScreen() {
                   </h3>
                   <div className="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1">
                     <span>Price per Unit:</span>
-                    <span className="font-semibold text-slate-700 dark:text-slate-355">${item.price.toLocaleString()}</span>
+                    <span className="font-semibold text-slate-700 dark:text-slate-355">{formatPriceNoDecimals(item.price)}</span>
                   </div>
                 </div>
 
@@ -192,7 +194,7 @@ export default function CartScreen() {
                 {/* Subtotal & Delete */}
                 <div className="text-right">
                   <div className="text-sm font-extrabold text-slate-900 dark:text-white">
-                    ${(item.price * item.qty).toLocaleString()}
+                    {formatPriceNoDecimals(item.price * item.qty)}
                   </div>
                   <button
                     onClick={() => handleRemoveItem(item.id)}
@@ -216,19 +218,19 @@ export default function CartScreen() {
               <div className="flex flex-col gap-3 text-xs font-medium text-slate-600 dark:text-slate-400">
                 <div className="flex justify-between">
                   <span>Cart Items ({totalQuantity})</span>
-                  <span className="font-bold text-slate-900 dark:text-white">${totalPrice.toLocaleString()}</span>
+                  <span className="font-bold text-slate-900 dark:text-white">{formatPriceNoDecimals(totalPrice)}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="flex items-center gap-1">
                     Est. Shipping & Handling <FiInfo className="h-3.5 w-3.5 text-slate-400" title="Based on delivery address & courier rates." />
                   </span>
                   <span className="font-bold text-slate-900 dark:text-white">
-                    {shippingCost > 0 ? `$${shippingCost}` : 'Calculated next'}
+                    {shippingCost > 0 ? formatPriceNoDecimals(shippingCost) : 'Calculated next'}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span>Est. Taxes & Processing (5%)</span>
-                  <span className="font-bold text-slate-900 dark:text-white">${taxCost.toLocaleString()}</span>
+                  <span className="font-bold text-slate-900 dark:text-white">{formatPriceNoDecimals(taxCost)}</span>
                 </div>
                 
                 <div className="h-px bg-slate-200 dark:bg-slate-800 my-2" />
@@ -236,7 +238,7 @@ export default function CartScreen() {
                 <div className="flex justify-between text-sm font-extrabold text-slate-900 dark:text-white">
                   <span>Estimated Total</span>
                   <AnimatePresence mode="wait" initial={false}>
-                    <motion.span key={grandTotal} initial={{ opacity: 0, y: shouldReduceMotion ? 0 : -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: shouldReduceMotion ? 0 : 6 }} className="text-secondary dark:text-accent font-display text-lg">${grandTotal.toLocaleString()}</motion.span>
+                    <motion.span key={grandTotal} initial={{ opacity: 0, y: shouldReduceMotion ? 0 : -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: shouldReduceMotion ? 0 : 6 }} className="text-secondary dark:text-accent font-display text-lg">{formatPriceNoDecimals(grandTotal)}</motion.span>
                   </AnimatePresence>
                 </div>
               </div>

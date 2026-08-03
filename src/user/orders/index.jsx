@@ -5,6 +5,7 @@ import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { FiCheckCircle, FiTruck } from 'react-icons/fi';
 import { fetchMyOrders } from '../../redux/slices/orderSlice';
 import { fetchMyRfqs } from '../../redux/slices/rfqSlice';
+import { useCurrency, formatPriceNoDecimals } from '../../utils/currency';
 import Card from '../../commonComponents/cards/Card';
 import Table from '../../commonComponents/tables/Table';
 import Button from '../../commonComponents/buttons/Button';
@@ -12,6 +13,7 @@ import Tabs from '../../commonComponents/layouts/Tabs';
 import { motionTransitions } from '../../config/motion';
 
 export default function OrdersScreen() {
+  const currency = useCurrency();
   const shouldReduceMotion = useReducedMotion();
   const dispatch = useDispatch();
   const location = useLocation();
@@ -68,7 +70,7 @@ export default function OrdersScreen() {
     {
       key: 'total',
       label: 'Total Value',
-      render: (val) => <span className="font-extrabold text-secondary dark:text-accent">${val.toLocaleString()}</span>
+      render: (val) => <span className="font-extrabold text-secondary dark:text-accent">{formatPriceNoDecimals(val)}</span>
     },
     {
       key: 'status',
@@ -214,7 +216,7 @@ export default function OrdersScreen() {
             <div className="h-px bg-slate-200 dark:bg-slate-800 my-1" />
             <div className="flex justify-between text-sm font-extrabold">
               <span className="text-slate-800 dark:text-white">Amount Cleared:</span>
-              <span className="text-secondary dark:text-accent">${orderDetails.total.toLocaleString()}</span>
+              <span className="text-secondary dark:text-accent">{formatPriceNoDecimals(orderDetails.total)}</span>
             </div>
           </div>
 

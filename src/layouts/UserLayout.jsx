@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link, Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { FiHome, FiShoppingBag, FiHeart, FiSettings, FiUser, FiBell, FiLogOut, FiMenu, FiX, FiHelpCircle, FiBox, FiFileText, FiGrid, FiMessageSquare, FiShoppingCart } from 'react-icons/fi';
+import { FiHome, FiShoppingBag, FiHeart, FiSettings, FiUser, FiBell, FiLogOut, FiMenu, FiX, FiHelpCircle, FiBox, FiFileText, FiGrid, FiMessageSquare, FiShoppingCart, FiGlobe, FiChevronDown, FiDollarSign } from 'react-icons/fi';
+import { useCurrency, setSelectedCurrency, CURRENCIES } from '../utils/currency';
 import Breadcrumb from '../commonComponents/breadcrumbs/Breadcrumb';
 import Dropdown from '../commonComponents/dropdowns/Dropdown';
 import PageContainer from '../commonComponents/layouts/PageContainer';
@@ -12,6 +13,7 @@ import ConfirmationDialog from '../commonComponents/modals/ConfirmationDialog';
 import WhatsAppFloatingButton from '../commonComponents/buttons/WhatsAppFloatingButton';
 
 export default function UserLayout() {
+  const currency = useCurrency();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
@@ -279,6 +281,24 @@ export default function UserLayout() {
               <FiBell className="h-5.5 w-5.5" />
               <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-brand-danger ring-2 ring-black-accent" />
             </Link>
+
+            {/* Currency Selector */}
+            <Dropdown
+              align="right"
+              trigger={
+                <button className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-background-surface/10 hover:bg-background-surface/20 transition-all border border-border-default/20 text-xs font-bold text-text-on-dark cursor-pointer outline-none">
+                  <FiGlobe className="h-4 w-4 text-accent-gold shrink-0" />
+                  <span>{currency.code}</span>
+                  <span className="text-accent-gold">({currency.symbol})</span>
+                  <FiChevronDown className="h-3.5 w-3.5 text-text-on-dark/65" />
+                </button>
+              }
+              items={CURRENCIES.map((c) => ({
+                label: `${c.code} (${c.symbol}) - ${c.label.split(' ')[0]}`,
+                onClick: () => setSelectedCurrency(c.code),
+                icon: FiDollarSign,
+              }))}
+            />
 
             {/* Profile Dropdown */}
             <Dropdown

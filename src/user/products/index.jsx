@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link, useSearchParams, useLocation } from 'react-router-dom';
+import { useCurrency, formatPrice } from '../../utils/currency';
 import { FiSearch, FiSliders, FiBox, FiArrowRight, FiX } from 'react-icons/fi';
 import LoginRedirectModal from '../../commonComponents/modals/LoginRedirectModal';
 import Card from '../../commonComponents/cards/Card';
@@ -103,6 +104,7 @@ const CardImageSlider = ({ images, defaultImage, alt, hasThreeD }) => {
 };
 
 export default function ProductsScreen() {
+  const currency = useCurrency();
   const location = useLocation();
   const dispatch = useDispatch();
   const isPortal = location.pathname.startsWith('/user');
@@ -373,7 +375,7 @@ export default function ProductsScreen() {
               <Input
                 label="Min Price"
                 type="number"
-                placeholder="$0"
+                placeholder={`${currency.symbol}0`}
                 value={minPrice}
                 onChange={(e) => setFilterParam('minPrice', e.target.value)}
                 min="0"
@@ -381,7 +383,7 @@ export default function ProductsScreen() {
               <Input
                 label="Max Price"
                 type="number"
-                placeholder="$50"
+                placeholder={`${currency.symbol}${Math.round(50 * currency.rate)}`}
                 value={maxPrice}
                 onChange={(e) => setFilterParam('maxPrice', e.target.value)}
                 min="0"
@@ -567,7 +569,7 @@ export default function ProductsScreen() {
 
                       <div>
                         <div className="flex items-center justify-between gap-3 text-sm font-extrabold text-accent-gold mb-brand-sm">
-                          <span>${p.price?.toFixed(2)} / 25 units</span>
+                          <span>{formatPrice(p.price)} / 25 Qty</span>
                           <span className="text-xs text-accent-gold-hover">{(p.averageRating || p.rating || 0).toFixed(1)} ★</span>
                         </div>
 

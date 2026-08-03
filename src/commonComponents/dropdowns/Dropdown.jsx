@@ -159,7 +159,7 @@ export default function Dropdown({
 
           {/* Options Panel */}
           {isOpen && (
-            <div className="absolute left-0 right-0 mt-1.5 max-h-60 overflow-y-auto rounded-xl bg-background-surface border border-border-default shadow-premium z-50 py-1.5 focus:outline-none flex flex-col">
+            <div className="absolute left-0 right-0 mt-1.5 max-h-60 overflow-y-auto rounded-xl bg-background-surface border border-border-default shadow-premium z-50 py-1.5 focus:outline-none flex flex-col overflow-hidden">
               {searchable && (
                 <div className="px-2 pb-1.5 border-b border-border-default/40 mb-1">
                   <div className="relative flex items-center">
@@ -232,7 +232,7 @@ export default function Dropdown({
           {isOpen && (
             <div
               ref={listRef}
-              className={`absolute ${align === 'right' ? 'right-0' : 'left-0'} mt-2 w-48 origin-top-right rounded-xl bg-brand-card dark:bg-slate-900 border border-brand-border dark:border-slate-800 shadow-lg z-50 py-1 transition-all duration-105`}
+              className={`absolute ${align === 'right' ? 'right-0' : 'left-0'} mt-2 w-48 origin-top-right rounded-xl bg-brand-card dark:bg-slate-900 border border-brand-border dark:border-slate-800 shadow-lg z-50 py-1 overflow-hidden transition-all duration-105`}
             >
               {items.map((item, idx) => {
                 const Icon = item.icon;

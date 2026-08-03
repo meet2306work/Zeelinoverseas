@@ -1,18 +1,21 @@
 import { useEffect, useState } from 'react';
 import { Link, Outlet, useLocation, useSearchParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { FiMenu, FiX, FiMessageSquare, FiUser } from 'react-icons/fi';
+import { FiMenu, FiX, FiMessageSquare, FiUser, FiGlobe, FiChevronDown, FiDollarSign } from 'react-icons/fi';
 import Button from '../commonComponents/buttons/Button';
 import Breadcrumb from '../commonComponents/breadcrumbs/Breadcrumb';
 import PageContainer from '../commonComponents/layouts/PageContainer';
 import PageTransition from '../commonComponents/layouts/PageTransition';
 import { logoutUser, selectIsAuthenticated, selectUserRole } from '../redux/slices/authSlice';
+import Dropdown from '../commonComponents/dropdowns/Dropdown';
+import { useCurrency, setSelectedCurrency, CURRENCIES } from '../utils/currency';
 import WhatsAppFloatingButton from '../commonComponents/buttons/WhatsAppFloatingButton';
 import LoginRedirectModal from '../commonComponents/modals/LoginRedirectModal';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { motionTransitions } from '../config/motion';
 
 export default function PublicLayout() {
+  const currency = useCurrency();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState('request a bulk order quote');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -117,6 +120,24 @@ export default function PublicLayout() {
 
           {/* Action Icons */}
           <div className="hidden md:flex items-center gap-brand-md">
+            {/* Currency Selector */}
+            <Dropdown
+              align="right"
+              trigger={
+                <button className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-background-surface/10 hover:bg-background-surface/20 transition-all border border-border-default/20 text-xs font-bold text-text-on-dark cursor-pointer outline-none">
+                  <FiGlobe className="h-4 w-4 text-accent-gold shrink-0" />
+                  <span>{currency.code}</span>
+                  <span className="text-accent-gold">({currency.symbol})</span>
+                  <FiChevronDown className="h-3.5 w-3.5 text-text-on-dark/65" />
+                </button>
+              }
+              items={CURRENCIES.map((c) => ({
+                label: `${c.code} (${c.symbol}) - ${c.label.split(' ')[0]}`,
+                onClick: () => setSelectedCurrency(c.code),
+                icon: FiDollarSign,
+              }))}
+            />
+
             {isAuthenticated && (
               // OLD (commented out - do not delete)
               // <Link to="/inquiry-cart" className="relative p-2 text-text-on-dark/70 hover:text-accent-gold transition-colors" title="Inquiry Follow-up">
@@ -181,6 +202,30 @@ export default function PublicLayout() {
               </Link>
             ))}
           </nav>
+          
+          {/* Mobile Currency Picker */}
+          <div className="flex justify-between items-center px-1 py-1">
+            <span className="text-xs font-bold text-text-on-dark/70 uppercase tracking-wider">Currency</span>
+            <Dropdown
+              align="right"
+              trigger={
+                <button className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-background-surface/10 hover:bg-background-surface/20 transition-all border border-border-default/20 text-xs font-bold text-text-on-dark cursor-pointer outline-none">
+                  <FiGlobe className="h-4 w-4 text-accent-gold shrink-0" />
+                  <span>{currency.code}</span>
+                  <span className="text-accent-gold">({currency.symbol})</span>
+                  <FiChevronDown className="h-3.5 w-3.5 text-text-on-dark/65" />
+                </button>
+              }
+              items={CURRENCIES.map((c) => ({
+                label: `${c.code} (${c.symbol})`,
+                onClick: () => {
+                  setSelectedCurrency(c.code);
+                  setIsMobileMenuOpen(false);
+                },
+                icon: FiDollarSign,
+              }))}
+            />
+          </div>
           
           <div className="h-px bg-border-default/20 my-1" />
 

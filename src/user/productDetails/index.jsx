@@ -12,6 +12,7 @@ import { motionTransitions } from '../../config/motion';
 import { addProductToWishlist, removeProductFromWishlist, selectIsInWishlist } from '../../redux/slices/wishlistSlice';
 import { fetchProductById, fetchProductReviews, createProductReview, clearProductDetails } from '../../redux/slices/productSlice';
 import { addToCart } from '../../redux/slices/cartSlice';
+import { useCurrency, formatPrice } from '../../utils/currency';
 
 const ThreeDViewer = lazy(() => import('../../commonComponents/threeDViewer/ThreeDViewer'));
 
@@ -31,6 +32,7 @@ const buildPriceTiers = (basePrice, unit) => PRICE_TIER_QUANTITIES.map((qty) => 
 });
 
 export default function ProductDetailsScreen() {
+  const currency = useCurrency();
   const location = useLocation();
   const dispatch = useDispatch();
   const isPortal = location.pathname.startsWith('/user');
@@ -58,9 +60,9 @@ export default function ProductDetailsScreen() {
     name: 'Loading Product...',
     description: '',
     priceTiers: [
-      { qty: 25, label: '25 Units', totalPrice: 0, unitPrice: 0 },
+      { qty: 25, label: '25 Qty', totalPrice: 0, unitPrice: 0 },
     ],
-    moq: '25 Units',
+    moq: '25 Qty',
     specs: [],
     shipping: '',
     image: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=400&q=80',
@@ -365,7 +367,7 @@ export default function ProductDetailsScreen() {
                     ? 'Pre-Order'
                     : product.availabilityStatus === 'Archived'
                     ? 'Archived'
-                    : `In Stock (${product.stock} Units)`}
+                    : `In Stock (${product.stock} Qty)`}
                 </span>
 
                 <p className="text-xs text-secondary dark:text-accent font-semibold inline-flex items-center gap-brand-sm bg-secondary/10 dark:bg-slate-800 px-2.5 py-1 rounded-md">
@@ -427,10 +429,10 @@ export default function ProductDetailsScreen() {
                         {/* Right: Price Details */}
                         <div className="text-right">
                           <span className="block text-sm font-extrabold text-brand-text-primary dark:text-white">
-                            ${tier.totalPrice.toFixed(2)} total
+                            {formatPrice(tier.totalPrice)} total
                           </span>
                           <span className="block text-[10px] font-semibold text-brand-text-secondary">
-                            ${tier.unitPrice.toFixed(2)} / {salesUnit}
+                            {formatPrice(tier.unitPrice)} / {salesUnit}
                           </span>
                         </div>
                       </button>
@@ -461,7 +463,7 @@ export default function ProductDetailsScreen() {
                       <span className={`text-sm font-bold transition-colors ${
                         needsInquiry ? 'text-amber-700 dark:text-amber-400' : 'text-brand-text-secondary dark:text-slate-400'
                       }`}>
-                        200+ Units
+                        200+ Qty
                       </span>
                     </div>
 
@@ -493,11 +495,11 @@ export default function ProductDetailsScreen() {
                 <div className="border-t border-dashed border-slate-200 dark:border-slate-800/80 pt-4 flex flex-col gap-2">
                   <div className="flex justify-between items-center text-xs text-brand-text-secondary">
                     <span>Subtotal ({selectedTier.label})</span>
-                    <span className="font-semibold text-brand-text-primary dark:text-white">${selectedTier.totalPrice.toFixed(2)}</span>
+                    <span className="font-semibold text-brand-text-primary dark:text-white">{formatPrice(selectedTier.totalPrice)}</span>
                   </div>
                   <div className="flex justify-between items-center text-xs text-brand-text-secondary">
                     <span>Unit Price</span>
-                    <span className="font-semibold text-brand-text-primary dark:text-white">${selectedTier.unitPrice.toFixed(2)} / {salesUnit}</span>
+                    <span className="font-semibold text-brand-text-primary dark:text-white">{formatPrice(selectedTier.unitPrice)} / {salesUnit}</span>
                   </div>
                   <div className="flex justify-between items-center text-xs text-brand-text-secondary">
                     <span>Estimated Shipping</span>
@@ -510,7 +512,7 @@ export default function ProductDetailsScreen() {
                       <p className="text-xs font-semibold text-brand-text-primary">{selectedTier.label}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-xl font-extrabold text-brand-text-primary">${selectedTier.totalPrice.toFixed(2)}</p>
+                      <p className="text-xl font-extrabold text-brand-text-primary">{formatPrice(selectedTier.totalPrice)}</p>
                       <p className="text-[10px] text-brand-text-secondary">Estimated product total</p>
                     </div>
                   </div>
@@ -549,7 +551,7 @@ export default function ProductDetailsScreen() {
                     }}
                   >
                     <Button variant="gold" size="lg" className="w-full py-3.5 shadow-md hover:shadow-lg transition-all" icon={FiMessageCircle}>
-                      Get Bulk Quote for 200+ Units
+                      Get Bulk Quote for 200+ Qty
                     </Button>
                   </Link>
                 ) : (
